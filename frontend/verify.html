@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RemindU - Verifikasi</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background: linear-gradient(145deg, #f5f7fe 0%, #eef2fa 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .card { max-width: 500px; width: 100%; background: white; border-radius: 36px; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1); padding: 40px 28px; text-align: center; }
+        h2 { font-size: 28px; margin-bottom: 8px; }
+        p { margin-bottom: 16px; color: #4a5568; }
+        input { width: 100%; padding: 14px 20px; background: #f3f4f9; border: 1px solid transparent; border-radius: 60px; margin-bottom: 16px; font-size: 15px; text-align: center; letter-spacing: 4px; }
+        button { background: #8b5cf6; color: white; border: none; border-radius: 60px; padding: 14px; width: 100%; font-weight: 600; cursor: pointer; margin-top: 8px; }
+        .timer { font-family: monospace; background: #f1f1f1; display: inline-block; padding: 4px 12px; border-radius: 30px; margin: 8px 0; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; margin: 12px 0; }
+        a { color: #8b5cf6; text-decoration: none; }
+        .success-msg { color: green; margin-top: 16px; display: none; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h2>Verification</h2>
+    <p>Enter Verification Code</p>
+    <p style="font-size: 14px;">We sent 5 digit code to your email</p>
+    <p>This code will expire in <span id="timerDisplay" class="timer">01:00</span></p>
+    <input type="text" id="otpInput" placeholder="OTP Code" maxlength="6">
+    <div class="error-msg" id="otpError" style="color:red; margin-top: -8px;"></div>
+    <div class="flex-between">
+        <span>Waiting for the code</span>
+        <a href="#" id="resendCodeLink">Resend Code</a>
+    </div>
+    <button id="verifyBtn">Verify</button>
+    <div id="successMsg" class="success-msg">✓ Success! your account has been successfully created</div>
+</div>
+<script>
+    const API_URL = 'http://localhost:3000/api';
+    let timerInterval;
+    let resendTimer = null;
+
+    function startTimer(seconds = 60) {
+        if (timerInterval) clearInterval(timerInterval);
+        const timerElement = document.getElementById('timerDisplay');
+        let remaining = seconds;
+        function update() {
+            const mins = Math.floor(remaining / 60);
+            const secs = remaining % 60;
+            timerElement.innerText = `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+            if (remaining <= 0) {
+                clearInterval(timerInterval);
+                timerElement.innerText = "Expired";
+                document.getElementById('verifyBtn').disabled = true;
+                document.getElementById('otpError').innerText = 'Code expired, please resend.';
+            } else {
+                document.getElementById('verifyBtn').disabled = false;
+            }
+        }
+        update();
+        timerInterval = setInterval(() => { if (remaining <= 0) clearInterval(timerInterval); else { remaining--; update(); } }, 1000);
+    }
+
+    startTimer(60);
+
+    const pendingEmail = localStorage.getItem('pendingVerifyEmail');
+    if (!pendingEmail) {
+        alert('Sesi registrasi hilang, silakan daftar ulang.');
+        window.location.href = 'register.html';
+    }
+
+    document.getElementById('verifyBtn').addEventListener('click', async () => {
+        const otp = document.getElementById('otpInput').value.trim();
+        if (!otp) { document.getElementById('otpError').innerText = 'Masukkan kode OTP'; return; }
+        try {
+            const res = await fetch(`${API_URL}/verify`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: pendingEmail, otp })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error);
+            document.getElementById('successMsg').style.display = 'block';
+            localStorage.removeItem('pendingVerifyEmail');
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 2000);
+        } catch (err) {
+            document.getElementById('otpError').innerText = err.message;
+        }
+    });
+
+    document.getElementById('resendCodeLink').addEventListener('click', async (e) => {
+        e.preventDefault();
+        if (resendTimer) return;
+        // Kirim permintaan resend OTP ke backend (perlu buat endpoint /api/resend-otp)
+        // Untuk sementara, kita lakukan registrasi ulang? Atau kita bisa panggil endpoint baru.
+        // Sederhananya: kita kirim ulang request ke /api/register? Tapi nanti bikin user duplikat.
+        // Lebih baik buat endpoint khusus. Karena backend belum ada, kita kasih alert saja.
+        alert('Fitur resend OTP belum diimplementasikan di backend. Silakan registrasi ulang.');
+        // Jika ingin simpel, kita arahkan ke register.html
+        // window.location.href = 'register.html';
+    });
+</script>
+</body>
+</html>

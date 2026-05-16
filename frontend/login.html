@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>RemindU - Login</title>
+    <style>
+        /* --- ROOT VARIABLES (sama seperti welcome) --- */
+        :root {
+            --purple: #8b5cf6;
+            --purple-dark: #7c3aed;
+            --purple-light: #ede9fe;
+            --bg: #f5f7fe;
+            --white: #ffffff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --border: #edf2f7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, 'Inter', sans-serif;
+        }
+
+        /* --- BG DECORATION (blob + warna latar dari welcome) --- */
+        body {
+            background: var(--bg);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        /* Elemen blur / blobs - persis dari welcome */
+        .bg-blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.38;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .bg-blob-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--purple);
+            top: -100px;
+            right: -100px;
+        }
+        .bg-blob-2 {
+            width: 300px;
+            height: 300px;
+            background: #ec4899;
+            bottom: -80px;
+            left: -80px;
+        }
+
+        /* --- CARD STYLE (dari login sederhana, tapi disesuaikan sedikit) --- */
+        .card {
+            max-width: 500px;
+            width: 100%;
+            background: var(--white);
+            border-radius: 36px;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1);
+            padding: 40px 28px;
+            position: relative;
+            z-index: 10;
+            backdrop-filter: blur(0px);
+            transition: transform 0.2s ease, box-shadow 0.2s;
+        }
+
+        h2 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+        p {
+            margin-bottom: 24px;
+            color: var(--text-muted);
+        }
+        input {
+            width: 100%;
+            padding: 14px 20px;
+            background: #f3f4f9;
+            border: 1px solid transparent;
+            border-radius: 60px;
+            margin-bottom: 16px;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.2s;
+        }
+        input:focus {
+            border-color: var(--purple);
+            background: var(--white);
+        }
+        button {
+            background: var(--purple);
+            color: white;
+            border: none;
+            border-radius: 60px;
+            padding: 14px;
+            width: 100%;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        button:hover {
+            background: var(--purple-dark);
+            transform: translateY(-2px);
+        }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .remember-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .remember-row input {
+            width: auto;
+            margin: 0;
+            padding: 0;
+            accent-color: var(--purple);
+            transform: scale(1.1);
+            cursor: pointer;
+        }
+        .remember-row label {
+            color: var(--text-muted);
+            font-size: 14px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .forgot-link {
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .or-divider {
+            text-align: center;
+            margin: 20px 0;
+            color: #aaa;
+        }
+        /* Google button dengan ikon */
+        .google-btn {
+            background: var(--white);
+            border: 1px solid #ddd;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .google-icon {
+            width: 20px;
+            height: 20px;
+        }
+        .link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        a {
+            color: var(--purple);
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .error-msg {
+            color: #e53e3e;
+            font-size: 12px;
+            margin-top: -12px;
+            margin-bottom: 12px;
+        }
+
+        /* Back link style sederhana */
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--purple);
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        @media (min-width: 768px) {
+            .card {
+                max-width: 550px;
+                padding: 48px 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Blobs persis dari welcome -->
+    <div class="bg-blob bg-blob-1"></div>
+    <div class="bg-blob bg-blob-2"></div>
+
+    <div class="card">
+        <a href="welcome.html" class="back-link">← Back</a>
+        <h2>Log In</h2>
+        <p>Enter your details</p>
+        <form id="loginForm">
+            <input type="text" id="loginEmail" placeholder="Username or Email" autocomplete="username">
+            <div class="error-msg" id="loginEmailError"></div>
+            <input type="password" id="loginPassword" placeholder="Password">
+            <div class="error-msg" id="loginPassError"></div>
+            
+            <div class="flex-between">
+                <div class="remember-row">
+                    <input type="checkbox" id="rememberMe">
+                    <label for="rememberMe">Remember Me</label>
+                </div>
+                <a href="#" id="forgotPwdLink" class="forgot-link">Forgot Password?</a>
+            </div>
+            
+            <button type="submit">Log in</button>
+        </form>
+        <div class="or-divider">OR</div>
+        <!-- Google button dengan ikon SVG -->
+        <button class="google-btn" id="googleLoginBtn">
+            <svg class="google-icon" viewBox="0 0 24 24">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+            </svg>
+            Continue With Google
+        </button>
+        <div class="link">Don't have an account? <a href="register.html">Sign Up</a></div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+        const form = document.getElementById('loginForm');
+        const emailInput = document.getElementById('loginEmail');
+        const passwordInput = document.getElementById('loginPassword');
+        const emailError = document.getElementById('loginEmailError');
+        const passError = document.getElementById('loginPassError');
+        const rememberCheck = document.getElementById('rememberMe');
+
+        // Validasi sederhana
+        function validate() {
+            let valid = true;
+            emailError.innerText = '';
+            passError.innerText = '';
+            const emailVal = emailInput.value.trim();
+            const passVal = passwordInput.value.trim();
+
+            if (!emailVal) {
+                emailError.innerText = 'Email or username is required';
+                valid = false;
+            } else if (!emailVal.includes('@') && emailVal.length < 3) {
+                emailError.innerText = 'Enter a valid email or username';
+                valid = false;
+            }
+            if (!passVal) {
+                passError.innerText = 'Password is required';
+                valid = false;
+            } else if (passVal.length < 4) {
+                passError.innerText = 'Password at least 4 characters';
+                valid = false;
+            }
+            return valid;
+        }
+
+        // Remember me handler
+        function handleRemember() {
+            if (rememberCheck.checked) {
+                localStorage.setItem('remindu_remember', 'true');
+                localStorage.setItem('remindu_saved_email', emailInput.value.trim());
+            } else {
+                localStorage.setItem('remindu_remember', 'false');
+                localStorage.removeItem('remindu_saved_email');
+            }
+        }
+
+        // Load saved email
+        if (localStorage.getItem('remindu_remember') === 'true') {
+            const saved = localStorage.getItem('remindu_saved_email');
+            if (saved) {
+                emailInput.value = saved;
+                rememberCheck.checked = true;
+            }
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!validate()) return;
+            handleRemember();
+
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            try {
+                const res = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Login failed');
+                localStorage.setItem('remindu_user', JSON.stringify({ email: data.email || email }));
+                window.location.href = 'home.html';
+            } catch (err) {
+                alert(err.message);
+            }
+        });
+
+        document.getElementById('forgotPwdLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            alert('Password reset feature will be available soon.');
+        });
+
+        document.getElementById('googleLoginBtn').addEventListener('click', () => {
+            alert('Demo Google login — integration coming soon.');
+        });
+    </script>
+</body>
+</html>

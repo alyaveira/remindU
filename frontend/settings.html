@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RemindU - Settings</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background: linear-gradient(145deg, #f5f7fe 0%, #eef2fa 100%); padding: 20px; min-height: 100vh; }
+        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 36px; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1); overflow: hidden; }
+        .page-content { padding: 28px 24px 36px; }
+        .header { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; position: relative; justify-content: center; }
+        .btn-back { position: absolute; left: 0; background: none; border: none; font-size: 24px; cursor: pointer; color: #8b5cf6; padding: 8px; border-radius: 50%; }
+        .btn-back:hover { background: #f1f5f9; }
+        h2 { font-size: 24px; font-weight: 600; color: #1e293b; }
+        .menu-list { display: flex; flex-direction: column; gap: 8px; }
+        .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 12px; background: #f8fafc; border-radius: 28px; cursor: pointer; transition: 0.2s; border: 1px solid #edf2f7; }
+        .menu-item:hover { background: #f1f5f9; transform: translateX(4px); }
+        .menu-left { display: flex; flex-direction: column; gap: 4px; }
+        .menu-title { font-weight: 600; color: #1e293b; }
+        .menu-sub { font-size: 13px; color: #64748b; }
+        .arrow-icon { color: #94a3b8; font-size: 18px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="page-content">
+        <div class="header">
+            <button class="btn-back" id="backBtn">←</button>
+            <h2>Settings</h2>
+        </div>
+        <div class="menu-list">
+            <div class="menu-item" id="notifSetting">
+                <div class="menu-left"><span class="menu-title">Notifications</span><span class="menu-sub">Enable/disable reminders</span></div>
+                <span class="arrow-icon">›</span>
+            </div>
+            <div class="menu-item" id="themeSetting">
+                <div class="menu-left"><span class="menu-title">Theme</span><span class="menu-sub">Light / Dark mode</span></div>
+                <span class="arrow-icon">›</span>
+            </div>
+            <div class="menu-item" id="langSetting">
+                <div class="menu-left"><span class="menu-title">Language</span><span class="menu-sub">English, Indonesia</span></div>
+                <span class="arrow-icon">›</span>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    if (!JSON.parse(localStorage.getItem('remindu_user') || '{}').email) {
+        alert('Sesi login tidak ditemukan.');
+        window.location.href = 'welcome.html';
+    }
+    document.getElementById('backBtn').onclick = () => window.location.href = 'home.html';
+    document.getElementById('notifSetting').onclick = () => alert('Pengaturan notifikasi akan hadir.');
+    document.getElementById('themeSetting').onclick = () => alert('Pilihan tema akan hadir.');
+    document.getElementById('langSetting').onclick = () => alert('Pilihan bahasa akan hadir.');
+</script>
+</body>
+</html>

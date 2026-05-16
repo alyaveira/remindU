@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>RemindU - Kalender</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        :root {
+            --purple: #8b5cf6;
+            --purple-dark: #7c3aed;
+            --purple-light: #ede9fe;
+            --bg: #f5f7fe;
+            --white: #ffffff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --border: #edf2f7;
+            --sidebar-w: 260px;
+            --sidebar-collapsed-w: 72px;
+            --header-h: 64px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+
+        /* --- BACKGROUND BLOBS --- */
+        body {
+            background: var(--bg);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        .bg-blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.38;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .bg-blob-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--purple);
+            top: -100px;
+            right: -100px;
+        }
+        .bg-blob-2 {
+            width: 300px;
+            height: 300px;
+            background: #ec4899;
+            bottom: -80px;
+            left: -80px;
+        }
+
+        /* LAYOUT */
+        .layout { display: flex; min-height: 100vh; position: relative; z-index: 5; }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: var(--sidebar-w);
+            background: var(--white);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 200;
+            transition: width 0.3s cubic-bezier(0.4,0,0.2,1), transform 0.3s;
+            overflow: hidden;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.04);
+        }
+        .sidebar.collapsed { width: var(--sidebar-collapsed-w); }
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 199; backdrop-filter: blur(2px); }
+        .sidebar-overlay.show { display: block; }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            height: var(--header-h);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .brand-wrap { display: flex; align-items: center; gap: 10px; overflow: hidden; }
+        .brand-logo { width: 36px; height: 36px; border-radius: 12px; background: linear-gradient(135deg, #1e3a8a, #8b5cf6); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px; font-weight: 900; color: white; }
+        .brand-name { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(135deg, #1e3a8a, #3b82f6, #8b5cf6, #ec4899); -webkit-background-clip: text; background-clip: text; color: transparent; white-space: nowrap; overflow: hidden; transition: opacity 0.2s, width 0.3s; }
+        .sidebar.collapsed .brand-name { opacity: 0; width: 0; }
+        .toggle-btn { width: 32px; height: 32px; border-radius: 10px; border: none; background: var(--bg); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: background 0.2s, color 0.2s; flex-shrink: 0; }
+        .toggle-btn:hover { background: var(--purple-light); color: var(--purple); }
+        .toggle-btn i { font-size: 20px; transition: transform 0.3s; }
+        .sidebar.collapsed .toggle-btn i { transform: rotate(180deg); }
+
+        .sidebar-user {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+        .sidebar-user:hover { background: var(--bg); }
+        .sidebar-avatar { width: 40px; height: 40px; border-radius: 14px; background: linear-gradient(135deg, var(--purple), #ec4899); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; color: white; flex-shrink: 0; background-size: cover; background-position: center; }
+        .sidebar-user-info { overflow: hidden; transition: opacity 0.2s; }
+        .sidebar.collapsed .sidebar-user-info { opacity: 0; width: 0; }
+        .sidebar-user-name { font-weight: 600; font-size: 14px; color: var(--text); white-space: nowrap; }
+        .sidebar-user-email { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
+
+        .sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; overflow-x: hidden; }
+        .sidebar-nav::-webkit-scrollbar { width: 4px; }
+        .sidebar-nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        .nav-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; padding: 8px 10px 4px; white-space: nowrap; overflow: hidden; transition: opacity 0.2s; }
+        .sidebar.collapsed .nav-label { opacity: 0; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 14px; cursor: pointer; transition: all 0.2s; color: var(--text-muted); margin-bottom: 2px; white-space: nowrap; overflow: hidden; }
+        .nav-item:hover { background: var(--bg); color: var(--purple); }
+        .nav-item.active { background: var(--purple-light); color: var(--purple); font-weight: 600; }
+        .nav-item i { font-size: 22px; flex-shrink: 0; }
+        .nav-item-label { font-size: 14px; transition: opacity 0.2s; }
+        .sidebar.collapsed .nav-item-label { opacity: 0; width: 0; }
+        .nav-badge { margin-left: auto; background: var(--purple); color: white; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; flex-shrink: 0; transition: opacity 0.2s; }
+        .sidebar.collapsed .nav-badge { opacity: 0; }
+
+        .sidebar-footer { padding: 12px 10px 16px; border-top: 1px solid var(--border); flex-shrink: 0; }
+
+        /* MAIN */
+        .main {
+            flex: 1;
+            margin-left: var(--sidebar-w);
+            transition: margin-left 0.3s cubic-bezier(0.4,0,0.2,1);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .main.expanded { margin-left: var(--sidebar-collapsed-w); }
+
+        /* TOPBAR */
+        .topbar {
+            height: var(--header-h);
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 8px rgba(0,0,0,0.04);
+        }
+        .topbar-left { display: flex; align-items: center; gap: 12px; }
+        .topbar-mobile-toggle { display: none; width: 36px; height: 36px; border-radius: 10px; border: none; background: var(--bg); cursor: pointer; align-items: center; justify-content: center; color: var(--text); transition: background 0.2s; }
+        .topbar-mobile-toggle:hover { background: var(--purple-light); }
+        .topbar-mobile-toggle i { font-size: 22px; }
+        .topbar-greeting { font-size: 15px; font-weight: 600; color: var(--text); }
+        .topbar-date { font-size: 12px; color: var(--text-muted); }
+        .topbar-right { display: flex; align-items: center; gap: 10px; }
+        .topbar-icon-btn { width: 36px; height: 36px; border-radius: 10px; border: none; background: var(--bg); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: all 0.2s; position: relative; }
+        .topbar-icon-btn:hover { background: var(--purple-light); color: var(--purple); }
+        .topbar-icon-btn i { font-size: 20px; }
+        .notif-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: #f97316; border: 2px solid var(--white); }
+        .topbar-avatar { width: 36px; height: 36px; border-radius: 12px; background: linear-gradient(135deg, var(--purple), #ec4899); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; color: white; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; position: relative; background-size: cover; background-position: center; }
+        .topbar-avatar:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(139,92,246,0.3); }
+        .dropdown {
+            position: absolute;
+            top: 44px;
+            right: 0;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+            width: 170px;
+            overflow: hidden;
+            z-index: 300;
+            display: none;
+            border: 1px solid var(--border);
+            animation: dropFade 0.18s ease;
+        }
+        @keyframes dropFade { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+        .dropdown.show { display: block; }
+        .dd-item { padding: 12px 16px; display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; color: var(--text); transition: background 0.15s; }
+        .dd-item:hover { background: var(--bg); }
+        .dd-item.danger { color: #e53e3e; border-top: 1px solid var(--border); }
+        .dd-item i { font-size: 18px; }
+
+        /* PAGE CONTENT (KALENDER) */
+        .page-content {
+            flex: 1;
+            padding: 28px;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .calendar-section {
+            background: var(--white);
+            border-radius: 28px;
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.02);
+        }
+        .month-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .month-nav button {
+            background: var(--bg);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            color: var(--text-muted);
+        }
+        .month-nav button:hover {
+            background: var(--purple-light);
+            color: var(--purple);
+            transform: scale(1.05);
+        }
+        .month-year {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text);
+        }
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            margin-bottom: 12px;
+        }
+        .weekday {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            padding: 8px 0;
+        }
+        .days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+        .day {
+            aspect-ratio: 1 / 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text);
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .day:hover {
+            background: var(--bg);
+            transform: scale(1.05);
+        }
+        .day.has-event {
+            background: var(--purple-light);
+            color: var(--purple);
+            font-weight: 700;
+        }
+        .day.today {
+            background: var(--purple);
+            color: white;
+            box-shadow: 0 4px 12px rgba(139,92,246,0.35);
+        }
+        .day.other-month {
+            color: #cbd5e1;
+        }
+        .day.selected-day {
+            background: #e0e7ff;
+            outline: 2px solid var(--purple);
+            outline-offset: 1px;
+        }
+
+        .events-section {
+            background: var(--white);
+            border-radius: 28px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.02);
+        }
+        .events-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .events-title i { color: var(--purple); }
+        .event-list { display: flex; flex-direction: column; gap: 12px; }
+        .event-card {
+            background: var(--bg);
+            border-radius: 20px;
+            padding: 14px 18px;
+            border-left: 5px solid var(--purple);
+            transition: all 0.2s;
+        }
+        .event-card:hover { transform: translateX(6px); background: #f1f5f9; box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
+        .event-title { font-weight: 700; font-size: 15px; color: var(--text); }
+        .event-time { font-size: 12px; color: var(--text-muted); margin-top: 6px; display: flex; align-items: center; gap: 4px; }
+        .no-event { text-align: center; padding: 36px 20px; color: var(--text-muted); background: var(--bg); border-radius: 28px; }
+        .no-event i { font-size: 40px; opacity: 0.5; margin-bottom: 10px; display: block; }
+
+        .bottom-nav {
+            display: none;
+            background: var(--white);
+            border-top: 1px solid var(--border);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 200;
+            padding: 8px 12px 16px;
+            justify-content: space-around;
+            box-shadow: 0 -4px 16px rgba(0,0,0,0.06);
+        }
+        .bnav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 16px;
+            transition: all 0.2s;
+            flex: 1;
+        }
+        .bnav-item i { font-size: 22px; }
+        .bnav-item.active { color: var(--purple); background: var(--purple-light); }
+        .bnav-item:hover:not(.active) { color: var(--purple); }
+
+        @media (max-width: 900px) {
+            .sidebar { transform: translateX(-100%); width: var(--sidebar-w) !important; box-shadow: none; }
+            .sidebar.mobile-open { transform: translateX(0); box-shadow: 4px 0 30px rgba(0,0,0,0.15); }
+            .main { margin-left: 0 !important; padding-bottom: 70px; }
+            .topbar-mobile-toggle { display: flex !important; }
+            .bottom-nav { display: flex; }
+            .page-content { padding: 16px; }
+            .topbar { padding: 0 16px; }
+        }
+        @media (max-width: 550px) {
+            .day { font-size: 13px; }
+            .month-year { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-blob bg-blob-1"></div>
+<div class="bg-blob bg-blob-2"></div>
+
+<div class="layout">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-wrap">
+                <div class="brand-logo">R</div>
+                <div class="brand-name">RemindU</div>
+            </div>
+            <button class="toggle-btn" id="sidebarToggle"><i class="material-icons-round">chevron_left</i></button>
+        </div>
+
+        <div class="sidebar-user" id="sidebarUser">
+            <div class="sidebar-avatar" id="sidebarAvatar">A</div>
+            <div class="sidebar-user-info">
+                <div class="sidebar-user-name" id="sidebarName">User</div>
+                <div class="sidebar-user-email" id="sidebarEmail">user@email.com</div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-label">Menu Utama</div>
+            <div class="nav-item" data-nav="home"><i class="material-icons-round">home</i><span class="nav-item-label">Beranda</span></div>
+            <div class="nav-item active" data-nav="calendar"><i class="material-icons-round">calendar_month</i><span class="nav-item-label">Kalender</span></div>
+            <div class="nav-item" data-nav="notification"><i class="material-icons-round">notifications</i><span class="nav-item-label">Notifikasi</span><span class="nav-badge" id="notifBadge">0</span></div>
+            <div class="nav-label" style="margin-top:8px;">Lainnya</div>
+            <div class="nav-item" data-nav="settings"><i class="material-icons-round">settings</i><span class="nav-item-label">Pengaturan</span></div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="nav-item" id="sidebarLogout" style="color:#e53e3e;"><i class="material-icons-round">logout</i><span class="nav-item-label">Keluar</span></div>
+        </div>
+    </aside>
+
+    <main class="main" id="mainContent">
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="topbar-mobile-toggle" id="mobileMenuBtn"><i class="material-icons-round">menu</i></button>
+                <div>
+                    <div class="topbar-greeting" id="topbarGreeting">Halo!</div>
+                    <div class="topbar-date" id="topbarDate"></div>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-icon-btn" id="topbarNotif"><i class="material-icons-round">notifications_none</i><span class="notif-dot" id="notifDot" style="display:none;"></span></button>
+                <div class="topbar-avatar relative" id="topbarAvatar">
+                    <span id="topbarAvatarChar">A</span>
+                    <div class="dropdown" id="dropdown">
+                        <div class="dd-item" id="ddProfile"><i class="material-icons-round">person</i> Profil</div>
+                        <div class="dd-item danger" id="ddLogout"><i class="material-icons-round">logout</i> Keluar</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-content">
+            <div class="calendar-section">
+                <div class="month-nav">
+                    <button id="prevMonth"><i class="material-icons-round">chevron_left</i></button>
+                    <div class="month-year" id="monthYear"></div>
+                    <button id="nextMonth"><i class="material-icons-round">chevron_right</i></button>
+                </div>
+                <div class="weekdays">
+                    <div class="weekday">M</div><div class="weekday">T</div><div class="weekday">W</div>
+                    <div class="weekday">T</div><div class="weekday">F</div><div class="weekday">S</div>
+                    <div class="weekday">S</div>
+                </div>
+                <div class="days" id="calendarDays"></div>
+            </div>
+
+            <div class="events-section">
+                <div class="events-title">
+                    <i class="material-icons-round">event_note</i> Kegiatan pada tanggal
+                    <span id="selectedDateLabel" style="color:#8b5cf6; font-weight:600;">-</span>
+                </div>
+                <div id="eventList" class="event-list">
+                    <div class="no-event"><i class="material-icons-round">event_busy</i> Pilih tanggal untuk melihat kegiatan</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <nav class="bottom-nav">
+        <div class="bnav-item" data-nav="home"><i class="material-icons-round">home</i><span>Home</span></div>
+        <div class="bnav-item active" data-nav="calendar"><i class="material-icons-round">calendar_month</i><span>Kalender</span></div>
+        <div class="bnav-item" data-nav="notification"><i class="material-icons-round">notifications</i><span>Notif</span></div>
+        <div class="bnav-item" data-nav="settings"><i class="material-icons-round">settings</i><span>Setting</span></div>
+    </nav>
+</div>
+
+<script>
+    (function() {
+        // ========== AUTH & AVATAR ==========
+        const userData = JSON.parse(localStorage.getItem('remindu_user') || '{}');
+        const userEmail = userData.email;
+        if (!userEmail) {
+            alert('Sesi login tidak ditemukan. Silakan login ulang.');
+            window.location.href = 'welcome.html';
+            return;
+        }
+
+        const firstName = userEmail.split('@')[0];
+        const displayName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
+        
+        // Fungsi untuk mengupdate avatar (sama persis dengan home)
+        function updateAvatar() {
+            const savedAvatar = localStorage.getItem('user_avatar');
+            const sidebarAvatarDiv = document.getElementById('sidebarAvatar');
+            const topbarAvatarDiv = document.getElementById('topbarAvatar');
+            const topbarAvatarChar = document.getElementById('topbarAvatarChar');
+            
+            if (!savedAvatar) {
+                // default: huruf pertama email
+                const defaultChar = userEmail.charAt(0).toUpperCase();
+                if (sidebarAvatarDiv) {
+                    sidebarAvatarDiv.textContent = defaultChar;
+                    sidebarAvatarDiv.style.backgroundImage = '';
+                }
+                if (topbarAvatarDiv) {
+                    topbarAvatarChar.textContent = defaultChar;
+                    topbarAvatarDiv.style.backgroundImage = '';
+                }
+            } else if (savedAvatar.startsWith('data:image')) {
+                // gambar base64
+                if (sidebarAvatarDiv) {
+                    sidebarAvatarDiv.textContent = '';
+                    sidebarAvatarDiv.style.backgroundImage = `url(${savedAvatar})`;
+                    sidebarAvatarDiv.style.backgroundSize = 'cover';
+                    sidebarAvatarDiv.style.backgroundPosition = 'center';
+                }
+                if (topbarAvatarDiv) {
+                    topbarAvatarChar.textContent = '';
+                    topbarAvatarDiv.style.backgroundImage = `url(${savedAvatar})`;
+                    topbarAvatarDiv.style.backgroundSize = 'cover';
+                    topbarAvatarDiv.style.backgroundPosition = 'center';
+                }
+            } else {
+                // teks (inisial)
+                if (sidebarAvatarDiv) {
+                    sidebarAvatarDiv.textContent = savedAvatar;
+                    sidebarAvatarDiv.style.backgroundImage = '';
+                }
+                if (topbarAvatarDiv) {
+                    topbarAvatarChar.textContent = savedAvatar;
+                    topbarAvatarDiv.style.backgroundImage = '';
+                }
+            }
+        }
+
+        // Update nama dan email
+        document.getElementById('sidebarName').textContent = displayName;
+        document.getElementById('sidebarEmail').textContent = userEmail;
+        document.getElementById('topbarGreeting').textContent = `Halo, ${displayName}!`;
+        document.getElementById('topbarDate').textContent = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        
+        // Panggil update avatar
+        updateAvatar();
+
+        // ========== SIDEBAR TOGGLE ==========
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        let sidebarCollapsed = localStorage.getItem('sidebar_collapsed') === 'true';
+        if (sidebarCollapsed) {
+            sidebar.classList.add('collapsed');
+            mainContent.classList.add('expanded');
+        }
+        sidebarToggle.addEventListener('click', () => {
+            sidebarCollapsed = !sidebarCollapsed;
+            localStorage.setItem('sidebar_collapsed', sidebarCollapsed);
+            sidebar.classList.toggle('collapsed', sidebarCollapsed);
+            mainContent.classList.toggle('expanded', sidebarCollapsed);
+        });
+
+        // ========== MOBILE SIDEBAR ==========
+        const overlay = document.getElementById('sidebarOverlay');
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        function checkMobile() { mobileMenuBtn.style.display = window.innerWidth <= 900 ? 'flex' : 'none'; }
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        mobileMenuBtn.addEventListener('click', () => { sidebar.classList.toggle('mobile-open'); overlay.classList.toggle('show'); });
+        overlay.addEventListener('click', () => { sidebar.classList.remove('mobile-open'); overlay.classList.remove('show'); });
+
+        // ========== DROPDOWN & NAVIGASI ==========
+        const avatarBtn = document.getElementById('topbarAvatar');
+        const dropdown = document.getElementById('dropdown');
+        avatarBtn.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('show'); });
+        document.addEventListener('click', () => dropdown.classList.remove('show'));
+        document.getElementById('ddProfile').addEventListener('click', () => window.location.href = 'profil.html');
+        document.getElementById('ddLogout').addEventListener('click', () => { localStorage.removeItem('remindu_user'); localStorage.removeItem('user_avatar'); window.location.href = 'welcome.html'; });
+        document.getElementById('sidebarLogout').addEventListener('click', () => { localStorage.removeItem('remindu_user'); localStorage.removeItem('user_avatar'); window.location.href = 'welcome.html'; });
+        document.getElementById('sidebarUser').addEventListener('click', () => window.location.href = 'profil.html');
+
+        function handleNav(nav) {
+            if (nav === 'home') window.location.href = 'home.html';
+            else if (nav === 'calendar') window.location.reload();
+            else if (nav === 'notification') alert('🔔 Belum ada notifikasi baru.');
+            else if (nav === 'settings') window.location.href = 'settings.html';
+        }
+        document.querySelectorAll('.nav-item[data-nav]').forEach(el => el.addEventListener('click', () => handleNav(el.dataset.nav)));
+        document.querySelectorAll('.bnav-item[data-nav]').forEach(el => el.addEventListener('click', () => handleNav(el.dataset.nav)));
+        document.getElementById('topbarNotif').addEventListener('click', () => handleNav('notification'));
+
+        // ========== KALENDER & TASKS ==========
+        let currentDate = new Date();
+        let tasks = [];
+        let selectedDate = null;
+        let selectedDayElem = null;
+
+        async function fetchTasks() {
+            try {
+                const res = await fetch('http://localhost:3000/api/tasks', { headers: { 'X-User-Email': userEmail } });
+                if (!res.ok) throw new Error();
+                tasks = await res.json();
+            } catch(e) { tasks = []; }
+            renderCalendar();
+        }
+
+        function getTasksByDate(date) {
+            const dateStr = date.toISOString().split('T')[0];
+            return tasks.filter(task => task.due_date && new Date(task.due_date).toISOString().split('T')[0] === dateStr);
+        }
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const firstDay = new Date(year, month, 1);
+            let startWeekday = firstDay.getDay();
+            let offset = startWeekday === 0 ? 6 : startWeekday - 1;
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const prevMonthDays = new Date(year, month, 0).getDate();
+            const daysContainer = document.getElementById('calendarDays');
+            daysContainer.innerHTML = '';
+
+            for (let i = 0; i < offset; i++) {
+                const dayNum = prevMonthDays - offset + i + 1;
+                const div = createDayElement(dayNum, true);
+                daysContainer.appendChild(div);
+            }
+
+            const today = new Date();
+            const isCurrentMonth = (year === today.getFullYear() && month === today.getMonth());
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateObj = new Date(year, month, d);
+                const hasEvent = tasks.some(task => task.due_date && new Date(task.due_date).toISOString().split('T')[0] === dateObj.toISOString().split('T')[0]);
+                const isToday = isCurrentMonth && d === today.getDate();
+                const div = createDayElement(d, false, dateObj, hasEvent, isToday);
+                daysContainer.appendChild(div);
+            }
+
+            const totalCells = offset + daysInMonth;
+            const remainingCells = 42 - totalCells;
+            for (let i = 1; i <= remainingCells; i++) {
+                const div = createDayElement(i, true);
+                daysContainer.appendChild(div);
+            }
+
+            document.getElementById('monthYear').textContent = currentDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+
+            if (!selectedDate) {
+                const todayObj = new Date();
+                if (todayObj.getMonth() === month && todayObj.getFullYear() === year) selectDate(todayObj);
+                else selectDate(new Date(year, month, 1));
+            } else if (selectedDate.getMonth() !== month || selectedDate.getFullYear() !== year) {
+                selectDate(new Date(year, month, 1));
+            } else {
+                selectDate(selectedDate);
+            }
+        }
+
+        function createDayElement(dayNum, isOtherMonth, dateObj = null, hasEvent = false, isToday = false) {
+            const div = document.createElement('div');
+            div.className = 'day';
+            if (isOtherMonth) div.classList.add('other-month');
+            if (hasEvent && !isOtherMonth) div.classList.add('has-event');
+            if (isToday && !isOtherMonth) div.classList.add('today');
+            div.textContent = dayNum;
+            if (!isOtherMonth && dateObj) {
+                div.addEventListener('click', (e) => { e.stopPropagation(); selectDate(dateObj, div); });
+            }
+            return div;
+        }
+
+        function selectDate(date, targetElem = null) {
+            selectedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            if (selectedDayElem) {
+                selectedDayElem.style.background = '';
+                selectedDayElem.classList.remove('selected-day');
+            }
+            if (targetElem) {
+                selectedDayElem = targetElem;
+                targetElem.style.background = '#e0e7ff';
+                targetElem.classList.add('selected-day');
+            } else {
+                const allDays = document.querySelectorAll('.days .day:not(.other-month)');
+                for (let d of allDays) {
+                    if (parseInt(d.textContent) === selectedDate.getDate()) {
+                        selectedDayElem = d;
+                        d.style.background = '#e0e7ff';
+                        d.classList.add('selected-day');
+                        break;
+                    }
+                }
+            }
+            document.getElementById('selectedDateLabel').innerHTML = `${selectedDate.getDate()} ${selectedDate.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}`;
+            renderEventsForDate(selectedDate);
+        }
+
+        function renderEventsForDate(date) {
+            const events = getTasksByDate(date);
+            const container = document.getElementById('eventList');
+            if (events.length === 0) {
+                container.innerHTML = `<div class="no-event"><i class="material-icons-round">event_busy</i><br>Tidak ada kegiatan pada tanggal ini</div>`;
+                return;
+            }
+            container.innerHTML = '';
+            events.forEach(task => {
+                const timeStr = task.due_date ? new Date(task.due_date).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : 'Sepanjang hari';
+                const eventDiv = document.createElement('div');
+                eventDiv.className = 'event-card';
+                eventDiv.innerHTML = `
+                    <div class="event-title">${escapeHtml(task.judul)}</div>
+                    <div class="event-time"><i class="material-icons-round" style="font-size:14px">schedule</i> ${timeStr}</div>
+                    ${task.notes ? `<div class="event-time"><i class="material-icons-round" style="font-size:14px">sticky_note_2</i> ${escapeHtml(task.notes.substring(0, 60))}</div>` : ''}
+                `;
+                container.appendChild(eventDiv);
+            });
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
+        }
+
+        document.getElementById('prevMonth').addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); });
+        document.getElementById('nextMonth').addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); });
+
+        fetchTasks();
+
+        function updateNotifBadge() { 
+            const badge = document.getElementById('notifBadge');
+            if (badge) badge.textContent = tasks.filter(t => !t.selesai).length;
+        }
+        setInterval(() => { if (tasks.length) updateNotifBadge(); }, 1000);
+    })();
+</script>
+</body>
+</html>

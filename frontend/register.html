@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RemindU - Daftar</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background: linear-gradient(145deg, #f5f7fe 0%, #eef2fa 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .card { max-width: 550px; width: 100%; background: white; border-radius: 36px; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1); padding: 40px 28px; }
+        h2 { font-size: 28px; margin-bottom: 8px; }
+        p { margin-bottom: 24px; color: #4a5568; }
+        input { width: 100%; padding: 14px 20px; background: #f3f4f9; border: 1px solid transparent; border-radius: 60px; margin-bottom: 16px; font-size: 15px; outline: none; }
+        input:focus { border-color: #8b5cf6; background: white; }
+        .flex-row { display: flex; gap: 12px; }
+        .terms { display: flex; align-items: center; gap: 10px; margin: 16px 0; font-size: 13px; }
+        .terms input { width: 18px; margin: 0; }
+        button { background: #8b5cf6; color: white; border: none; border-radius: 60px; padding: 14px; width: 100%; font-weight: 600; cursor: pointer; }
+        .or-divider { text-align: center; margin: 20px 0; color: #aaa; }
+        .google-btn { background: white; border: 1px solid #ddd; color: #333; }
+        .link { text-align: center; margin-top: 20px; font-size: 14px; }
+        a { color: #8b5cf6; text-decoration: none; }
+        .error-msg { color: #e53e3e; font-size: 12px; margin-top: -12px; margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <a href="login.html" style="display: inline-block; margin-bottom: 20px;">← Back</a>
+    <h2>Sign Up</h2>
+    <p>Create New Account</p>
+    <form id="signupForm">
+        <div class="flex-row">
+            <input type="text" id="firstName" placeholder="First Name*">
+            <input type="text" id="lastName" placeholder="Last Name*">
+        </div>
+        <div class="error-msg" id="nameError"></div>
+        <input type="email" id="signupEmail" placeholder="Email Address*">
+        <div class="error-msg" id="emailError"></div>
+        <input type="password" id="signupPassword" placeholder="Password*">
+        <div class="error-msg" id="passwordError"></div>
+        <input type="password" id="confirmPassword" placeholder="Confirm Password*">
+        <div class="error-msg" id="confirmError"></div>
+        <div class="terms">
+            <input type="checkbox" id="acceptTerms"> <label>I accept all terms and conditions</label>
+        </div>
+        <button type="submit">Sign in</button>
+    </form>
+    <div class="or-divider">OR</div>
+    <button class="google-btn" onclick="alert('Demo Google sign up')">Continue With Google</button>
+    <div class="link">Already Registered? <a href="login.html">Log in here</a></div>
+</div>
+<script>
+    const API_URL = 'http://localhost:3000/api';
+    document.getElementById('signupForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const firstName = document.getElementById('firstName').value;
+        const lastName = document.getElementById('lastName').value;
+        const email = document.getElementById('signupEmail').value;
+        const password = document.getElementById('signupPassword').value;
+        const confirm = document.getElementById('confirmPassword').value;
+        const terms = document.getElementById('acceptTerms').checked;
+
+        if (password !== confirm) { alert('Password dan konfirmasi tidak cocok'); return; }
+        if (!terms) { alert('Harus menyetujui syarat & ketentuan'); return; }
+
+        try {
+            const res = await fetch(`${API_URL}/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ firstName, lastName, email, password, terms })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error);
+            // simpan email sementara di localStorage untuk ke halaman verifikasi
+            localStorage.setItem('pendingVerifyEmail', email);
+            alert(`Registrasi berhasil! Kode OTP: ${data.otp}\nCatat kode ini untuk verifikasi.`);
+            window.location.href = 'verify.html';
+        } catch (err) {
+            alert(err.message);
+        }
+    });
+</script>
+</body>
+</html>
