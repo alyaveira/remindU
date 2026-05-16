@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>RemindU - AI Motivasi</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        :root {
+            --purple: #8b5cf6;
+            --purple-dark: #7c3aed;
+            --purple-light: #ede9fe;
+            --bg: #f5f7fe;
+            --white: #ffffff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --border: #edf2f7;
+            --sidebar-w: 260px;
+            --sidebar-collapsed-w: 72px;
+            --header-h: 64px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+        body { background: var(--bg); min-height: 100vh; overflow-x: hidden; position: relative; }
+        .bg-blob { position: fixed; border-radius: 50%; filter: blur(60px); opacity: 0.38; pointer-events: none; z-index: 0; }
+        .bg-blob-1 { width: 400px; height: 400px; background: var(--purple); top: -100px; right: -100px; }
+        .bg-blob-2 { width: 300px; height: 300px; background: #ec4899; bottom: -80px; left: -80px; }
+        .layout { display: flex; min-height: 100vh; position: relative; z-index: 5; }
+        /* SIDEBAR */
+        .sidebar { width: var(--sidebar-w); background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 200; transition: width 0.3s cubic-bezier(0.4,0,0.2,1), transform 0.3s; overflow: hidden; box-shadow: 2px 0 20px rgba(0,0,0,0.04); }
+        .sidebar.collapsed { width: var(--sidebar-collapsed-w); }
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 199; backdrop-filter: blur(2px); }
+        .sidebar-overlay.show { display: block; }
+        .sidebar-header { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: var(--header-h); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+        .brand-wrap { display: flex; align-items: center; gap: 10px; overflow: hidden; }
+        .brand-logo { width: 36px; height: 36px; border-radius: 12px; background: linear-gradient(135deg, #1e3a8a, #8b5cf6); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px; font-weight: 900; color: white; }
+        .brand-name { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(135deg, #1e3a8a, #3b82f6, #8b5cf6, #ec4899); -webkit-background-clip: text; background-clip: text; color: transparent; white-space: nowrap; overflow: hidden; transition: opacity 0.2s, width 0.3s; }
+        .sidebar.collapsed .brand-name { opacity: 0; width: 0; }
+        .toggle-btn { width: 32px; height: 32px; border-radius: 10px; border: none; background: var(--bg); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: background 0.2s, color 0.2s; flex-shrink: 0; }
+        .toggle-btn:hover { background: var(--purple-light); color: var(--purple); }
+        .toggle-btn i { font-size: 20px; transition: transform 0.3s; }
+        .sidebar.collapsed .toggle-btn i { transform: rotate(180deg); }
+        .sidebar-user { padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+        .sidebar-user:hover { background: var(--bg); }
+        .sidebar-avatar { width: 40px; height: 40px; border-radius: 14px; background: linear-gradient(135deg, var(--purple), #ec4899); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; color: white; flex-shrink: 0; }
+        .sidebar-user-info { overflow: hidden; transition: opacity 0.2s; }
+        .sidebar.collapsed .sidebar-user-info { opacity: 0; width: 0; }
+        .sidebar-user-name { font-weight: 600; font-size: 14px; color: var(--text); white-space: nowrap; }
+        .sidebar-user-email { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
+        .sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; overflow-x: hidden; }
+        .sidebar-nav::-webkit-scrollbar { width: 4px; }
+        .sidebar-nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        .nav-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; padding: 8px 10px 4px; white-space: nowrap; overflow: hidden; transition: opacity 0.2s; }
+        .sidebar.collapsed .nav-label { opacity: 0; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 14px; cursor: pointer; transition: all 0.2s; color: var(--text-muted); margin-bottom: 2px; white-space: nowrap; overflow: hidden; }
+        .nav-item:hover { background: var(--bg); color: var(--purple); }
+        .nav-item.active { background: var(--purple-light); color: var(--purple); font-weight: 600; }
+        .nav-item i { font-size: 22px; flex-shrink: 0; }
+        .nav-item-label { font-size: 14px; transition: opacity 0.2s; }
+        .sidebar.collapsed .nav-item-label { opacity: 0; width: 0; }
+        .nav-badge { margin-left: auto; background: var(--purple); color: white; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; flex-shrink: 0; transition: opacity 0.2s; }
+        .sidebar.collapsed .nav-badge { opacity: 0; }
+        .sidebar-footer { padding: 12px 10px 16px; border-top: 1px solid var(--border); flex-shrink: 0; }
+        /* MAIN */
+        .main { flex: 1; margin-left: var(--sidebar-w); transition: margin-left 0.3s cubic-bezier(0.4,0,0.2,1); min-height: 100vh; display: flex; flex-direction: column; }
+        .main.expanded { margin-left: var(--sidebar-collapsed-w); }
+        /* TOPBAR */
+        .topbar { height: var(--header-h); background: var(--white); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 8px rgba(0,0,0,0.04); }
+        .topbar-left { display: flex; align-items: center; gap: 12px; }
+        .topbar-mobile-toggle { display: none; width: 36px; height: 36px; border-radius: 10px; border: none; background: var(--bg); cursor: pointer; align-items: center; justify-content: center; color: var(--text); transition: background 0.2s; }
+        .topbar-mobile-toggle:hover { background: var(--purple-light); }
+        .topbar-mobile-toggle i { font-size: 22px; }
+        .topbar-greeting { font-size: 15px; font-weight: 600; color: var(--text); }
+        .topbar-date { font-size: 12px; color: var(--text-muted); }
+        .topbar-right { display: flex; align-items: center; gap: 10px; }
+        .topbar-icon-btn { width: 36px; height: 36px; border-radius: 10px; border: none; background: var(--bg); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: all 0.2s; position: relative; }
+        .topbar-icon-btn:hover { background: var(--purple-light); color: var(--purple); }
+        .topbar-icon-btn i { font-size: 20px; }
+        .notif-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: #f97316; border: 2px solid var(--white); }
+        .topbar-avatar { width: 36px; height: 36px; border-radius: 12px; background: linear-gradient(135deg, var(--purple), #ec4899); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; color: white; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
+        .topbar-avatar:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(139,92,246,0.3); }
+        .dropdown { position: absolute; top: 44px; right: 0; background: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); width: 170px; overflow: hidden; z-index: 300; display: none; border: 1px solid var(--border); animation: dropFade 0.18s ease; }
+        @keyframes dropFade { from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);} }
+        .dropdown.show { display: block; }
+        .dd-item { padding: 12px 16px; display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; color: var(--text); transition: background 0.15s; }
+        .dd-item:hover { background: var(--bg); }
+        .dd-item.danger { color: #e53e3e; border-top: 1px solid var(--border); }
+        .dd-item i { font-size: 18px; }
+        /* PAGE */
+        .page-content { flex: 1; padding: 28px; max-width: 800px; width: 100%; margin: 0 auto; }
+        /* HERO CARD */
+        .ai-hero { background: linear-gradient(135deg, #C026A8 0%, #9333EA 60%, #6d28d9 100%); border-radius: 28px; padding: 36px 32px; color: white; margin-bottom: 24px; position: relative; overflow: hidden; box-shadow: 0 12px 32px rgba(192,38,168,0.35); animation: fadeUp 0.5s ease both; }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);} }
+        .ai-hero::before { content:''; position:absolute; top:-60px; right:-40px; width:220px; height:220px; border-radius:50%; background:rgba(255,255,255,0.1); }
+        .ai-hero::after { content:''; position:absolute; bottom:-50px; left:20%; width:160px; height:160px; border-radius:50%; background:rgba(255,255,255,0.07); }
+        .ai-hero-inner { position: relative; z-index: 2; }
+        .ai-hero-badge { background: rgba(255,255,255,0.2); display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 40px; font-size: 12px; font-weight: 700; margin-bottom: 14px; backdrop-filter: blur(4px); }
+        .ai-hero-badge i { font-size: 14px; }
+        .ai-hero h2 { font-size: 28px; font-weight: 800; margin-bottom: 8px; line-height: 1.2; }
+        .ai-hero p { font-size: 14px; opacity: 0.88; margin-bottom: 20px; }
+        .ai-context-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+        .ai-context-chip { background: rgba(255,255,255,0.15); border-radius: 40px; padding: 6px 14px; font-size: 12px; font-weight: 600; backdrop-filter: blur(4px); }
+        .ai-generate-btn { background: white; color: var(--purple-dark); border: none; padding: 13px 28px; border-radius: 40px; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(0,0,0,0.15); }
+        .ai-generate-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+        .ai-generate-btn:disabled { opacity: 0.75; cursor: default; }
+        .ai-generate-btn i { font-size: 20px; }
+        /* RESULT CARD */
+        .ai-result-card { background: var(--white); border-radius: 24px; padding: 28px; border: 1px solid var(--border); box-shadow: 0 4px 16px rgba(0,0,0,0.04); margin-bottom: 20px; display: none; animation: fadeUp 0.4s ease both; }
+        .ai-result-card.show { display: block; }
+        .ai-result-icon { font-size: 52px; text-align: center; margin-bottom: 16px; animation: floatIcon 3s infinite ease-in-out; display: block; }
+        @keyframes floatIcon { 0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);} }
+        .ai-result-title { font-size: 24px; font-weight: 800; color: var(--text); text-align: center; margin-bottom: 12px; }
+        .ai-result-msg { font-size: 15px; color: var(--text-muted); text-align: center; line-height: 1.7; }
+        .ai-result-divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+        .ai-result-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .btn-save-motiv { background: var(--purple); color: white; border: none; padding: 10px 22px; border-radius: 40px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+        .btn-save-motiv:hover { background: var(--purple-dark); transform: translateY(-2px); }
+        .btn-regen { background: var(--bg); color: var(--text); border: 1px solid var(--border); padding: 10px 22px; border-radius: 40px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+        .btn-regen:hover { background: var(--purple-light); color: var(--purple); border-color: var(--purple-light); }
+        .btn-regen i, .btn-save-motiv i { font-size: 16px; }
+        /* SAVED MOTIVATIONS */
+        .section-title { font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+        .saved-list { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; animation: fadeUp 0.5s 0.2s ease both; }
+        .saved-card { background: var(--white); border-radius: 18px; padding: 18px; border: 1px solid var(--border); transition: all 0.2s; position: relative; }
+        .saved-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.07); }
+        .saved-card-icon { font-size: 32px; margin-bottom: 10px; display: block; }
+        .saved-card-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+        .saved-card-msg { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+        .saved-card-del { position: absolute; top: 12px; right: 12px; background: none; border: none; cursor: pointer; color: #cbd5e1; font-size: 18px; transition: color 0.2s; padding: 4px; border-radius: 8px; }
+        .saved-card-del:hover { color: #e53e3e; background: #fee2e2; }
+        .empty-saved { text-align: center; padding: 40px 20px; color: var(--text-muted); background: var(--white); border-radius: 20px; border: 1px solid var(--border); grid-column: 1/-1; }
+        .empty-saved i { font-size: 40px; opacity: 0.4; margin-bottom: 10px; display: block; }
+        /* SPINNER */
+        .spin { animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        /* MOOD SELECT */
+        .mood-section { background: var(--white); border-radius: 20px; padding: 20px; border: 1px solid var(--border); margin-bottom: 20px; animation: fadeUp 0.5s 0.1s ease both; }
+        .mood-title { font-size: 14px; font-weight: 600; color: var(--text-muted); margin-bottom: 12px; }
+        .mood-row { display: flex; gap: 10px; flex-wrap: wrap; }
+        .mood-btn { background: var(--bg); border: 1px solid var(--border); border-radius: 40px; padding: 8px 16px; font-size: 13px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; font-weight: 500; color: var(--text-muted); }
+        .mood-btn.selected { background: var(--purple-light); border-color: var(--purple); color: var(--purple); font-weight: 700; }
+        .mood-btn:hover:not(.selected) { background: var(--purple-light); color: var(--purple); }
+        /* BOTTOM NAV */
+        .bottom-nav { display: none; background: var(--white); border-top: 1px solid var(--border); position: fixed; bottom: 0; left: 0; right: 0; z-index: 200; padding: 8px 12px 16px; justify-content: space-around; box-shadow: 0 -4px 16px rgba(0,0,0,0.06); }
+        .bnav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; color: #94a3b8; cursor: pointer; padding: 6px 12px; border-radius: 16px; transition: all 0.2s; flex: 1; }
+        .bnav-item i { font-size: 22px; }
+        .bnav-item.active { color: var(--purple); background: var(--purple-light); }
+        @media (max-width: 900px) {
+            .sidebar { transform: translateX(-100%); width: var(--sidebar-w) !important; }
+            .sidebar.mobile-open { transform: translateX(0); box-shadow: 4px 0 30px rgba(0,0,0,0.15); }
+            .main { margin-left: 0 !important; padding-bottom: 70px; }
+            .topbar-mobile-toggle { display: flex !important; }
+            .bottom-nav { display: flex; }
+            .page-content { padding: 16px; }
+            .topbar { padding: 0 16px; }
+            .saved-list { grid-template-columns: 1fr; }
+        }
+        .relative { position: relative; }
+    </style>
+</head>
+<body>
+<div class="bg-blob bg-blob-1"></div>
+<div class="bg-blob bg-blob-2"></div>
+<div class="layout">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-wrap">
+                <div class="brand-logo">R</div>
+                <div class="brand-name">RemindU</div>
+            </div>
+            <button class="toggle-btn" id="sidebarToggle"><i class="material-icons-round">chevron_left</i></button>
+        </div>
+        <div class="sidebar-user" id="sidebarUser">
+            <div class="sidebar-avatar" id="sidebarAvatar">A</div>
+            <div class="sidebar-user-info">
+                <div class="sidebar-user-name" id="sidebarName">User</div>
+                <div class="sidebar-user-email" id="sidebarEmail">user@email.com</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-label">Menu Utama</div>
+            <div class="nav-item" data-nav="home"><i class="material-icons-round">home</i><span class="nav-item-label">Beranda</span></div>
+            <div class="nav-item" data-nav="calendar"><i class="material-icons-round">calendar_month</i><span class="nav-item-label">Kalender</span></div>
+            <div class="nav-item" data-nav="notification"><i class="material-icons-round">notifications</i><span class="nav-item-label">Notifikasi</span><span class="nav-badge" id="notifBadge">0</span></div>
+            <div class="nav-label" style="margin-top:8px;">Lainnya</div>
+            <div class="nav-item active" data-nav="ai"><i class="material-icons-round">auto_awesome</i><span class="nav-item-label">AI Motivasi</span></div>
+            <div class="nav-item" data-nav="settings"><i class="material-icons-round">settings</i><span class="nav-item-label">Pengaturan</span></div>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="nav-item" id="sidebarLogout" style="color:#e53e3e;"><i class="material-icons-round">logout</i><span class="nav-item-label">Keluar</span></div>
+        </div>
+    </aside>
+    <main class="main" id="mainContent">
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="topbar-mobile-toggle" id="mobileMenuBtn"><i class="material-icons-round">menu</i></button>
+                <div>
+                    <div class="topbar-greeting" id="topbarGreeting">Halo!</div>
+                    <div class="topbar-date" id="topbarDate"></div>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-icon-btn" id="topbarNotif"><i class="material-icons-round">notifications_none</i><span class="notif-dot" id="notifDot" style="display:none;"></span></button>
+                <div class="topbar-avatar relative" id="topbarAvatar">
+                    <span id="topbarAvatarChar">A</span>
+                    <div class="dropdown" id="dropdown">
+                        <div class="dd-item" id="ddProfile"><i class="material-icons-round">person</i> Profil</div>
+                        <div class="dd-item danger" id="ddLogout"><i class="material-icons-round">logout</i> Keluar</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <div class="page-content">
+            <!-- HERO -->
+            <div class="ai-hero">
+                <div class="ai-hero-inner">
+                    <div class="ai-hero-badge"><i class="material-icons-round">auto_awesome</i> Powered by Claude AI</div>
+                    <h2>AI Motivasi Personal</h2>
+                    <p>Dapatkan motivasi yang personal dan relevan berdasarkan progress task kamu hari ini. AI akan menganalisis situasimu dan memberikan semangat yang tepat!</p>
+                    <div class="ai-context-row" id="contextRow">
+                        <div class="ai-context-chip" id="chipTotal">📋 Memuat task...</div>
+                        <div class="ai-context-chip" id="chipDone">✅ 0 selesai</div>
+                        <div class="ai-context-chip" id="chipPct">📊 0% progress</div>
+                    </div>
+                    <button class="ai-generate-btn" id="generateBtn">
+                        <i class="material-icons-round" id="generateIcon">auto_awesome</i>
+                        <span id="generateText">Generate Motivasi</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- MOOD SELECTOR -->
+            <div class="mood-section">
+                <div class="mood-title">Bagaimana perasaanmu sekarang? (opsional)</div>
+                <div class="mood-row" id="moodRow">
+                    <button class="mood-btn" data-mood="semangat">🔥 Semangat</button>
+                    <button class="mood-btn" data-mood="lelah">😴 Lelah</button>
+                    <button class="mood-btn" data-mood="stres">😰 Stres</button>
+                    <button class="mood-btn" data-mood="bingung">😕 Bingung</button>
+                    <button class="mood-btn" data-mood="biasa">😐 Biasa saja</button>
+                    <button class="mood-btn" data-mood="senang">😊 Senang</button>
+                </div>
+            </div>
+
+            <!-- RESULT -->
+            <div class="ai-result-card" id="resultCard">
+                <span class="ai-result-icon" id="resultIcon">✨</span>
+                <div class="ai-result-title" id="resultTitle">Judul Motivasi</div>
+                <div class="ai-result-msg" id="resultMsg">Pesan motivasi akan tampil di sini...</div>
+                <hr class="ai-result-divider">
+                <div class="ai-result-actions">
+                    <button class="btn-save-motiv" id="btnSave"><i class="material-icons-round">bookmark</i> Simpan</button>
+                    <button class="btn-regen" id="btnRegen"><i class="material-icons-round">refresh</i> Generate Ulang</button>
+                </div>
+            </div>
+
+            <!-- SAVED -->
+            <div class="section-title"><i class="material-icons-round" style="color:var(--purple);">bookmark</i> Motivasi Tersimpan</div>
+            <div class="saved-list" id="savedList"></div>
+        </div>
+    </main>
+    <nav class="bottom-nav">
+        <div class="bnav-item" data-nav="home"><i class="material-icons-round">home</i><span>Home</span></div>
+        <div class="bnav-item" data-nav="calendar"><i class="material-icons-round">calendar_month</i><span>Kalender</span></div>
+        <div class="bnav-item" data-nav="notification"><i class="material-icons-round">notifications</i><span>Notif</span></div>
+        <div class="bnav-item active" data-nav="ai"><i class="material-icons-round">auto_awesome</i><span>AI</span></div>
+        <div class="bnav-item" data-nav="settings"><i class="material-icons-round">settings</i><span>Setting</span></div>
+    </nav>
+</div>
+<script>
+(function() {
+    const userData = JSON.parse(localStorage.getItem('remindu_user') || '{}');
+    const userEmail = userData.email;
+    if (!userEmail) { window.location.href = 'welcome.html'; return; }
+    const firstName = userEmail.split('@')[0];
+    const displayName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
+    document.getElementById('sidebarName').textContent = displayName;
+    document.getElementById('sidebarEmail').textContent = userEmail;
+    document.getElementById('topbarGreeting').textContent = `Halo, ${displayName}!`;
+    document.getElementById('topbarDate').textContent = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    const savedAvatar = localStorage.getItem('user_avatar');
+    const avatarChar = (savedAvatar && savedAvatar.length <= 2) ? savedAvatar : userEmail.charAt(0).toUpperCase();
+    document.getElementById('sidebarAvatar').textContent = avatarChar;
+    document.getElementById('topbarAvatarChar').textContent = avatarChar;
+
+    // SIDEBAR
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    let sidebarCollapsed = localStorage.getItem('sidebar_collapsed') === 'true';
+    if (sidebarCollapsed) { sidebar.classList.add('collapsed'); mainContent.classList.add('expanded'); }
+    sidebarToggle.addEventListener('click', () => {
+        sidebarCollapsed = !sidebarCollapsed;
+        localStorage.setItem('sidebar_collapsed', sidebarCollapsed);
+        sidebar.classList.toggle('collapsed', sidebarCollapsed);
+        mainContent.classList.toggle('expanded', sidebarCollapsed);
+    });
+    const overlay = document.getElementById('sidebarOverlay');
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    function checkMobile() { mobileMenuBtn.style.display = window.innerWidth <= 900 ? 'flex' : 'none'; }
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    mobileMenuBtn.addEventListener('click', () => { sidebar.classList.toggle('mobile-open'); overlay.classList.toggle('show'); });
+    overlay.addEventListener('click', () => { sidebar.classList.remove('mobile-open'); overlay.classList.remove('show'); });
+
+    // DROPDOWN & NAV
+    const avatarBtn = document.getElementById('topbarAvatar');
+    const dropdown = document.getElementById('dropdown');
+    avatarBtn.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('show'); });
+    document.addEventListener('click', () => dropdown.classList.remove('show'));
+    document.getElementById('ddProfile').addEventListener('click', () => window.location.href = 'profil.html');
+    document.getElementById('ddLogout').addEventListener('click', () => { localStorage.removeItem('remindu_user'); window.location.href = 'welcome.html'; });
+    document.getElementById('sidebarLogout').addEventListener('click', () => { localStorage.removeItem('remindu_user'); window.location.href = 'welcome.html'; });
+    document.getElementById('sidebarUser').addEventListener('click', () => window.location.href = 'profil.html');
+    function handleNav(nav) {
+        if (nav === 'home') window.location.href = 'home.html';
+        else if (nav === 'calendar') window.location.href = 'calendar.html';
+        else if (nav === 'notification') window.location.href = 'notification.html';
+        else if (nav === 'settings') window.location.href = 'settings.html';
+        else if (nav === 'ai') window.location.reload();
+    }
+    document.querySelectorAll('.nav-item[data-nav]').forEach(el => el.addEventListener('click', () => handleNav(el.dataset.nav)));
+    document.querySelectorAll('.bnav-item[data-nav]').forEach(el => el.addEventListener('click', () => handleNav(el.dataset.nav)));
+    document.getElementById('topbarNotif').addEventListener('click', () => window.location.href = 'notification.html');
+
+    // TASKS
+    let tasks = [];
+    let selectedMood = '';
+    let lastGenerated = null;
+
+    async function loadTasks() {
+        try {
+            const res = await fetch('http://localhost:3000/api/tasks', { headers: { 'X-User-Email': userEmail } });
+            if (!res.ok) throw new Error();
+            tasks = await res.json();
+        } catch(e) { tasks = []; }
+        updateContext();
+    }
+
+    function updateContext() {
+        const total = tasks.length;
+        const done = tasks.filter(t => t.selesai).length;
+        const pct = total === 0 ? 0 : Math.round(done / total * 100);
+        document.getElementById('chipTotal').textContent = `📋 ${total} task`;
+        document.getElementById('chipDone').textContent = `✅ ${done} selesai`;
+        document.getElementById('chipPct').textContent = `📊 ${pct}% progress`;
+        const badge = document.getElementById('notifBadge');
+        if (badge) badge.textContent = tasks.filter(t => !t.selesai).length;
+    }
+
+    // MOOD
+    document.querySelectorAll('.mood-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+            if (selectedMood === btn.dataset.mood) {
+                selectedMood = '';
+            } else {
+                btn.classList.add('selected');
+                selectedMood = btn.dataset.mood;
+            }
+        });
+    });
+
+    // AI GENERATE
+    async function generateMotivation() {
+        const btn = document.getElementById('generateBtn');
+        const icon = document.getElementById('generateIcon');
+        const text = document.getElementById('generateText');
+        btn.disabled = true;
+        icon.className = 'material-icons-round spin';
+        icon.textContent = 'refresh';
+        text.textContent = 'Sedang dibuat...';
+
+        const total = tasks.length;
+        const done = tasks.filter(t => t.selesai).length;
+        const pct = total === 0 ? 0 : Math.round(done / total * 100);
+        const cats = [...new Set(tasks.filter(t => !t.selesai).map(t => t.kategori))].join(', ') || 'umum';
+        const moodText = selectedMood ? ` Mood pengguna saat ini: ${selectedMood}.` : '';
+        const prompt = `Kamu adalah motivator produktivitas yang penuh empati dan inspirasi untuk aplikasi RemindU. Nama pengguna: ${displayName}. Data: ${total} total task, ${done} sudah selesai (${pct}%). Kategori belum selesai: ${cats}.${moodText} Berikan motivasi personal yang hangat, relevan dengan situasi nyata pengguna ini, dan memberikan dorongan spesifik. Balas HANYA dalam format JSON tanpa markdown: {"icon":"<1 emoji>","title":"<judul max 6 kata>","msg":"<3 kalimat motivasi yang personal, hangat, dan spesifik>"}`;
+
+        try {
+            const res = await fetch('https://api.anthropic.com/v1/messages', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages: [{ role: 'user', content: prompt }] })
+            });
+            const data = await res.json();
+            const rawText = (data.content || []).map(c => c.text || '').join('');
+            const clean = rawText.replace(/```json|```/g, '').trim();
+            const parsed = JSON.parse(clean);
+            lastGenerated = parsed;
+            showResult(parsed);
+        } catch(e) {
+            lastGenerated = { icon: '💪', title: 'Tetap Semangat!', msg: `${displayName}, setiap langkah kecil membawa kamu lebih dekat ke tujuan. Kamu sudah menyelesaikan ${done} dari ${total} task — itu luar biasa! Teruskan dan jangan berhenti sekarang.` };
+            showResult(lastGenerated);
+        } finally {
+            btn.disabled = false;
+            icon.className = 'material-icons-round';
+            icon.textContent = 'auto_awesome';
+            text.textContent = 'Generate Motivasi';
+        }
+    }
+
+    function showResult(data) {
+        const card = document.getElementById('resultCard');
+        card.classList.remove('show');
+        setTimeout(() => {
+            document.getElementById('resultIcon').textContent = data.icon || '✨';
+            document.getElementById('resultTitle').textContent = data.title || 'Tetap Semangat!';
+            document.getElementById('resultMsg').textContent = data.msg || '';
+            card.classList.add('show');
+        }, 100);
+    }
+
+    document.getElementById('generateBtn').addEventListener('click', generateMotivation);
+    document.getElementById('btnRegen').addEventListener('click', generateMotivation);
+
+    // SAVE
+    document.getElementById('btnSave').addEventListener('click', () => {
+        if (!lastGenerated) return;
+        const saved = JSON.parse(localStorage.getItem('remindu_saved_motivs') || '[]');
+        saved.unshift({ ...lastGenerated, id: Date.now() });
+        localStorage.setItem('remindu_saved_motivs', JSON.stringify(saved.slice(0, 20)));
+        renderSaved();
+        const btn = document.getElementById('btnSave');
+        btn.innerHTML = '<i class="material-icons-round">check</i> Tersimpan!';
+        btn.style.background = '#10b981';
+        setTimeout(() => {
+            btn.innerHTML = '<i class="material-icons-round">bookmark</i> Simpan';
+            btn.style.background = '';
+        }, 2000);
+    });
+
+    function renderSaved() {
+        const saved = JSON.parse(localStorage.getItem('remindu_saved_motivs') || '[]');
+        const container = document.getElementById('savedList');
+        container.innerHTML = '';
+        if (saved.length === 0) {
+            container.innerHTML = `<div class="empty-saved"><i class="material-icons-round">bookmark_border</i><p>Belum ada motivasi tersimpan.<br>Generate dan simpan motivasi favoritmu!</p></div>`;
+            return;
+        }
+        saved.forEach(m => {
+            const card = document.createElement('div');
+            card.className = 'saved-card';
+            card.innerHTML = `
+                <span class="saved-card-icon">${m.icon || '✨'}</span>
+                <div class="saved-card-title">${m.title || ''}</div>
+                <div class="saved-card-msg">${m.msg || ''}</div>
+                <button class="saved-card-del material-icons-round" data-id="${m.id}">delete_outline</button>`;
+            card.querySelector('.saved-card-del').addEventListener('click', (e) => {
+                e.stopPropagation();
+                const id = parseInt(e.target.dataset.id);
+                const updated = saved.filter(s => s.id !== id);
+                localStorage.setItem('remindu_saved_motivs', JSON.stringify(updated));
+                renderSaved();
+            });
+            container.appendChild(card);
+        });
+    }
+
+    loadTasks();
+    renderSaved();
+})();
+</script>
+</body>
+</html>

@@ -548,7 +548,7 @@ document.getElementById('sidebarUser').addEventListener('click', () => window.lo
 function handleNav(nav) {
     if (nav === 'home') window.location.reload();
     else if (nav === 'calendar') window.location.href = 'calendar.html';
-    else if (nav === 'notification') alert('🔔 Belum ada notifikasi baru.');
+    else if (nav === 'notification') window.location.href = 'notification.html';
     else if (nav === 'settings') window.location.href = 'settings.html';
 }
 document.querySelectorAll('.nav-item[data-nav]').forEach(item => item.addEventListener('click', () => handleNav(item.dataset.nav)));

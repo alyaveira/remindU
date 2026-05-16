@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>RemindU - Notifikasi</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        :root {
+            --purple: #8b5cf6;
+            --purple-dark: #7c3aed;
+            --purple-light: #ede9fe;
+            --blue: #3b82f6;
+            --orange: #f97316;
+            --green: #10b981;
+            --bg: #f5f7fe;
+            --white: #ffffff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --border: #edf2f7;
+            --sidebar-w: 260px;
+            --sidebar-collapsed-w: 72px;
+            --header-h: 64px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+        body { background: var(--bg); min-height: 100vh; overflow-x: hidden; position: relative; }
+        .bg-blob { position: fixed; border-radius: 50%; filter: blur(60px); opacity: 0.38; pointer-events: none; z-index: 0; }
+        .bg-blob-1 { width: 400px; height: 400px; background: var(--purple); top: -100px; right: -100px; }
+        .bg-blob-2 { width: 300px; height: 300px; background: #ec4899; bottom: -80px; left: -80px; }
+        .layout { display: flex; min-height: 100vh; position: relative; z-index: 5; }
+        /* SIDEBAR */
+        .sidebar { width: var(--sidebar-w); background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 200; transition: width 0.3s cubic-bezier(0.4,0,0.2,1), transform 0.3s; overflow: hidden; box-shadow: 2px 0 20px rgba(0,0,0,0.04); }
+        .sidebar.collapsed { width: var(--sidebar-collapsed-w); }
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 199; backdrop-filter: blur(2px); }
+        .sidebar-overlay.show { display: block; }
+        .sidebar-header { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: var(--header-h); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+        .brand-wrap { display: flex; align-items: center; gap: 10px; overflow: hidden; }
+        .brand-logo { width: 36px; height: 36px; border-radius: 12px; background: linear-gradient(135deg, #1e3a8a, #8b5cf6); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px; font-weight: 900; color: white; }
+        .brand-name { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(135deg, #1e3a8a, #3b82f6, #8b5cf6, #ec4899); -webkit-background-clip: text; background-clip: text; color: transparent; white-space: nowrap; overflow: hidden; transition: opacity 0.2s, width 0.3s; }
+        .sidebar.collapsed .brand-name { opacity: 0; width: 0; }
+        .toggle-btn { width: 32px; height: 32px; border-radius: 10px; border: none; background: var(--bg); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: background 0.2s, color 0.2s; flex-shrink: 0; }
+        .toggle-btn:hover { background: var(--purple-light); color: var(--purple); }
+        .toggle-btn i { font-size: 20px; transition: transform 0.3s; }
+        .sidebar.collapsed .toggle-btn i { transform: rotate(180deg); }
+        .sidebar-user { padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+        .sidebar-user:hover { background: var(--bg); }
+        .sidebar-avatar { width: 40px; height: 40px; border-radius: 14px; background: linear-gradient(135deg, var(--purple), #ec4899); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; color: white; flex-shrink: 0; }
+        .sidebar-user-info { overflow: hidden; transition: opacity 0.2s; }
+        .sidebar.collapsed .sidebar-user-info { opacity: 0; width: 0; }
+        .sidebar-user-name { font-weight: 600; font-size: 14px; color: var(--text); white-space: nowrap; }
+        .sidebar-user-email { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
+        .sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; overflow-x: hidden; }
+        .sidebar-nav::-webkit-scrollbar { width: 4px; }
+        .sidebar-nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        .nav-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; padding: 8px 10px 4px; white-space: nowrap; overflow: hidden; transition: opacity 0.2s; }
+        .sidebar.collapsed .nav-label { opacity: 0; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 14px; cursor: pointer; transition: all 0.2s; color: var(--text-muted); margin-bottom: 2px; white-space: nowrap; overflow: hidden; }
+        .nav-item:hover { background: var(--bg); color: var(--purple); }
+        .nav-item.active { background: var(--purple-light); color: var(--purple); font-weight: 600; }
+        .nav-item i { font-size: 22px; flex-shrink: 0; }
+        .nav-item-label { font-size: 14px; transition: opacity 0.2s; }
+        .sidebar.collapsed .nav-item-label { opacity: 0; width: 0; }
+        .nav-badge { margin-left: auto; background: var(--purple); color: white; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; flex-shrink: 0; transition: opacity 0.2s; }
+        .sidebar.collapsed .nav-badge { opacity: 0; }
+        .sidebar-footer { padding: 12px 10px 16px; border-top: 1px solid var(--border); flex-shrink: 0; }
+        /* MAIN */
+        .main { flex: 1; margin-left: var(--sidebar-w); transition: margin-left 0.3s cubic-bezier(0.4,0,0.2,1); min-height: 100vh; display: flex; flex-direction: column; }
+        .main.expanded { margin-left: var(--sidebar-collapsed-w); }
+        /* TOPBAR */
+        .topbar { height: var(--header-h); background: var(--white); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 8px rgba(0,0,0,0.04); }
+        .topbar-left { display: flex; align-items: center; gap: 12px; }
+        .topbar-mobile-toggle { display: none; width: 36px; height: 36px; border-radius: 10px; border: none; background: var(--bg); cursor: pointer; align-items: center; justify-content: center; color: var(--text); transition: background 0.2s; }
+        .topbar-mobile-toggle:hover { background: var(--purple-light); }
+        .topbar-mobile-toggle i { font-size: 22px; }
+        .topbar-greeting { font-size: 15px; font-weight: 600; color: var(--text); }
+        .topbar-date { font-size: 12px; color: var(--text-muted); }
+        .topbar-right { display: flex; align-items: center; gap: 10px; }
+        .topbar-icon-btn { width: 36px; height: 36px; border-radius: 10px; border: none; background: var(--bg); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: all 0.2s; position: relative; }
+        .topbar-icon-btn:hover { background: var(--purple-light); color: var(--purple); }
+        .topbar-icon-btn i { font-size: 20px; }
+        .notif-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--orange); border: 2px solid var(--white); }
+        .topbar-avatar { width: 36px; height: 36px; border-radius: 12px; background: linear-gradient(135deg, var(--purple), #ec4899); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; color: white; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
+        .topbar-avatar:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(139,92,246,0.3); }
+        .dropdown { position: absolute; top: 44px; right: 0; background: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); width: 170px; overflow: hidden; z-index: 300; display: none; border: 1px solid var(--border); animation: dropFade 0.18s ease; }
+        @keyframes dropFade { from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);} }
+        .dropdown.show { display: block; }
+        .dd-item { padding: 12px 16px; display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; color: var(--text); transition: background 0.15s; }
+        .dd-item:hover { background: var(--bg); }
+        .dd-item.danger { color: #e53e3e; border-top: 1px solid var(--border); }
+        .dd-item i { font-size: 18px; }
+        /* PAGE */
+        .page-content { flex: 1; padding: 28px; max-width: 900px; width: 100%; margin: 0 auto; }
+        /* NOTIF HEADER BANNER */
+        .notif-banner { background: linear-gradient(135deg, var(--purple) 0%, #6d28d9 60%, #4f46e5 100%); border-radius: 24px; padding: 24px 28px; color: white; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; overflow: hidden; position: relative; box-shadow: 0 8px 24px rgba(139,92,246,0.3); animation: fadeUp 0.5s ease both; }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);} }
+        .notif-banner::before { content:''; position:absolute; top:-60px; right:-40px; width:200px; height:200px; border-radius:50%; background:rgba(255,255,255,0.08); }
+        .notif-banner-text h2 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+        .notif-banner-text p { font-size: 13px; opacity: 0.85; }
+        .notif-banner-icon { font-size: 52px; position: relative; z-index: 1; animation: floatIcon 3s infinite ease-in-out; }
+        @keyframes floatIcon { 0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);} }
+        .notif-actions { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; }
+        .btn-mark-all { background: var(--purple); color: white; border: none; padding: 10px 20px; border-radius: 14px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(139,92,246,0.3); }
+        .btn-mark-all:hover { background: var(--purple-dark); transform: translateY(-2px); }
+        .btn-mark-all i { font-size: 16px; }
+        .notif-filter { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+        .notif-filter::-webkit-scrollbar { display: none; }
+        .filter-chip { background: var(--white); border: 1px solid var(--border); padding: 7px 16px; border-radius: 40px; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+        .filter-chip.active { background: var(--purple); color: white; border-color: var(--purple); }
+        .filter-chip:hover:not(.active) { background: var(--purple-light); color: var(--purple); }
+        /* NOTIF LIST */
+        .notif-list { display: flex; flex-direction: column; gap: 10px; animation: fadeUp 0.5s 0.15s ease both; }
+        .notif-card { background: var(--white); border-radius: 18px; padding: 16px 18px; display: flex; gap: 14px; align-items: flex-start; border: 1px solid var(--border); transition: all 0.2s; position: relative; cursor: pointer; }
+        .notif-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.06); }
+        .notif-card.unread { border-left: 4px solid var(--purple); background: #faf5ff; }
+        .notif-card.unread .notif-card-title { font-weight: 700; }
+        .notif-icon-wrap { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 22px; }
+        .notif-icon-wrap.deadline { background: #fef3c7; }
+        .notif-icon-wrap.tip { background: var(--purple-light); }
+        .notif-icon-wrap.success { background: #d1fae5; }
+        .notif-icon-wrap.info { background: #dbeafe; }
+        .notif-icon-wrap.warning { background: #fee2e2; }
+        .notif-body { flex: 1; }
+        .notif-card-title { font-size: 14px; color: var(--text); margin-bottom: 4px; font-weight: 500; }
+        .notif-card-msg { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+        .notif-card-time { font-size: 11px; color: #94a3b8; margin-top: 6px; }
+        .notif-unread-dot { position: absolute; top: 16px; right: 16px; width: 8px; height: 8px; border-radius: 50%; background: var(--purple); }
+        .empty-notif { text-align: center; padding: 60px 20px; color: var(--text-muted); background: var(--white); border-radius: 20px; border: 1px solid var(--border); }
+        .empty-notif i { font-size: 52px; opacity: 0.4; margin-bottom: 12px; display: block; }
+        /* BOTTOM NAV */
+        .bottom-nav { display: none; background: var(--white); border-top: 1px solid var(--border); position: fixed; bottom: 0; left: 0; right: 0; z-index: 200; padding: 8px 12px 16px; justify-content: space-around; box-shadow: 0 -4px 16px rgba(0,0,0,0.06); }
+        .bnav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; color: #94a3b8; cursor: pointer; padding: 6px 12px; border-radius: 16px; transition: all 0.2s; flex: 1; }
+        .bnav-item i { font-size: 22px; }
+        .bnav-item.active { color: var(--purple); background: var(--purple-light); }
+        .bnav-item:hover:not(.active) { color: var(--purple); }
+        @media (max-width: 900px) {
+            .sidebar { transform: translateX(-100%); width: var(--sidebar-w) !important; box-shadow: none; }
+            .sidebar.mobile-open { transform: translateX(0); box-shadow: 4px 0 30px rgba(0,0,0,0.15); }
+            .main { margin-left: 0 !important; padding-bottom: 70px; }
+            .topbar-mobile-toggle { display: flex !important; }
+            .bottom-nav { display: flex; }
+            .page-content { padding: 16px; }
+            .topbar { padding: 0 16px; }
+        }
+        .relative { position: relative; }
+    </style>
+</head>
+<body>
+<div class="bg-blob bg-blob-1"></div>
+<div class="bg-blob bg-blob-2"></div>
+<div class="layout">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-wrap">
+                <div class="brand-logo">R</div>
+                <div class="brand-name">RemindU</div>
+            </div>
+            <button class="toggle-btn" id="sidebarToggle"><i class="material-icons-round">chevron_left</i></button>
+        </div>
+        <div class="sidebar-user" id="sidebarUser">
+            <div class="sidebar-avatar" id="sidebarAvatar">A</div>
+            <div class="sidebar-user-info">
+                <div class="sidebar-user-name" id="sidebarName">User</div>
+                <div class="sidebar-user-email" id="sidebarEmail">user@email.com</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-label">Menu Utama</div>
+            <div class="nav-item" data-nav="home"><i class="material-icons-round">home</i><span class="nav-item-label">Beranda</span></div>
+            <div class="nav-item" data-nav="calendar"><i class="material-icons-round">calendar_month</i><span class="nav-item-label">Kalender</span></div>
+            <div class="nav-item active" data-nav="notification"><i class="material-icons-round">notifications</i><span class="nav-item-label">Notifikasi</span><span class="nav-badge" id="notifBadge">0</span></div>
+            <div class="nav-label" style="margin-top:8px;">Lainnya</div>
+            <div class="nav-item" data-nav="settings"><i class="material-icons-round">settings</i><span class="nav-item-label">Pengaturan</span></div>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="nav-item" id="sidebarLogout" style="color:#e53e3e;"><i class="material-icons-round">logout</i><span class="nav-item-label">Keluar</span></div>
+        </div>
+    </aside>
+    <main class="main" id="mainContent">
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="topbar-mobile-toggle" id="mobileMenuBtn"><i class="material-icons-round">menu</i></button>
+                <div>
+                    <div class="topbar-greeting" id="topbarGreeting">Halo!</div>
+                    <div class="topbar-date" id="topbarDate"></div>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-icon-btn" id="topbarNotif"><i class="material-icons-round">notifications_none</i><span class="notif-dot" id="notifDot" style="display:none;"></span></button>
+                <div class="topbar-avatar relative" id="topbarAvatar">
+                    <span id="topbarAvatarChar">A</span>
+                    <div class="dropdown" id="dropdown">
+                        <div class="dd-item" id="ddProfile"><i class="material-icons-round">person</i> Profil</div>
+                        <div class="dd-item danger" id="ddLogout"><i class="material-icons-round">logout</i> Keluar</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <div class="page-content">
+            <div class="notif-banner">
+                <div class="notif-banner-text">
+                    <h2>Notifikasi</h2>
+                    <p>Pantau semua pengingat dan update task kamu di sini.</p>
+                </div>
+                <div class="notif-banner-icon">🔔</div>
+            </div>
+            <div class="notif-actions">
+                <button class="btn-mark-all" id="btnMarkAll"><i class="material-icons-round">done_all</i> Tandai Semua Dibaca</button>
+                <div class="notif-filter">
+                    <div class="filter-chip active" data-filter="all">Semua</div>
+                    <div class="filter-chip" data-filter="deadline">⏰ Deadline</div>
+                    <div class="filter-chip" data-filter="tip">💡 Tips</div>
+                    <div class="filter-chip" data-filter="success">✅ Selesai</div>
+                </div>
+            </div>
+            <div class="notif-list" id="notifList"></div>
+        </div>
+    </main>
+    <nav class="bottom-nav">
+        <div class="bnav-item" data-nav="home"><i class="material-icons-round">home</i><span>Home</span></div>
+        <div class="bnav-item" data-nav="calendar"><i class="material-icons-round">calendar_month</i><span>Kalender</span></div>
+        <div class="bnav-item active" data-nav="notification"><i class="material-icons-round">notifications</i><span>Notif</span></div>
+        <div class="bnav-item" data-nav="settings"><i class="material-icons-round">settings</i><span>Setting</span></div>
+    </nav>
+</div>
+<script>
+(function() {
+    const userData = JSON.parse(localStorage.getItem('remindu_user') || '{}');
+    const userEmail = userData.email;
+    if (!userEmail) { window.location.href = 'welcome.html'; return; }
+    const firstName = userEmail.split('@')[0];
+    const displayName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
+    document.getElementById('sidebarName').textContent = displayName;
+    document.getElementById('sidebarEmail').textContent = userEmail;
+    document.getElementById('topbarGreeting').textContent = `Halo, ${displayName}!`;
+    document.getElementById('topbarDate').textContent = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    const savedAvatar = localStorage.getItem('user_avatar');
+    const avatarChar = (savedAvatar && savedAvatar.length <= 2) ? savedAvatar : userEmail.charAt(0).toUpperCase();
+    document.getElementById('sidebarAvatar').textContent = avatarChar;
+    document.getElementById('topbarAvatarChar').textContent = avatarChar;
+
+    // SIDEBAR
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    let sidebarCollapsed = localStorage.getItem('sidebar_collapsed') === 'true';
+    if (sidebarCollapsed) { sidebar.classList.add('collapsed'); mainContent.classList.add('expanded'); }
+    sidebarToggle.addEventListener('click', () => {
+        sidebarCollapsed = !sidebarCollapsed;
+        localStorage.setItem('sidebar_collapsed', sidebarCollapsed);
+        sidebar.classList.toggle('collapsed', sidebarCollapsed);
+        mainContent.classList.toggle('expanded', sidebarCollapsed);
+    });
+    const overlay = document.getElementById('sidebarOverlay');
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    function checkMobile() { mobileMenuBtn.style.display = window.innerWidth <= 900 ? 'flex' : 'none'; }
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    mobileMenuBtn.addEventListener('click', () => { sidebar.classList.toggle('mobile-open'); overlay.classList.toggle('show'); });
+    overlay.addEventListener('click', () => { sidebar.classList.remove('mobile-open'); overlay.classList.remove('show'); });
+
+    // DROPDOWN & NAV
+    const avatarBtn = document.getElementById('topbarAvatar');
+    const dropdown = document.getElementById('dropdown');
+    avatarBtn.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('show'); });
+    document.addEventListener('click', () => dropdown.classList.remove('show'));
+    document.getElementById('ddProfile').addEventListener('click', () => window.location.href = 'profil.html');
+    document.getElementById('ddLogout').addEventListener('click', () => { localStorage.removeItem('remindu_user'); window.location.href = 'welcome.html'; });
+    document.getElementById('sidebarLogout').addEventListener('click', () => { localStorage.removeItem('remindu_user'); window.location.href = 'welcome.html'; });
+    document.getElementById('sidebarUser').addEventListener('click', () => window.location.href = 'profil.html');
+    function handleNav(nav) {
+        if (nav === 'home') window.location.href = 'home.html';
+        else if (nav === 'calendar') window.location.href = 'calendar.html';
+        else if (nav === 'notification') window.location.reload();
+        else if (nav === 'settings') window.location.href = 'settings.html';
+    }
+    document.querySelectorAll('.nav-item[data-nav]').forEach(el => el.addEventListener('click', () => handleNav(el.dataset.nav)));
+    document.querySelectorAll('.bnav-item[data-nav]').forEach(el => el.addEventListener('click', () => handleNav(el.dataset.nav)));
+    document.getElementById('topbarNotif').addEventListener('click', () => {});
+
+    // NOTIFIKASI DATA
+    let allNotifs = JSON.parse(localStorage.getItem('remindu_notifs') || 'null');
+    if (!allNotifs) {
+        allNotifs = [
+            { id: 1, type: 'deadline', icon: '⏰', title: 'Deadline Mendekat!', msg: 'Salah satu task kamu segera jatuh tempo. Jangan sampai terlewat ya!', time: new Date(Date.now() - 3600000 * 2).toISOString(), read: false },
+            { id: 2, type: 'tip', icon: '💡', title: 'Tips RemindU', msg: 'Coba pecah task besar menjadi sub-task kecil agar lebih mudah diselesaikan satu per satu.', time: new Date(Date.now() - 3600000 * 8).toISOString(), read: false },
+            { id: 3, type: 'success', icon: '✅', title: 'Task Selesai!', msg: 'Kamu telah menyelesaikan task. Pertahankan konsistensimu!', time: new Date(Date.now() - 86400000).toISOString(), read: true },
+            { id: 4, type: 'tip', icon: '🔥', title: 'Jaga Momentummu', msg: 'Kamu sudah produktif belakangan ini. Terus lanjutkan dan jaga streak produktivitasmu!', time: new Date(Date.now() - 86400000 * 2).toISOString(), read: true },
+            { id: 5, type: 'deadline', icon: '📋', title: 'Jadwal Diperbarui', msg: 'Task kamu telah diperbarui. Cek jadwal terbaru agar tidak ada yang terlewat.', time: new Date(Date.now() - 86400000 * 5).toISOString(), read: true },
+        ];
+        localStorage.setItem('remindu_notifs', JSON.stringify(allNotifs));
+    }
+
+    let currentFilter = 'all';
+
+    function formatTime(iso) {
+        const d = new Date(iso);
+        const diff = Date.now() - d.getTime();
+        if (diff < 3600000) return `${Math.max(1, Math.floor(diff/60000))} menit lalu`;
+        if (diff < 86400000) return `${Math.floor(diff/3600000)} jam lalu`;
+        if (diff < 86400000*7) return `${Math.floor(diff/86400000)} hari lalu`;
+        return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    function iconClass(type) {
+        if (type === 'deadline') return 'deadline';
+        if (type === 'tip') return 'tip';
+        if (type === 'success') return 'success';
+        return 'info';
+    }
+
+    function renderNotifs() {
+        const list = document.getElementById('notifList');
+        const filtered = currentFilter === 'all' ? allNotifs : allNotifs.filter(n => n.type === currentFilter);
+        const unread = allNotifs.filter(n => !n.read).length;
+        document.getElementById('notifBadge').textContent = unread;
+        document.getElementById('notifDot').style.display = unread > 0 ? 'block' : 'none';
+        list.innerHTML = '';
+        if (filtered.length === 0) {
+            list.innerHTML = `<div class="empty-notif"><i class="material-icons-round">notifications_none</i><p>Tidak ada notifikasi di sini.</p></div>`;
+            return;
+        }
+        filtered.forEach(n => {
+            const card = document.createElement('div');
+            card.className = 'notif-card' + (!n.read ? ' unread' : '');
+            card.innerHTML = `
+                <div class="notif-icon-wrap ${iconClass(n.type)}">${n.icon}</div>
+                <div class="notif-body">
+                    <div class="notif-card-title">${n.title}</div>
+                    <div class="notif-card-msg">${n.msg}</div>
+                    <div class="notif-card-time">${formatTime(n.time)}</div>
+                </div>
+                ${!n.read ? '<div class="notif-unread-dot"></div>' : ''}`;
+            card.addEventListener('click', () => {
+                n.read = true;
+                localStorage.setItem('remindu_notifs', JSON.stringify(allNotifs));
+                renderNotifs();
+            });
+            list.appendChild(card);
+        });
+    }
+
+    // Tambah notifikasi dari tasks
+    async function loadTaskNotifs() {
+        try {
+            const res = await fetch('http://localhost:3000/api/tasks', { headers: { 'X-User-Email': userEmail } });
+            if (!res.ok) return;
+            const tasks = await res.json();
+            const badge = document.getElementById('notifBadge');
+            const unfinished = tasks.filter(t => !t.selesai).length;
+            if (badge) badge.textContent = unfinished;
+            // Cek task yang hampir deadline (dalam 24 jam)
+            tasks.forEach(task => {
+                if (!task.selesai && task.due_date) {
+                    const diff = new Date(task.due_date) - Date.now();
+                    if (diff > 0 && diff < 86400000) {
+                        const exists = allNotifs.some(n => n.taskId === task.id_task && n.type === 'deadline');
+                        if (!exists) {
+                            allNotifs.unshift({
+                                id: Date.now(),
+                                taskId: task.id_task,
+                                type: 'deadline',
+                                icon: '⏰',
+                                title: 'Deadline Mendekat!',
+                                msg: `Task "${task.judul}" akan jatuh tempo kurang dari 24 jam lagi. Segera selesaikan!`,
+                                time: new Date().toISOString(),
+                                read: false
+                            });
+                        }
+                    }
+                }
+            });
+            localStorage.setItem('remindu_notifs', JSON.stringify(allNotifs));
+            renderNotifs();
+        } catch(e) {}
+    }
+
+    document.getElementById('btnMarkAll').addEventListener('click', () => {
+        allNotifs.forEach(n => n.read = true);
+        localStorage.setItem('remindu_notifs', JSON.stringify(allNotifs));
+        renderNotifs();
+    });
+
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            currentFilter = chip.dataset.filter;
+            renderNotifs();
+        });
+    });
+
+    loadTaskNotifs();
+    renderNotifs();
+})();
+</script>
+</body>
+</html>

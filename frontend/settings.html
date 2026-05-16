@@ -2,58 +2,496 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>RemindU - Settings</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
-        body { background: linear-gradient(145deg, #f5f7fe 0%, #eef2fa 100%); padding: 20px; min-height: 100vh; }
-        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 36px; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1); overflow: hidden; }
-        .page-content { padding: 28px 24px 36px; }
-        .header { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; position: relative; justify-content: center; }
-        .btn-back { position: absolute; left: 0; background: none; border: none; font-size: 24px; cursor: pointer; color: #8b5cf6; padding: 8px; border-radius: 50%; }
-        .btn-back:hover { background: #f1f5f9; }
-        h2 { font-size: 24px; font-weight: 600; color: #1e293b; }
-        .menu-list { display: flex; flex-direction: column; gap: 8px; }
-        .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 12px; background: #f8fafc; border-radius: 28px; cursor: pointer; transition: 0.2s; border: 1px solid #edf2f7; }
-        .menu-item:hover { background: #f1f5f9; transform: translateX(4px); }
-        .menu-left { display: flex; flex-direction: column; gap: 4px; }
-        .menu-title { font-weight: 600; color: #1e293b; }
-        .menu-sub { font-size: 13px; color: #64748b; }
-        .arrow-icon { color: #94a3b8; font-size: 18px; }
+        :root {
+            --purple: #8b5cf6;
+            --purple-dark: #7c3aed;
+            --purple-light: #ede9fe;
+            --bg: #f5f7fe;
+            --white: #ffffff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --border: #edf2f7;
+            --sidebar-w: 260px;
+            --sidebar-collapsed-w: 72px;
+            --header-h: 64px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+        body { background: var(--bg); min-height: 100vh; overflow-x: hidden; position: relative; }
+        .bg-blob { position: fixed; border-radius: 50%; filter: blur(60px); opacity: 0.38; pointer-events: none; z-index: 0; }
+        .bg-blob-1 { width: 400px; height: 400px; background: var(--purple); top: -100px; right: -100px; }
+        .bg-blob-2 { width: 300px; height: 300px; background: #ec4899; bottom: -80px; left: -80px; }
+        .layout { display: flex; min-height: 100vh; position: relative; z-index: 5; }
+        /* SIDEBAR */
+        .sidebar { width: var(--sidebar-w); background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 200; transition: width 0.3s cubic-bezier(0.4,0,0.2,1), transform 0.3s; overflow: hidden; box-shadow: 2px 0 20px rgba(0,0,0,0.04); }
+        .sidebar.collapsed { width: var(--sidebar-collapsed-w); }
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 199; backdrop-filter: blur(2px); }
+        .sidebar-overlay.show { display: block; }
+        .sidebar-header { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: var(--header-h); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+        .brand-wrap { display: flex; align-items: center; gap: 10px; overflow: hidden; }
+        .brand-logo { width: 36px; height: 36px; border-radius: 12px; background: linear-gradient(135deg, #1e3a8a, #8b5cf6); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px; font-weight: 900; color: white; }
+        .brand-name { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(135deg, #1e3a8a, #3b82f6, #8b5cf6, #ec4899); -webkit-background-clip: text; background-clip: text; color: transparent; white-space: nowrap; overflow: hidden; transition: opacity 0.2s, width 0.3s; }
+        .sidebar.collapsed .brand-name { opacity: 0; width: 0; }
+        .toggle-btn { width: 32px; height: 32px; border-radius: 10px; border: none; background: var(--bg); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: background 0.2s, color 0.2s; flex-shrink: 0; }
+        .toggle-btn:hover { background: var(--purple-light); color: var(--purple); }
+        .toggle-btn i { font-size: 20px; transition: transform 0.3s; }
+        .sidebar.collapsed .toggle-btn i { transform: rotate(180deg); }
+        .sidebar-user { padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+        .sidebar-user:hover { background: var(--bg); }
+        .sidebar-avatar { width: 40px; height: 40px; border-radius: 14px; background: linear-gradient(135deg, var(--purple), #ec4899); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; color: white; flex-shrink: 0; }
+        .sidebar-user-info { overflow: hidden; transition: opacity 0.2s; }
+        .sidebar.collapsed .sidebar-user-info { opacity: 0; width: 0; }
+        .sidebar-user-name { font-weight: 600; font-size: 14px; color: var(--text); white-space: nowrap; }
+        .sidebar-user-email { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
+        .sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; overflow-x: hidden; }
+        .sidebar-nav::-webkit-scrollbar { width: 4px; }
+        .sidebar-nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        .nav-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; padding: 8px 10px 4px; white-space: nowrap; overflow: hidden; transition: opacity 0.2s; }
+        .sidebar.collapsed .nav-label { opacity: 0; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 14px; cursor: pointer; transition: all 0.2s; color: var(--text-muted); margin-bottom: 2px; white-space: nowrap; overflow: hidden; }
+        .nav-item:hover { background: var(--bg); color: var(--purple); }
+        .nav-item.active { background: var(--purple-light); color: var(--purple); font-weight: 600; }
+        .nav-item i { font-size: 22px; flex-shrink: 0; }
+        .nav-item-label { font-size: 14px; transition: opacity 0.2s; }
+        .sidebar.collapsed .nav-item-label { opacity: 0; width: 0; }
+        .nav-badge { margin-left: auto; background: var(--purple); color: white; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; flex-shrink: 0; transition: opacity 0.2s; }
+        .sidebar.collapsed .nav-badge { opacity: 0; }
+        .sidebar-footer { padding: 12px 10px 16px; border-top: 1px solid var(--border); flex-shrink: 0; }
+        /* MAIN */
+        .main { flex: 1; margin-left: var(--sidebar-w); transition: margin-left 0.3s cubic-bezier(0.4,0,0.2,1); min-height: 100vh; display: flex; flex-direction: column; }
+        .main.expanded { margin-left: var(--sidebar-collapsed-w); }
+        /* TOPBAR */
+        .topbar { height: var(--header-h); background: var(--white); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 8px rgba(0,0,0,0.04); }
+        .topbar-left { display: flex; align-items: center; gap: 12px; }
+        .topbar-mobile-toggle { display: none; width: 36px; height: 36px; border-radius: 10px; border: none; background: var(--bg); cursor: pointer; align-items: center; justify-content: center; color: var(--text); transition: background 0.2s; }
+        .topbar-mobile-toggle:hover { background: var(--purple-light); }
+        .topbar-mobile-toggle i { font-size: 22px; }
+        .topbar-greeting { font-size: 15px; font-weight: 600; color: var(--text); }
+        .topbar-date { font-size: 12px; color: var(--text-muted); }
+        .topbar-right { display: flex; align-items: center; gap: 10px; }
+        .topbar-icon-btn { width: 36px; height: 36px; border-radius: 10px; border: none; background: var(--bg); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: all 0.2s; position: relative; }
+        .topbar-icon-btn:hover { background: var(--purple-light); color: var(--purple); }
+        .topbar-icon-btn i { font-size: 20px; }
+        .notif-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: #f97316; border: 2px solid var(--white); }
+        .topbar-avatar { width: 36px; height: 36px; border-radius: 12px; background: linear-gradient(135deg, var(--purple), #ec4899); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; color: white; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
+        .topbar-avatar:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(139,92,246,0.3); }
+        .dropdown { position: absolute; top: 44px; right: 0; background: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); width: 170px; overflow: hidden; z-index: 300; display: none; border: 1px solid var(--border); animation: dropFade 0.18s ease; }
+        @keyframes dropFade { from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);} }
+        .dropdown.show { display: block; }
+        .dd-item { padding: 12px 16px; display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; color: var(--text); transition: background 0.15s; }
+        .dd-item:hover { background: var(--bg); }
+        .dd-item.danger { color: #e53e3e; border-top: 1px solid var(--border); }
+        .dd-item i { font-size: 18px; }
+        /* PAGE */
+        .page-content { flex: 1; padding: 28px; max-width: 800px; width: 100%; margin: 0 auto; }
+        /* BANNER */
+        .settings-banner { background: linear-gradient(135deg, var(--purple) 0%, #6d28d9 60%, #4f46e5 100%); border-radius: 24px; padding: 24px 28px; color: white; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; overflow: hidden; position: relative; box-shadow: 0 8px 24px rgba(139,92,246,0.3); animation: fadeUp 0.5s ease both; }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);} }
+        .settings-banner::before { content:''; position:absolute; top:-60px; right:-40px; width:200px; height:200px; border-radius:50%; background:rgba(255,255,255,0.08); }
+        .settings-banner h2 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+        .settings-banner p { font-size: 13px; opacity: 0.85; }
+        .settings-banner-icon { font-size: 52px; animation: floatIcon 3s infinite ease-in-out; position: relative; z-index: 1; }
+        @keyframes floatIcon { 0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);} }
+        /* SECTIONS */
+        .settings-section { background: var(--white); border-radius: 24px; padding: 20px; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.03); margin-bottom: 16px; animation: fadeUp 0.5s 0.1s ease both; }
+        .settings-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; margin-bottom: 12px; }
+        .settings-item { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--border); cursor: pointer; transition: all 0.2s; border-radius: 0; }
+        .settings-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .settings-item:first-of-type { padding-top: 0; }
+        .settings-item:hover .settings-item-left { transform: translateX(4px); }
+        .settings-item-left { display: flex; align-items: center; gap: 14px; transition: transform 0.2s; }
+        .settings-item-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .settings-item-icon.purple { background: var(--purple-light); color: var(--purple); }
+        .settings-item-icon.blue { background: #dbeafe; color: #3b82f6; }
+        .settings-item-icon.green { background: #d1fae5; color: #10b981; }
+        .settings-item-icon.orange { background: #fef3c7; color: #f97316; }
+        .settings-item-icon.pink { background: #fce7f3; color: #ec4899; }
+        .settings-item-icon i { font-size: 20px; }
+        .settings-item-text { }
+        .settings-item-title { font-size: 14px; font-weight: 600; color: var(--text); }
+        .settings-item-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        .settings-item-right { display: flex; align-items: center; gap: 8px; color: var(--text-muted); }
+        .settings-item-right i { font-size: 20px; }
+        /* SWITCH */
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #cbd5e1; transition: 0.3s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background: white; transition: 0.3s; border-radius: 50%; }
+        input:checked + .slider { background: var(--purple); }
+        input:checked + .slider:before { transform: translateX(20px); }
+        /* BOTTOM NAV */
+        .bottom-nav { display: none; background: var(--white); border-top: 1px solid var(--border); position: fixed; bottom: 0; left: 0; right: 0; z-index: 200; padding: 8px 12px 16px; justify-content: space-around; box-shadow: 0 -4px 16px rgba(0,0,0,0.06); }
+        .bnav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; color: #94a3b8; cursor: pointer; padding: 6px 12px; border-radius: 16px; transition: all 0.2s; flex: 1; }
+        .bnav-item i { font-size: 22px; }
+        .bnav-item.active { color: var(--purple); background: var(--purple-light); }
+        @media (max-width: 900px) {
+            .sidebar { transform: translateX(-100%); width: var(--sidebar-w) !important; }
+            .sidebar.mobile-open { transform: translateX(0); box-shadow: 4px 0 30px rgba(0,0,0,0.15); }
+            .main { margin-left: 0 !important; padding-bottom: 70px; }
+            .topbar-mobile-toggle { display: flex !important; }
+            .bottom-nav { display: flex; }
+            .page-content { padding: 16px; }
+            .topbar { padding: 0 16px; }
+        }
+        .relative { position: relative; }
+        /* MODAL */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 400; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .modal-overlay.show { display: flex; }
+        .modal-box { background: white; border-radius: 24px; padding: 28px; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.2); animation: dropFade 0.2s ease; }
+        .modal-title { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+        .modal-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+        .modal-options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+        .modal-option { padding: 13px 16px; border-radius: 14px; border: 1px solid var(--border); cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; display: flex; align-items: center; gap: 10px; }
+        .modal-option:hover { background: var(--purple-light); border-color: var(--purple); color: var(--purple); }
+        .modal-option.selected { background: var(--purple-light); border-color: var(--purple); color: var(--purple); font-weight: 700; }
+        .modal-option i { font-size: 18px; }
+        .modal-footer { display: flex; gap: 10px; }
+        .btn-modal-cancel { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 14px; padding: 12px; font-weight: 600; cursor: pointer; font-size: 14px; }
+        .btn-modal-save { flex: 1; background: var(--purple); color: white; border: none; border-radius: 14px; padding: 12px; font-weight: 600; cursor: pointer; font-size: 14px; transition: background 0.2s; }
+        .btn-modal-save:hover { background: var(--purple-dark); }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="page-content">
-        <div class="header">
-            <button class="btn-back" id="backBtn">←</button>
-            <h2>Settings</h2>
+<div class="bg-blob bg-blob-1"></div>
+<div class="bg-blob bg-blob-2"></div>
+<div class="layout">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-wrap">
+                <div class="brand-logo">R</div>
+                <div class="brand-name">RemindU</div>
+            </div>
+            <button class="toggle-btn" id="sidebarToggle"><i class="material-icons-round">chevron_left</i></button>
         </div>
-        <div class="menu-list">
-            <div class="menu-item" id="notifSetting">
-                <div class="menu-left"><span class="menu-title">Notifications</span><span class="menu-sub">Enable/disable reminders</span></div>
-                <span class="arrow-icon">›</span>
+        <div class="sidebar-user" id="sidebarUser">
+            <div class="sidebar-avatar" id="sidebarAvatar">A</div>
+            <div class="sidebar-user-info">
+                <div class="sidebar-user-name" id="sidebarName">User</div>
+                <div class="sidebar-user-email" id="sidebarEmail">user@email.com</div>
             </div>
-            <div class="menu-item" id="themeSetting">
-                <div class="menu-left"><span class="menu-title">Theme</span><span class="menu-sub">Light / Dark mode</span></div>
-                <span class="arrow-icon">›</span>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-label">Menu Utama</div>
+            <div class="nav-item" data-nav="home"><i class="material-icons-round">home</i><span class="nav-item-label">Beranda</span></div>
+            <div class="nav-item" data-nav="calendar"><i class="material-icons-round">calendar_month</i><span class="nav-item-label">Kalender</span></div>
+            <div class="nav-item" data-nav="notification"><i class="material-icons-round">notifications</i><span class="nav-item-label">Notifikasi</span><span class="nav-badge" id="notifBadge">0</span></div>
+            <div class="nav-label" style="margin-top:8px;">Lainnya</div>
+            <div class="nav-item" data-nav="ai"><i class="material-icons-round">auto_awesome</i><span class="nav-item-label">AI Motivasi</span></div>
+            <div class="nav-item active" data-nav="settings"><i class="material-icons-round">settings</i><span class="nav-item-label">Pengaturan</span></div>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="nav-item" id="sidebarLogout" style="color:#e53e3e;"><i class="material-icons-round">logout</i><span class="nav-item-label">Keluar</span></div>
+        </div>
+    </aside>
+    <main class="main" id="mainContent">
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="topbar-mobile-toggle" id="mobileMenuBtn"><i class="material-icons-round">menu</i></button>
+                <div>
+                    <div class="topbar-greeting" id="topbarGreeting">Halo!</div>
+                    <div class="topbar-date" id="topbarDate"></div>
+                </div>
             </div>
-            <div class="menu-item" id="langSetting">
-                <div class="menu-left"><span class="menu-title">Language</span><span class="menu-sub">English, Indonesia</span></div>
-                <span class="arrow-icon">›</span>
+            <div class="topbar-right">
+                <button class="topbar-icon-btn" id="topbarNotif"><i class="material-icons-round">notifications_none</i><span class="notif-dot" id="notifDot" style="display:none;"></span></button>
+                <div class="topbar-avatar relative" id="topbarAvatar">
+                    <span id="topbarAvatarChar">A</span>
+                    <div class="dropdown" id="dropdown">
+                        <div class="dd-item" id="ddProfile"><i class="material-icons-round">person</i> Profil</div>
+                        <div class="dd-item danger" id="ddLogout"><i class="material-icons-round">logout</i> Keluar</div>
+                    </div>
+                </div>
             </div>
+        </header>
+        <div class="page-content">
+            <div class="settings-banner">
+                <div>
+                    <h2>Pengaturan</h2>
+                    <p>Sesuaikan RemindU sesuai kebutuhanmu.</p>
+                </div>
+                <div class="settings-banner-icon">⚙️</div>
+            </div>
+
+            <!-- KOSTUMASI -->
+            <div class="settings-section">
+                <div class="settings-section-title">Kostumasi</div>
+                <div class="settings-item" id="widgetSetting">
+                    <div class="settings-item-left">
+                        <div class="settings-item-icon purple"><i class="material-icons-round">widgets</i></div>
+                        <div class="settings-item-text">
+                            <div class="settings-item-title">Widget</div>
+                            <div class="settings-item-sub">Kelola widget beranda</div>
+                        </div>
+                    </div>
+                    <div class="settings-item-right"><i class="material-icons-round">chevron_right</i></div>
+                </div>
+                <div class="settings-item" id="notifSetting">
+                    <div class="settings-item-left">
+                        <div class="settings-item-icon blue"><i class="material-icons-round">notifications</i></div>
+                        <div class="settings-item-text">
+                            <div class="settings-item-title">Notifikasi</div>
+                            <div class="settings-item-sub">Atur pengingat dan alert</div>
+                        </div>
+                    </div>
+                    <div class="settings-item-right">
+                        <label class="switch" onclick="event.stopPropagation()">
+                            <input type="checkbox" id="notifToggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="settings-item" id="themeSetting">
+                    <div class="settings-item-left">
+                        <div class="settings-item-icon pink"><i class="material-icons-round">palette</i></div>
+                        <div class="settings-item-text">
+                            <div class="settings-item-title">Tema</div>
+                            <div class="settings-item-sub" id="themeLabel">Light</div>
+                        </div>
+                    </div>
+                    <div class="settings-item-right"><i class="material-icons-round">chevron_right</i></div>
+                </div>
+                <div class="settings-item" id="syncSetting">
+                    <div class="settings-item-left">
+                        <div class="settings-item-icon green"><i class="material-icons-round">sync</i></div>
+                        <div class="settings-item-text">
+                            <div class="settings-item-title">Sinkronisasi Kalender</div>
+                            <div class="settings-item-sub">Hubungkan kalender perangkat</div>
+                        </div>
+                    </div>
+                    <div class="settings-item-right">
+                        <label class="switch" onclick="event.stopPropagation()">
+                            <input type="checkbox" id="syncToggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DATE & TIME -->
+            <div class="settings-section">
+                <div class="settings-section-title">Tanggal & Waktu</div>
+                <div class="settings-item" id="dateFmtSetting">
+                    <div class="settings-item-left">
+                        <div class="settings-item-icon orange"><i class="material-icons-round">calendar_today</i></div>
+                        <div class="settings-item-text">
+                            <div class="settings-item-title">Format Tanggal</div>
+                            <div class="settings-item-sub" id="dateFmtLabel">DD/MM/YYYY</div>
+                        </div>
+                    </div>
+                    <div class="settings-item-right"><i class="material-icons-round">chevron_right</i></div>
+                </div>
+                <div class="settings-item" id="timeFmtSetting">
+                    <div class="settings-item-left">
+                        <div class="settings-item-icon blue"><i class="material-icons-round">schedule</i></div>
+                        <div class="settings-item-text">
+                            <div class="settings-item-title">Format Waktu</div>
+                            <div class="settings-item-sub" id="timeFmtLabel">24 Jam</div>
+                        </div>
+                    </div>
+                    <div class="settings-item-right"><i class="material-icons-round">chevron_right</i></div>
+                </div>
+                <div class="settings-item" id="firstDaySetting">
+                    <div class="settings-item-left">
+                        <div class="settings-item-icon purple"><i class="material-icons-round">event</i></div>
+                        <div class="settings-item-text">
+                            <div class="settings-item-title">Hari Pertama Minggu</div>
+                            <div class="settings-item-sub" id="firstDayLabel">Senin</div>
+                        </div>
+                    </div>
+                    <div class="settings-item-right"><i class="material-icons-round">chevron_right</i></div>
+                </div>
+            </div>
+
+            <!-- AI -->
+            <div class="settings-section">
+                <div class="settings-section-title">AI & Motivasi</div>
+                <div class="settings-item" id="aiSetting">
+                    <div class="settings-item-left">
+                        <div class="settings-item-icon purple"><i class="material-icons-round">auto_awesome</i></div>
+                        <div class="settings-item-text">
+                            <div class="settings-item-title">AI Motivasi Personal</div>
+                            <div class="settings-item-sub">Motivasi berbasis AI Claude</div>
+                        </div>
+                    </div>
+                    <div class="settings-item-right"><i class="material-icons-round">chevron_right</i></div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <nav class="bottom-nav">
+        <div class="bnav-item" data-nav="home"><i class="material-icons-round">home</i><span>Home</span></div>
+        <div class="bnav-item" data-nav="calendar"><i class="material-icons-round">calendar_month</i><span>Kalender</span></div>
+        <div class="bnav-item" data-nav="notification"><i class="material-icons-round">notifications</i><span>Notif</span></div>
+        <div class="bnav-item active" data-nav="settings"><i class="material-icons-round">settings</i><span>Setting</span></div>
+    </nav>
+</div>
+
+<!-- MODAL THEME -->
+<div class="modal-overlay" id="themeModal">
+    <div class="modal-box">
+        <div class="modal-title">Pilih Tema</div>
+        <div class="modal-sub">Sesuaikan tampilan RemindU kamu</div>
+        <div class="modal-options">
+            <div class="modal-option" data-val="light"><i class="material-icons-round">light_mode</i> Light</div>
+            <div class="modal-option" data-val="dark"><i class="material-icons-round">dark_mode</i> Dark</div>
+            <div class="modal-option selected" data-val="system"><i class="material-icons-round">devices</i> Ikuti Sistem</div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-modal-cancel" id="themeCancel">Batal</button>
+            <button class="btn-modal-save" id="themeSave">Simpan</button>
         </div>
     </div>
 </div>
+<!-- MODAL DATE FORMAT -->
+<div class="modal-overlay" id="dateFmtModal">
+    <div class="modal-box">
+        <div class="modal-title">Format Tanggal</div>
+        <div class="modal-sub">Pilih format penulisan tanggal</div>
+        <div class="modal-options">
+            <div class="modal-option selected" data-val="DD/MM/YYYY"><i class="material-icons-round">calendar_today</i> 27/12/2025 (DD/MM/YYYY)</div>
+            <div class="modal-option" data-val="MM/DD/YYYY"><i class="material-icons-round">calendar_today</i> 12/27/2025 (MM/DD/YYYY)</div>
+            <div class="modal-option" data-val="YYYY/MM/DD"><i class="material-icons-round">calendar_today</i> 2025/12/27 (YYYY/MM/DD)</div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-modal-cancel" id="dateFmtCancel">Batal</button>
+            <button class="btn-modal-save" id="dateFmtSave">Simpan</button>
+        </div>
+    </div>
+</div>
+<!-- MODAL TIME FORMAT -->
+<div class="modal-overlay" id="timeFmtModal">
+    <div class="modal-box">
+        <div class="modal-title">Format Waktu</div>
+        <div class="modal-sub">Pilih format jam yang digunakan</div>
+        <div class="modal-options">
+            <div class="modal-option selected" data-val="24"><i class="material-icons-round">schedule</i> 24 Jam (14:30)</div>
+            <div class="modal-option" data-val="12"><i class="material-icons-round">schedule</i> 12 Jam (2:30 PM)</div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-modal-cancel" id="timeFmtCancel">Batal</button>
+            <button class="btn-modal-save" id="timeFmtSave">Simpan</button>
+        </div>
+    </div>
+</div>
+<!-- MODAL FIRST DAY -->
+<div class="modal-overlay" id="firstDayModal">
+    <div class="modal-box">
+        <div class="modal-title">Hari Pertama Minggu</div>
+        <div class="modal-sub">Tentukan awal minggu di kalender</div>
+        <div class="modal-options">
+            <div class="modal-option selected" data-val="Senin"><i class="material-icons-round">event</i> Senin</div>
+            <div class="modal-option" data-val="Minggu"><i class="material-icons-round">event</i> Minggu</div>
+            <div class="modal-option" data-val="Sabtu"><i class="material-icons-round">event</i> Sabtu</div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-modal-cancel" id="firstDayCancel">Batal</button>
+            <button class="btn-modal-save" id="firstDaySave">Simpan</button>
+        </div>
+    </div>
+</div>
+
 <script>
+(function() {
     if (!JSON.parse(localStorage.getItem('remindu_user') || '{}').email) {
-        alert('Sesi login tidak ditemukan.');
-        window.location.href = 'welcome.html';
+        window.location.href = 'welcome.html'; return;
     }
-    document.getElementById('backBtn').onclick = () => window.location.href = 'home.html';
-    document.getElementById('notifSetting').onclick = () => alert('Pengaturan notifikasi akan hadir.');
-    document.getElementById('themeSetting').onclick = () => alert('Pilihan tema akan hadir.');
-    document.getElementById('langSetting').onclick = () => alert('Pilihan bahasa akan hadir.');
+    const userData = JSON.parse(localStorage.getItem('remindu_user'));
+    const userEmail = userData.email;
+    const firstName = userEmail.split('@')[0];
+    const displayName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
+    document.getElementById('sidebarName').textContent = displayName;
+    document.getElementById('sidebarEmail').textContent = userEmail;
+    document.getElementById('topbarGreeting').textContent = `Halo, ${displayName}!`;
+    document.getElementById('topbarDate').textContent = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    const savedAvatar = localStorage.getItem('user_avatar');
+    const avatarChar = (savedAvatar && savedAvatar.length <= 2) ? savedAvatar : userEmail.charAt(0).toUpperCase();
+    document.getElementById('sidebarAvatar').textContent = avatarChar;
+    document.getElementById('topbarAvatarChar').textContent = avatarChar;
+
+    // SIDEBAR
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    let sidebarCollapsed = localStorage.getItem('sidebar_collapsed') === 'true';
+    if (sidebarCollapsed) { sidebar.classList.add('collapsed'); mainContent.classList.add('expanded'); }
+    sidebarToggle.addEventListener('click', () => {
+        sidebarCollapsed = !sidebarCollapsed;
+        localStorage.setItem('sidebar_collapsed', sidebarCollapsed);
+        sidebar.classList.toggle('collapsed', sidebarCollapsed);
+        mainContent.classList.toggle('expanded', sidebarCollapsed);
+    });
+    const overlay = document.getElementById('sidebarOverlay');
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    function checkMobile() { mobileMenuBtn.style.display = window.innerWidth <= 900 ? 'flex' : 'none'; }
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    mobileMenuBtn.addEventListener('click', () => { sidebar.classList.toggle('mobile-open'); overlay.classList.toggle('show'); });
+    overlay.addEventListener('click', () => { sidebar.classList.remove('mobile-open'); overlay.classList.remove('show'); });
+
+    const avatarBtn = document.getElementById('topbarAvatar');
+    const dropdown = document.getElementById('dropdown');
+    avatarBtn.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('show'); });
+    document.addEventListener('click', () => dropdown.classList.remove('show'));
+    document.getElementById('ddProfile').addEventListener('click', () => window.location.href = 'profil.html');
+    document.getElementById('ddLogout').addEventListener('click', () => { localStorage.removeItem('remindu_user'); window.location.href = 'welcome.html'; });
+    document.getElementById('sidebarLogout').addEventListener('click', () => { localStorage.removeItem('remindu_user'); window.location.href = 'welcome.html'; });
+    document.getElementById('sidebarUser').addEventListener('click', () => window.location.href = 'profil.html');
+    function handleNav(nav) {
+        if (nav === 'home') window.location.href = 'home.html';
+        else if (nav === 'calendar') window.location.href = 'calendar.html';
+        else if (nav === 'notification') window.location.href = 'notification.html';
+        else if (nav === 'settings') window.location.reload();
+        else if (nav === 'ai') window.location.href = 'ai-motivation.html';
+    }
+    document.querySelectorAll('.nav-item[data-nav]').forEach(el => el.addEventListener('click', () => handleNav(el.dataset.nav)));
+    document.querySelectorAll('.bnav-item[data-nav]').forEach(el => el.addEventListener('click', () => handleNav(el.dataset.nav)));
+    document.getElementById('topbarNotif').addEventListener('click', () => window.location.href = 'notification.html');
+
+    // MODAL HELPER
+    function openModal(id) { document.getElementById(id).classList.add('show'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+    function setupModal(modalId, itemId, labelId, cancelId, saveId, settingKey) {
+        const modal = document.getElementById(modalId);
+        const label = document.getElementById(labelId);
+        const saved = localStorage.getItem(settingKey);
+        if (saved) {
+            label.textContent = saved;
+            modal.querySelectorAll('.modal-option').forEach(opt => {
+                opt.classList.toggle('selected', opt.dataset.val === saved);
+            });
+        }
+        document.getElementById(itemId).addEventListener('click', () => openModal(modalId));
+        modal.querySelectorAll('.modal-option').forEach(opt => {
+            opt.addEventListener('click', () => {
+                modal.querySelectorAll('.modal-option').forEach(o => o.classList.remove('selected'));
+                opt.classList.add('selected');
+            });
+        });
+        document.getElementById(cancelId).addEventListener('click', () => closeModal(modalId));
+        document.getElementById(saveId).addEventListener('click', () => {
+            const selected = modal.querySelector('.modal-option.selected');
+            if (selected) {
+                label.textContent = selected.dataset.val;
+                localStorage.setItem(settingKey, selected.dataset.val);
+            }
+            closeModal(modalId);
+        });
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(modalId); });
+    }
+
+    setupModal('themeModal', 'themeSetting', 'themeLabel', 'themeCancel', 'themeSave', 'remindu_theme');
+    setupModal('dateFmtModal', 'dateFmtSetting', 'dateFmtLabel', 'dateFmtCancel', 'dateFmtSave', 'remindu_datefmt');
+    setupModal('timeFmtModal', 'timeFmtSetting', 'timeFmtLabel', 'timeFmtCancel', 'timeFmtSave', 'remindu_timefmt');
+    setupModal('firstDayModal', 'firstDaySetting', 'firstDayLabel', 'firstDayCancel', 'firstDaySave', 'remindu_firstday');
+
+    document.getElementById('widgetSetting').addEventListener('click', () => alert('Fitur widget akan segera hadir.'));
+    document.getElementById('aiSetting').addEventListener('click', () => window.location.href = 'ai-motivation.html');
+    document.getElementById('syncSetting');
+})();
 </script>
 </body>
 </html>
