@@ -6,136 +6,125 @@
     <title>RemindU - Notifikasi</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <style>
-        /* (STYLE SAMA PERSIS DENGAN KODE NOTIFICATION YANG ANDA KIRIMKAN, SAYA SINGKAT KARENA SAMA) */
-        :root {
-            --purple: #8b5cf6;
-            --purple-dark: #7c3aed;
-            --purple-light: #ede9fe;
-            --blue: #3b82f6;
-            --orange: #f97316;
-            --green: #10b981;
-            --bg: #f5f7fe;
-            --white: #ffffff;
-            --text: #0f172a;
-            --text-muted: #64748b;
-            --border: #edf2f7;
-            --sidebar-w: 260px;
-            --sidebar-collapsed-w: 72px;
-            --header-h: 64px;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
-        body { background: var(--bg); min-height: 100vh; overflow-x: hidden; position: relative; }
-        .bg-blob { position: fixed; border-radius: 50%; filter: blur(60px); opacity: 0.38; pointer-events: none; z-index: 0; }
-        .bg-blob-1 { width: 400px; height: 400px; background: var(--purple); top: -100px; right: -100px; }
-        .bg-blob-2 { width: 300px; height: 300px; background: #ec4899; bottom: -80px; left: -80px; }
-        .layout { display: flex; min-height: 100vh; position: relative; z-index: 5; }
-        .sidebar { width: var(--sidebar-w); background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 200; transition: width 0.3s cubic-bezier(0.4,0,0.2,1), transform 0.3s; overflow: hidden; box-shadow: 2px 0 20px rgba(0,0,0,0.04); }
-        .sidebar.collapsed { width: var(--sidebar-collapsed-w); }
-        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 199; backdrop-filter: blur(2px); }
-        .sidebar-overlay.show { display: block; }
-        .sidebar-header { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: var(--header-h); border-bottom: 1px solid var(--border); flex-shrink: 0; }
-        .brand-wrap { display: flex; align-items: center; gap: 10px; overflow: hidden; }
-        .brand-logo { width: 36px; height: 36px; border-radius: 12px; background: linear-gradient(135deg, #1e3a8a, #8b5cf6); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px; font-weight: 900; color: white; }
-        .brand-name { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(135deg, #1e3a8a, #3b82f6, #8b5cf6, #ec4899); -webkit-background-clip: text; background-clip: text; color: transparent; white-space: nowrap; overflow: hidden; transition: opacity 0.2s, width 0.3s; }
-        .sidebar.collapsed .brand-name { opacity: 0; width: 0; }
-        .toggle-btn { width: 32px; height: 32px; border-radius: 10px; border: none; background: var(--bg); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: background 0.2s, color 0.2s; flex-shrink: 0; }
-        .toggle-btn:hover { background: var(--purple-light); color: var(--purple); }
-        .toggle-btn i { font-size: 20px; transition: transform 0.3s; }
-        .sidebar.collapsed .toggle-btn i { transform: rotate(180deg); }
-        .sidebar-user { padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
-        .sidebar-user:hover { background: var(--bg); }
-        .sidebar-avatar { width: 40px; height: 40px; border-radius: 14px; background: linear-gradient(135deg, var(--purple), #ec4899); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; color: white; flex-shrink: 0; background-size: cover; background-position: center; }
-        .sidebar-user-info { overflow: hidden; transition: opacity 0.2s; }
-        .sidebar.collapsed .sidebar-user-info { opacity: 0; width: 0; }
-        .sidebar-user-name { font-weight: 600; font-size: 14px; color: var(--text); white-space: nowrap; }
-        .sidebar-user-email { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
-        .sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; overflow-x: hidden; }
-        .sidebar-nav::-webkit-scrollbar { width: 4px; }
-        .sidebar-nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-        .nav-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; padding: 8px 10px 4px; white-space: nowrap; overflow: hidden; transition: opacity 0.2s; }
-        .sidebar.collapsed .nav-label { opacity: 0; }
-        .nav-item { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 14px; cursor: pointer; transition: all 0.2s; color: var(--text-muted); margin-bottom: 2px; white-space: nowrap; overflow: hidden; }
-        .nav-item:hover { background: var(--bg); color: var(--purple); }
-        .nav-item.active { background: var(--purple-light); color: var(--purple); font-weight: 600; }
-        .nav-item i { font-size: 22px; flex-shrink: 0; }
-        .nav-item-label { font-size: 14px; transition: opacity 0.2s; }
-        .sidebar.collapsed .nav-item-label { opacity: 0; width: 0; }
-        .nav-badge { margin-left: auto; background: var(--purple); color: white; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; flex-shrink: 0; transition: opacity 0.2s; }
-        .sidebar.collapsed .nav-badge { opacity: 0; }
-        .sidebar-footer { padding: 12px 10px 16px; border-top: 1px solid var(--border); flex-shrink: 0; }
-        .main { flex: 1; margin-left: var(--sidebar-w); transition: margin-left 0.3s cubic-bezier(0.4,0,0.2,1); min-height: 100vh; display: flex; flex-direction: column; }
-        .main.expanded { margin-left: var(--sidebar-collapsed-w); }
-        .topbar { height: var(--header-h); background: var(--white); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 8px rgba(0,0,0,0.04); }
-        .topbar-left { display: flex; align-items: center; gap: 12px; }
-        .topbar-mobile-toggle { display: none; width: 36px; height: 36px; border-radius: 10px; border: none; background: var(--bg); cursor: pointer; align-items: center; justify-content: center; color: var(--text); transition: background 0.2s; }
-        .topbar-mobile-toggle:hover { background: var(--purple-light); }
-        .topbar-mobile-toggle i { font-size: 22px; }
-        .topbar-greeting { font-size: 15px; font-weight: 600; color: var(--text); }
-        .topbar-date { font-size: 12px; color: var(--text-muted); }
-        .topbar-right { display: flex; align-items: center; gap: 10px; }
-        .topbar-icon-btn { width: 36px; height: 36px; border-radius: 10px; border: none; background: var(--bg); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: all 0.2s; position: relative; }
-        .topbar-icon-btn:hover { background: var(--purple-light); color: var(--purple); }
-        .topbar-icon-btn i { font-size: 20px; }
-        .notif-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--orange); border: 2px solid var(--white); }
-        .topbar-avatar { width: 36px; height: 36px; border-radius: 12px; background: linear-gradient(135deg, var(--purple), #ec4899); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; color: white; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; position: relative; background-size: cover; background-position: center; }
-        .topbar-avatar:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(139,92,246,0.3); }
-        .dropdown { position: absolute; top: 44px; right: 0; background: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); width: 170px; overflow: hidden; z-index: 300; display: none; border: 1px solid var(--border); animation: dropFade 0.18s ease; }
+        :root { --purple:#8b5cf6; --purple-dark:#7c3aed; --purple-light:#ede9fe; --blue:#3b82f6; --orange:#f97316; --green:#10b981; --bg:#f5f7fe; --white:#ffffff; --text:#0f172a; --text-muted:#64748b; --border:#edf2f7; --sidebar-w:260px; --sidebar-collapsed-w:72px; --header-h:64px; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',system-ui,-apple-system,sans-serif; }
+        body { background:var(--bg); min-height:100vh; overflow-x:hidden; position:relative; }
+        .bg-blob { position:fixed; border-radius:50%; filter:blur(60px); opacity:0.38; pointer-events:none; z-index:0; }
+        .bg-blob-1 { width:400px; height:400px; background:var(--purple); top:-100px; right:-100px; }
+        .bg-blob-2 { width:300px; height:300px; background:#ec4899; bottom:-80px; left:-80px; }
+        .layout { display:flex; min-height:100vh; position:relative; z-index:5; }
+        .sidebar { width:var(--sidebar-w); background:var(--white); border-right:1px solid var(--border); display:flex; flex-direction:column; position:fixed; top:0; left:0; bottom:0; z-index:200; transition:width 0.3s cubic-bezier(0.4,0,0.2,1),transform 0.3s; overflow:hidden; box-shadow:2px 0 20px rgba(0,0,0,0.04); }
+        .sidebar.collapsed { width:var(--sidebar-collapsed-w); }
+        .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.35); z-index:199; backdrop-filter:blur(2px); }
+        .sidebar-overlay.show { display:block; }
+        .sidebar-header { display:flex; align-items:center; justify-content:space-between; padding:0 16px; height:var(--header-h); border-bottom:1px solid var(--border); flex-shrink:0; }
+        .brand-wrap { display:flex; align-items:center; gap:10px; overflow:hidden; }
+        .brand-logo { width:36px; height:36px; border-radius:12px; background:linear-gradient(135deg,#1e3a8a,#8b5cf6); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:18px; font-weight:900; color:white; }
+        .brand-name { font-size:20px; font-weight:800; letter-spacing:-0.5px; background:linear-gradient(135deg,#1e3a8a,#3b82f6,#8b5cf6,#ec4899); -webkit-background-clip:text; background-clip:text; color:transparent; white-space:nowrap; overflow:hidden; transition:opacity 0.2s,width 0.3s; }
+        .sidebar.collapsed .brand-name { opacity:0; width:0; }
+        .toggle-btn { width:32px; height:32px; border-radius:10px; border:none; background:var(--bg); cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--text-muted); transition:background 0.2s,color 0.2s; flex-shrink:0; }
+        .toggle-btn:hover { background:var(--purple-light); color:var(--purple); }
+        .toggle-btn i { font-size:20px; transition:transform 0.3s; }
+        .sidebar.collapsed .toggle-btn i { transform:rotate(180deg); }
+        .sidebar-user { padding:16px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:12px; cursor:pointer; transition:background 0.2s; flex-shrink:0; }
+        .sidebar-user:hover { background:var(--bg); }
+        .sidebar-avatar { width:40px; height:40px; border-radius:14px; background:linear-gradient(135deg,var(--purple),#ec4899); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:16px; color:white; flex-shrink:0; background-size:cover; background-position:center; }
+        .sidebar-user-info { overflow:hidden; transition:opacity 0.2s; }
+        .sidebar.collapsed .sidebar-user-info { opacity:0; width:0; }
+        .sidebar-user-name { font-weight:600; font-size:14px; color:var(--text); white-space:nowrap; }
+        .sidebar-user-email { font-size:11px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:160px; }
+        .sidebar-nav { flex:1; padding:12px 10px; overflow-y:auto; overflow-x:hidden; }
+        .sidebar-nav::-webkit-scrollbar { width:4px; }
+        .sidebar-nav::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
+        .nav-label { font-size:10px; font-weight:700; text-transform:uppercase; color:var(--text-muted); letter-spacing:1px; padding:8px 10px 4px; white-space:nowrap; overflow:hidden; transition:opacity 0.2s; }
+        .sidebar.collapsed .nav-label { opacity:0; }
+        .nav-item { display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:14px; cursor:pointer; transition:all 0.2s; color:var(--text-muted); margin-bottom:2px; white-space:nowrap; overflow:hidden; }
+        .nav-item:hover { background:var(--bg); color:var(--purple); }
+        .nav-item.active { background:var(--purple-light); color:var(--purple); font-weight:600; }
+        .nav-item i { font-size:22px; flex-shrink:0; }
+        .nav-item-label { font-size:14px; transition:opacity 0.2s; }
+        .sidebar.collapsed .nav-item-label { opacity:0; width:0; }
+        .nav-badge { margin-left:auto; background:var(--purple); color:white; font-size:10px; font-weight:700; padding:2px 7px; border-radius:20px; flex-shrink:0; transition:opacity 0.2s; }
+        .sidebar.collapsed .nav-badge { opacity:0; }
+        .sidebar-footer { padding:12px 10px 16px; border-top:1px solid var(--border); flex-shrink:0; }
+        .main { flex:1; margin-left:var(--sidebar-w); transition:margin-left 0.3s cubic-bezier(0.4,0,0.2,1); min-height:100vh; display:flex; flex-direction:column; }
+        .main.expanded { margin-left:var(--sidebar-collapsed-w); }
+        .topbar { height:var(--header-h); background:var(--white); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; padding:0 28px; position:sticky; top:0; z-index:100; box-shadow:0 1px 8px rgba(0,0,0,0.04); }
+        .topbar-left { display:flex; align-items:center; gap:12px; }
+        .topbar-mobile-toggle { display:none; width:36px; height:36px; border-radius:10px; border:none; background:var(--bg); cursor:pointer; align-items:center; justify-content:center; color:var(--text); transition:background 0.2s; }
+        .topbar-mobile-toggle:hover { background:var(--purple-light); }
+        .topbar-mobile-toggle i { font-size:22px; }
+        .topbar-greeting { font-size:15px; font-weight:600; color:var(--text); }
+        .topbar-date { font-size:12px; color:var(--text-muted); }
+        .topbar-right { display:flex; align-items:center; gap:10px; }
+        .topbar-icon-btn { width:36px; height:36px; border-radius:10px; border:none; background:var(--bg); cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--text-muted); transition:all 0.2s; position:relative; }
+        .topbar-icon-btn:hover { background:var(--purple-light); color:var(--purple); }
+        .topbar-icon-btn i { font-size:20px; }
+        .notif-dot { position:absolute; top:6px; right:6px; width:8px; height:8px; border-radius:50%; background:var(--orange); border:2px solid var(--white); }
+        .topbar-avatar { width:36px; height:36px; border-radius:12px; background:linear-gradient(135deg,var(--purple),#ec4899); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:15px; color:white; cursor:pointer; transition:transform 0.2s,box-shadow 0.2s; position:relative; background-size:cover; background-position:center; }
+        .topbar-avatar:hover { transform:scale(1.05); box-shadow:0 4px 12px rgba(139,92,246,0.3); }
+        .dropdown { position:absolute; top:44px; right:0; background:white; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,0.12); width:170px; overflow:hidden; z-index:300; display:none; border:1px solid var(--border); animation:dropFade 0.18s ease; }
         @keyframes dropFade { from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);} }
-        .dropdown.show { display: block; }
-        .dd-item { padding: 12px 16px; display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; color: var(--text); transition: background 0.15s; }
-        .dd-item:hover { background: var(--bg); }
-        .dd-item.danger { color: #e53e3e; border-top: 1px solid var(--border); }
-        .dd-item i { font-size: 18px; }
-        .page-content { flex: 1; padding: 28px; max-width: 900px; width: 100%; margin: 0 auto; }
-        .notif-banner { background: linear-gradient(135deg, var(--purple) 0%, #6d28d9 60%, #4f46e5 100%); border-radius: 24px; padding: 24px 28px; color: white; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; overflow: hidden; position: relative; box-shadow: 0 8px 24px rgba(139,92,246,0.3); animation: fadeUp 0.5s ease both; }
+        .dropdown.show { display:block; }
+        .dd-item { padding:12px 16px; display:flex; align-items:center; gap:10px; cursor:pointer; font-size:13px; color:var(--text); transition:background 0.15s; }
+        .dd-item:hover { background:var(--bg); }
+        .dd-item.danger { color:#e53e3e; border-top:1px solid var(--border); }
+        .dd-item i { font-size:18px; }
+        .relative { position:relative; }
+        .page-content { flex:1; padding:28px; max-width:900px; width:100%; margin:0 auto; }
+        .notif-banner { background:linear-gradient(135deg,var(--purple) 0%,#6d28d9 60%,#4f46e5 100%); border-radius:24px; padding:24px 28px; color:white; margin-bottom:24px; display:flex; align-items:center; justify-content:space-between; overflow:hidden; position:relative; box-shadow:0 8px 24px rgba(139,92,246,0.3); animation:fadeUp 0.5s ease both; }
         @keyframes fadeUp { from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);} }
         .notif-banner::before { content:''; position:absolute; top:-60px; right:-40px; width:200px; height:200px; border-radius:50%; background:rgba(255,255,255,0.08); }
-        .notif-banner-text h2 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-        .notif-banner-text p { font-size: 13px; opacity: 0.85; }
-        .notif-banner-icon { font-size: 52px; position: relative; z-index: 1; animation: floatIcon 3s infinite ease-in-out; }
+        .notif-banner-text h2 { font-size:22px; font-weight:700; margin-bottom:4px; }
+        .notif-banner-text p { font-size:13px; opacity:0.85; }
+        .notif-banner-icon { font-size:52px; position:relative; z-index:1; animation:floatIcon 3s infinite ease-in-out; }
         @keyframes floatIcon { 0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);} }
-        .notif-actions { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; }
-        .btn-mark-all { background: var(--purple); color: white; border: none; padding: 10px 20px; border-radius: 14px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(139,92,246,0.3); }
-        .btn-mark-all:hover { background: var(--purple-dark); transform: translateY(-2px); }
-        .btn-mark-all i { font-size: 16px; }
-        .notif-filter { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
-        .notif-filter::-webkit-scrollbar { display: none; }
-        .filter-chip { background: var(--white); border: 1px solid var(--border); padding: 7px 16px; border-radius: 40px; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; white-space: nowrap; transition: all 0.2s; }
-        .filter-chip.active { background: var(--purple); color: white; border-color: var(--purple); }
-        .filter-chip:hover:not(.active) { background: var(--purple-light); color: var(--purple); }
-        .notif-list { display: flex; flex-direction: column; gap: 10px; animation: fadeUp 0.5s 0.15s ease both; }
-        .notif-card { background: var(--white); border-radius: 18px; padding: 16px 18px; display: flex; gap: 14px; align-items: flex-start; border: 1px solid var(--border); transition: all 0.2s; position: relative; cursor: pointer; }
-        .notif-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.06); }
-        .notif-card.unread { border-left: 4px solid var(--purple); background: #faf5ff; }
-        .notif-card.unread .notif-card-title { font-weight: 700; }
-        .notif-icon-wrap { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 22px; }
-        .notif-icon-wrap.deadline { background: #fef3c7; }
-        .notif-icon-wrap.tip { background: var(--purple-light); }
-        .notif-icon-wrap.success { background: #d1fae5; }
-        .notif-icon-wrap.info { background: #dbeafe; }
-        .notif-icon-wrap.warning { background: #fee2e2; }
-        .notif-body { flex: 1; }
-        .notif-card-title { font-size: 14px; color: var(--text); margin-bottom: 4px; font-weight: 500; }
-        .notif-card-msg { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
-        .notif-card-time { font-size: 11px; color: #94a3b8; margin-top: 6px; }
-        .notif-unread-dot { position: absolute; top: 16px; right: 16px; width: 8px; height: 8px; border-radius: 50%; background: var(--purple); }
-        .empty-notif { text-align: center; padding: 60px 20px; color: var(--text-muted); background: var(--white); border-radius: 20px; border: 1px solid var(--border); }
-        .empty-notif i { font-size: 52px; opacity: 0.4; margin-bottom: 12px; display: block; }
-        .bottom-nav { display: none; background: var(--white); border-top: 1px solid var(--border); position: fixed; bottom: 0; left: 0; right: 0; z-index: 200; padding: 8px 12px 16px; justify-content: space-around; box-shadow: 0 -4px 16px rgba(0,0,0,0.06); }
-        .bnav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; color: #94a3b8; cursor: pointer; padding: 6px 12px; border-radius: 16px; transition: all 0.2s; flex: 1; }
-        .bnav-item i { font-size: 22px; }
-        .bnav-item.active { color: var(--purple); background: var(--purple-light); }
-        .bnav-item:hover:not(.active) { color: var(--purple); }
-        @media (max-width: 900px) {
-            .sidebar { transform: translateX(-100%); width: var(--sidebar-w) !important; box-shadow: none; }
-            .sidebar.mobile-open { transform: translateX(0); box-shadow: 4px 0 30px rgba(0,0,0,0.15); }
-            .main { margin-left: 0 !important; padding-bottom: 70px; }
-            .topbar-mobile-toggle { display: flex !important; }
-            .bottom-nav { display: flex; }
-            .page-content { padding: 16px; }
-            .topbar { padding: 0 16px; }
+        .notif-actions { display:flex; gap:10px; margin-bottom:20px; align-items:center; flex-wrap:wrap; }
+        .btn-mark-all { background:var(--purple); color:white; border:none; padding:10px 20px; border-radius:14px; font-weight:600; font-size:13px; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:6px; box-shadow:0 4px 12px rgba(139,92,246,0.3); }
+        .btn-mark-all:hover { background:var(--purple-dark); transform:translateY(-2px); }
+        .btn-mark-all i { font-size:16px; }
+        .notif-filter { display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; scrollbar-width:none; }
+        .notif-filter::-webkit-scrollbar { display:none; }
+        .filter-chip { background:var(--white); border:1px solid var(--border); padding:7px 16px; border-radius:40px; font-size:13px; font-weight:500; color:var(--text-muted); cursor:pointer; white-space:nowrap; transition:all 0.2s; }
+        .filter-chip.active { background:var(--purple); color:white; border-color:var(--purple); }
+        .filter-chip:hover:not(.active) { background:var(--purple-light); color:var(--purple); }
+        .notif-list { display:flex; flex-direction:column; gap:10px; animation:fadeUp 0.5s 0.15s ease both; }
+        .notif-card { background:var(--white); border-radius:18px; padding:16px 18px; display:flex; gap:14px; align-items:flex-start; border:1px solid var(--border); transition:all 0.2s; position:relative; cursor:pointer; }
+        .notif-card:hover { transform:translateY(-2px); box-shadow:0 6px 16px rgba(0,0,0,0.06); }
+        .notif-card.unread { border-left:4px solid var(--purple); background:#faf5ff; }
+        .notif-card.unread .notif-card-title { font-weight:700; }
+        .notif-icon-wrap { width:44px; height:44px; border-radius:14px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:22px; }
+        .notif-icon-wrap.deadline { background:#fef3c7; }
+        .notif-icon-wrap.motivasi { background:var(--purple-light); }
+        .notif-icon-wrap.achievement { background:#d1fae5; }
+        .notif-icon-wrap.system { background:#dbeafe; }
+        .notif-icon-wrap.reminder { background:#fce7f3; }
+        .notif-body { flex:1; }
+        .notif-card-title { font-size:14px; color:var(--text); margin-bottom:4px; font-weight:500; }
+        .notif-card-msg { font-size:12px; color:var(--text-muted); line-height:1.5; }
+        .notif-card-time { font-size:11px; color:#94a3b8; margin-top:6px; }
+        .notif-unread-dot { position:absolute; top:16px; right:16px; width:8px; height:8px; border-radius:50%; background:var(--purple); }
+        .notif-del-btn { position:absolute; bottom:12px; right:14px; background:none; border:none; color:#94a3b8; cursor:pointer; display:none; font-size:16px; }
+        .notif-card:hover .notif-del-btn { display:block; }
+        .notif-del-btn:hover { color:#e53e3e; }
+        .empty-notif { text-align:center; padding:60px 20px; color:var(--text-muted); background:var(--white); border-radius:20px; border:1px solid var(--border); }
+        .empty-notif i { font-size:52px; opacity:0.4; margin-bottom:12px; display:block; }
+        .skeleton { background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:18px; height:80px; }
+        @keyframes shimmer { 0%{background-position:200% 0}100%{background-position:-200% 0} }
+        .bottom-nav { display:none; background:var(--white); border-top:1px solid var(--border); position:fixed; bottom:0; left:0; right:0; z-index:200; padding:8px 12px 16px; justify-content:space-around; box-shadow:0 -4px 16px rgba(0,0,0,0.06); }
+        .bnav-item { display:flex; flex-direction:column; align-items:center; gap:3px; font-size:10px; color:#94a3b8; cursor:pointer; padding:6px 12px; border-radius:16px; transition:all 0.2s; flex:1; }
+        .bnav-item i { font-size:22px; }
+        .bnav-item.active { color:var(--purple); background:var(--purple-light); }
+        .bnav-item:hover:not(.active) { color:var(--purple); }
+        @media (max-width:900px) {
+            .sidebar { transform:translateX(-100%); width:var(--sidebar-w) !important; box-shadow:none; }
+            .sidebar.mobile-open { transform:translateX(0); box-shadow:4px 0 30px rgba(0,0,0,0.15); }
+            .main { margin-left:0 !important; padding-bottom:70px; }
+            .topbar-mobile-toggle { display:flex !important; }
+            .bottom-nav { display:flex; }
+            .page-content { padding:16px; }
+            .topbar { padding:0 16px; }
         }
-        .relative { position: relative; }
     </style>
 </head>
 <body>
@@ -145,10 +134,7 @@
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <div class="brand-wrap">
-                <div class="brand-logo">R</div>
-                <div class="brand-name">RemindU</div>
-            </div>
+            <div class="brand-wrap"><div class="brand-logo">R</div><div class="brand-name">RemindU</div></div>
             <button class="toggle-btn" id="sidebarToggle"><i class="material-icons-round">chevron_left</i></button>
         </div>
         <div class="sidebar-user" id="sidebarUser">
@@ -165,6 +151,7 @@
             <div class="nav-item active" data-nav="notification"><i class="material-icons-round">notifications</i><span class="nav-item-label">Notifikasi</span><span class="nav-badge" id="notifBadge">0</span></div>
             <div class="nav-label" style="margin-top:8px;">Lainnya</div>
             <div class="nav-item" data-nav="ai"><i class="material-icons-round">auto_awesome</i><span class="nav-item-label">AI Motivasi</span></div>
+            <div class="nav-item" data-nav="statistic"><i class="material-icons-round">bar_chart</i><span class="nav-item-label">Statistik</span></div>
             <div class="nav-item" data-nav="settings"><i class="material-icons-round">settings</i><span class="nav-item-label">Pengaturan</span></div>
         </nav>
         <div class="sidebar-footer">
@@ -175,10 +162,7 @@
         <header class="topbar">
             <div class="topbar-left">
                 <button class="topbar-mobile-toggle" id="mobileMenuBtn"><i class="material-icons-round">menu</i></button>
-                <div>
-                    <div class="topbar-greeting" id="topbarGreeting">Halo!</div>
-                    <div class="topbar-date" id="topbarDate"></div>
-                </div>
+                <div><div class="topbar-greeting" id="topbarGreeting">Halo!</div><div class="topbar-date" id="topbarDate"></div></div>
             </div>
             <div class="topbar-right">
                 <button class="topbar-icon-btn" id="topbarNotif"><i class="material-icons-round">notifications_none</i><span class="notif-dot" id="notifDot" style="display:none;"></span></button>
@@ -201,45 +185,48 @@
                 <div class="notif-filter">
                     <div class="filter-chip active" data-filter="all">Semua</div>
                     <div class="filter-chip" data-filter="deadline">⏰ Deadline</div>
-                    <div class="filter-chip" data-filter="tip">💡 Tips</div>
-                    <div class="filter-chip" data-filter="success">✅ Selesai</div>
+                    <div class="filter-chip" data-filter="motivasi">💡 Motivasi</div>
+                    <div class="filter-chip" data-filter="system">📋 Sistem</div>
+                    <div class="filter-chip" data-filter="achievement">✅ Pencapaian</div>
                 </div>
             </div>
-            <div class="notif-list" id="notifList"></div>
+            <div class="notif-list" id="notifList">
+                <div class="skeleton"></div>
+                <div class="skeleton" style="height:70px;margin-top:4px;opacity:0.6;"></div>
+                <div class="skeleton" style="height:70px;margin-top:4px;opacity:0.4;"></div>
+            </div>
         </div>
     </main>
     <nav class="bottom-nav">
         <div class="bnav-item" data-nav="home"><i class="material-icons-round">home</i><span>Home</span></div>
         <div class="bnav-item" data-nav="calendar"><i class="material-icons-round">calendar_month</i><span>Kalender</span></div>
         <div class="bnav-item active" data-nav="notification"><i class="material-icons-round">notifications</i><span>Notif</span></div>
-        <div class="bnav-item" data-nav="settings"><i class="material-icons-round">settings</i><span>Setting</span></div>
+        <div class="bnav-item" data-nav="settings"><i class="material-icons-round">Setting</i><span>Setting</span></div>
     </nav>
 </div>
 <script>
 (function() {
+    const API_URL = 'http://localhost:3000/api';
     const userData = JSON.parse(localStorage.getItem('remindu_user') || '{}');
     const userEmail = userData.email;
     if (!userEmail) { window.location.href = 'welcome.html'; return; }
     const firstName = userEmail.split('@')[0];
     const displayName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
+
+    // Avatar
     function updateAvatar() {
         const saved = localStorage.getItem('user_avatar');
-        const sidebarAvatar = document.getElementById('sidebarAvatar');
-        const topbarAvatar = document.getElementById('topbarAvatar');
-        const topbarSpan = document.getElementById('topbarAvatarChar');
+        const sa = document.getElementById('sidebarAvatar');
+        const tc = document.getElementById('topbarAvatarChar');
+        const ta = document.getElementById('topbarAvatar');
         if (!saved) {
-            const def = userEmail.charAt(0).toUpperCase();
-            if(sidebarAvatar){ sidebarAvatar.textContent = def; sidebarAvatar.style.backgroundImage = ''; }
-            if(topbarSpan){ topbarSpan.textContent = def; }
-            if(topbarAvatar){ topbarAvatar.style.backgroundImage = ''; }
-        } else if(saved.startsWith('data:image')) {
-            if(sidebarAvatar){ sidebarAvatar.textContent = ''; sidebarAvatar.style.backgroundImage = `url(${saved})`; sidebarAvatar.style.backgroundSize = 'cover'; }
-            if(topbarSpan){ topbarSpan.textContent = ''; }
-            if(topbarAvatar){ topbarAvatar.style.backgroundImage = `url(${saved})`; topbarAvatar.style.backgroundSize = 'cover'; }
+            const d = userEmail.charAt(0).toUpperCase();
+            sa.textContent = d; tc.textContent = d; sa.style.backgroundImage = ''; ta.style.backgroundImage = '';
+        } else if (saved.startsWith('data:image')) {
+            sa.textContent = ''; sa.style.backgroundImage = `url(${saved})`; sa.style.backgroundSize = 'cover';
+            tc.textContent = ''; ta.style.backgroundImage = `url(${saved})`; ta.style.backgroundSize = 'cover';
         } else {
-            if(sidebarAvatar){ sidebarAvatar.textContent = saved; sidebarAvatar.style.backgroundImage = ''; }
-            if(topbarSpan){ topbarSpan.textContent = saved; }
-            if(topbarAvatar){ topbarAvatar.style.backgroundImage = ''; }
+            sa.textContent = saved; tc.textContent = saved; sa.style.backgroundImage = ''; ta.style.backgroundImage = '';
         }
     }
     document.getElementById('sidebarName').textContent = displayName;
@@ -251,14 +238,11 @@
     // Sidebar
     const sidebar = document.getElementById('sidebar');
     const main = document.getElementById('mainContent');
-    const toggle = document.getElementById('sidebarToggle');
     let collapsed = localStorage.getItem('sidebar_collapsed') === 'true';
     if (collapsed) { sidebar.classList.add('collapsed'); main.classList.add('expanded'); }
-    toggle.addEventListener('click', () => {
-        collapsed = !collapsed;
-        localStorage.setItem('sidebar_collapsed', collapsed);
-        sidebar.classList.toggle('collapsed', collapsed);
-        main.classList.toggle('expanded', collapsed);
+    document.getElementById('sidebarToggle').addEventListener('click', () => {
+        collapsed = !collapsed; localStorage.setItem('sidebar_collapsed', collapsed);
+        sidebar.classList.toggle('collapsed', collapsed); main.classList.toggle('expanded', collapsed);
     });
     const overlay = document.getElementById('sidebarOverlay');
     const mobileBtn = document.getElementById('mobileMenuBtn');
@@ -267,99 +251,148 @@
     mobileBtn.addEventListener('click', () => { sidebar.classList.toggle('mobile-open'); overlay.classList.toggle('show'); });
     overlay.addEventListener('click', () => { sidebar.classList.remove('mobile-open'); overlay.classList.remove('show'); });
 
-    // Dropdown
-    const avatarBtn = document.getElementById('topbarAvatar');
-    const dropdown = document.getElementById('dropdown');
-    avatarBtn.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('show'); });
-    document.addEventListener('click', () => dropdown.classList.remove('show'));
+    // Dropdown & Nav
+    document.getElementById('topbarAvatar').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('dropdown').classList.toggle('show'); });
+    document.addEventListener('click', () => document.getElementById('dropdown').classList.remove('show'));
     document.getElementById('ddProfile').addEventListener('click', () => window.location.href = 'profil.html');
     document.getElementById('ddLogout').addEventListener('click', () => { localStorage.removeItem('remindu_user'); window.location.href = 'welcome.html'; });
     document.getElementById('sidebarLogout').addEventListener('click', () => { localStorage.removeItem('remindu_user'); window.location.href = 'welcome.html'; });
     document.getElementById('sidebarUser').addEventListener('click', () => window.location.href = 'profil.html');
+    const navMap = { home:'home.html', calendar:'calendar.html', notification:null, settings:'settings.html', ai:'ai-motivation.html', statistic:'statistic.html' };
+    document.querySelectorAll('[data-nav]').forEach(el => el.addEventListener('click', () => { const u = navMap[el.dataset.nav]; if (u) window.location.href = u; else window.location.reload(); }));
+    document.getElementById('topbarNotif').addEventListener('click', () => window.location.reload());
 
-    // Navigasi dengan AI Motivasi
-    function handleNav(nav) {
-        if (nav === 'home') window.location.href = 'home.html';
-        else if (nav === 'calendar') window.location.href = 'calendar.html';
-        else if (nav === 'notification') window.location.reload();
-        else if (nav === 'settings') window.location.href = 'settings.html';
-        else if (nav === 'ai') window.location.href = 'ai-motivation.html';
-    }
-    document.querySelectorAll('.nav-item[data-nav]').forEach(el => el.addEventListener('click', () => handleNav(el.dataset.nav)));
-    document.querySelectorAll('.bnav-item[data-nav]').forEach(el => el.addEventListener('click', () => handleNav(el.dataset.nav)));
-    document.getElementById('topbarNotif').addEventListener('click', () => handleNav('notification'));
-
-    // Notifikasi
-    let allNotifs = JSON.parse(localStorage.getItem('remindu_notifs') || 'null');
-    if (!allNotifs) {
-        allNotifs = [
-            { id:1, type:'deadline', icon:'⏰', title:'Deadline Mendekat!', msg:'Salah satu task kamu segera jatuh tempo. Jangan sampai terlewat ya!', time:new Date(Date.now()-3600000*2).toISOString(), read:false },
-            { id:2, type:'tip', icon:'💡', title:'Tips RemindU', msg:'Coba pecah task besar menjadi sub-task kecil agar lebih mudah diselesaikan satu per satu.', time:new Date(Date.now()-3600000*8).toISOString(), read:false },
-            { id:3, type:'success', icon:'✅', title:'Task Selesai!', msg:'Kamu telah menyelesaikan task. Pertahankan konsistensimu!', time:new Date(Date.now()-86400000).toISOString(), read:true },
-            { id:4, type:'tip', icon:'🔥', title:'Jaga Momentummu', msg:'Kamu sudah produktif belakangan ini. Terus lanjutkan dan jaga streak produktivitasmu!', time:new Date(Date.now()-86400000*2).toISOString(), read:true },
-            { id:5, type:'deadline', icon:'📋', title:'Jadwal Diperbarui', msg:'Task kamu telah diperbarui. Cek jadwal terbaru agar tidak ada yang terlewat.', time:new Date(Date.now()-86400000*5).toISOString(), read:true },
-        ];
-        localStorage.setItem('remindu_notifs', JSON.stringify(allNotifs));
-    }
+    // ======= NOTIFIKASI DARI BACKEND =======
+    let allNotifs = [];
     let currentFilter = 'all';
+
+    const TIPE_ICON = { deadline:'⏰', motivasi:'💡', system:'📋', achievement:'✅', reminder:'🔔' };
+    const TIPE_CLASS = { deadline:'deadline', motivasi:'motivasi', system:'system', achievement:'achievement', reminder:'reminder' };
+
     function formatTime(iso) {
         const d = new Date(iso); const diff = Date.now() - d.getTime();
-        if(diff<3600000) return `${Math.max(1,Math.floor(diff/60000))} menit lalu`;
-        if(diff<86400000) return `${Math.floor(diff/3600000)} jam lalu`;
-        if(diff<86400000*7) return `${Math.floor(diff/86400000)} hari lalu`;
-        return d.toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});
+        if (diff < 3600000) return `${Math.max(1, Math.floor(diff/60000))} menit lalu`;
+        if (diff < 86400000) return `${Math.floor(diff/3600000)} jam lalu`;
+        if (diff < 86400000*7) return `${Math.floor(diff/86400000)} hari lalu`;
+        return d.toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' });
     }
-    function iconClass(type) {
-        if(type==='deadline') return 'deadline';
-        if(type==='tip') return 'tip';
-        if(type==='success') return 'success';
-        return 'info';
-    }
+
     function renderNotifs() {
         const list = document.getElementById('notifList');
-        const filtered = currentFilter==='all' ? allNotifs : allNotifs.filter(n=>n.type===currentFilter);
-        const unread = allNotifs.filter(n=>!n.read).length;
-        document.getElementById('notifBadge').textContent = unread;
-        document.getElementById('notifDot').style.display = unread>0 ? 'block' : 'none';
+        const filtered = currentFilter === 'all' ? allNotifs : allNotifs.filter(n => n.tipe === currentFilter);
+        const unread = allNotifs.filter(n => !n.status_baca).length;
+        const badge = document.getElementById('notifBadge');
+        badge.textContent = unread > 0 ? unread : '0';
+        document.getElementById('notifDot').style.display = unread > 0 ? 'block' : 'none';
         list.innerHTML = '';
-        if(filtered.length===0) { list.innerHTML = `<div class="empty-notif"><i class="material-icons-round">notifications_none</i><p>Tidak ada notifikasi di sini.</p></div>`; return; }
-        filtered.forEach(n=>{
+        if (filtered.length === 0) {
+            list.innerHTML = `<div class="empty-notif"><i class="material-icons-round">notifications_none</i><p>Tidak ada notifikasi di sini.</p></div>`;
+            return;
+        }
+        filtered.forEach((n, idx) => {
+            const tipe = n.tipe || 'system';
+            const icon = TIPE_ICON[tipe] || '📌';
+            const cls = TIPE_CLASS[tipe] || 'system';
             const card = document.createElement('div');
-            card.className = 'notif-card' + (!n.read ? ' unread' : '');
-            card.innerHTML = `<div class="notif-icon-wrap ${iconClass(n.type)}">${n.icon}</div><div class="notif-body"><div class="notif-card-title">${n.title}</div><div class="notif-card-msg">${n.msg}</div><div class="notif-card-time">${formatTime(n.time)}</div></div>${!n.read ? '<div class="notif-unread-dot"></div>' : ''}`;
-            card.addEventListener('click',()=>{ n.read=true; localStorage.setItem('remindu_notifs',JSON.stringify(allNotifs)); renderNotifs(); });
+            card.className = 'notif-card' + (!n.status_baca ? ' unread' : '');
+            card.style.animationDelay = `${idx * 0.04}s`;
+            card.innerHTML = `
+                <div class="notif-icon-wrap ${cls}">${icon}</div>
+                <div class="notif-body">
+                    <div class="notif-card-title">${n.judul || 'Notifikasi'}</div>
+                    <div class="notif-card-msg">${n.pesan}</div>
+                    <div class="notif-card-time">${formatTime(n.waktu_kirim)}</div>
+                </div>
+                ${!n.status_baca ? '<div class="notif-unread-dot"></div>' : ''}
+                <button class="notif-del-btn material-icons-round" data-id="${n.id_notif}" title="Hapus">delete_outline</button>`;
+
+            // Mark as read on click
+            card.addEventListener('click', async (e) => {
+                if (e.target.classList.contains('notif-del-btn')) return;
+                if (!n.status_baca) {
+                    try {
+                        await fetch(`${API_URL}/notifications/${n.id_notif}/read`, { method:'PUT', headers:{'X-User-Email':userEmail} });
+                        n.status_baca = 1;
+                        renderNotifs();
+                    } catch {}
+                }
+            });
+
+            // Delete
+            card.querySelector('.notif-del-btn').addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const id = parseInt(e.target.dataset.id);
+                try {
+                    await fetch(`${API_URL}/notifications/${id}`, { method:'DELETE', headers:{'X-User-Email':userEmail} });
+                    allNotifs = allNotifs.filter(x => x.id_notif !== id);
+                    renderNotifs();
+                } catch {}
+            });
+
             list.appendChild(card);
         });
     }
-    async function loadTaskNotifs() {
+
+    // Load dari backend; fallback ke localStorage notif lokal (task deadline)
+    async function loadNotifs() {
+        // Load backend notifs
+        let backendNotifs = [];
         try {
-            const res = await fetch('http://localhost:3000/api/tasks',{ headers:{'X-User-Email':userEmail} });
-            if(!res.ok) return;
-            const tasks = await res.json();
-            const badge = document.getElementById('notifBadge');
-            const unfinished = tasks.filter(t=>!t.selesai).length;
-            if(badge) badge.textContent = unfinished;
-            tasks.forEach(task=>{
-                if(!task.selesai && task.due_date){
-                    const diff = new Date(task.due_date)-Date.now();
-                    if(diff>0 && diff<86400000){
-                        const exists = allNotifs.some(n=>n.taskId===task.id_task && n.type==='deadline');
-                        if(!exists){
-                            allNotifs.unshift({ id:Date.now(), taskId:task.id_task, type:'deadline', icon:'⏰', title:'Deadline Mendekat!', msg:`Task "${task.judul}" akan jatuh tempo kurang dari 24 jam lagi. Segera selesaikan!`, time:new Date().toISOString(), read:false });
+            const res = await fetch(`${API_URL}/notifications`, { headers:{'X-User-Email':userEmail} });
+            if (res.ok) backendNotifs = await res.json();
+        } catch {}
+
+        // Load task deadline notifs (generate otomatis dari tasks)
+        let taskNotifs = [];
+        try {
+            const res2 = await fetch(`${API_URL}/tasks`, { headers:{'X-User-Email':userEmail} });
+            if (res2.ok) {
+                const tasks = await res2.json();
+                tasks.forEach(task => {
+                    if (!task.selesai && task.due_date) {
+                        const diff = new Date(task.due_date) - Date.now();
+                        if (diff > 0 && diff < 86400000 * 2) {
+                            const already = backendNotifs.some(n => n.tipe === 'deadline' && n.pesan && n.pesan.includes(task.judul));
+                            if (!already) {
+                                taskNotifs.push({
+                                    id_notif: 'local_' + task.id_task,
+                                    judul: '⏰ Deadline Mendekat!',
+                                    pesan: `Task "${task.judul}" akan jatuh tempo ${diff < 86400000 ? 'dalam 24 jam' : 'besok'}. Segera selesaikan!`,
+                                    tipe: 'deadline',
+                                    waktu_kirim: new Date().toISOString(),
+                                    status_baca: 0
+                                });
+                            }
                         }
                     }
-                }
-            });
-            localStorage.setItem('remindu_notifs',JSON.stringify(allNotifs));
-            renderNotifs();
-        } catch(e){}
+                });
+            }
+        } catch {}
+
+        allNotifs = [...taskNotifs, ...backendNotifs];
+        renderNotifs();
     }
-    document.getElementById('btnMarkAll').addEventListener('click',()=>{ allNotifs.forEach(n=>n.read=true); localStorage.setItem('remindu_notifs',JSON.stringify(allNotifs)); renderNotifs(); });
-    document.querySelectorAll('.filter-chip').forEach(chip=>{
-        chip.addEventListener('click',()=>{ document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active')); chip.classList.add('active'); currentFilter=chip.dataset.filter; renderNotifs(); });
+
+    // Mark all read
+    document.getElementById('btnMarkAll').addEventListener('click', async () => {
+        try {
+            await fetch(`${API_URL}/notifications/read-all`, { method:'PUT', headers:{'X-User-Email':userEmail} });
+        } catch {}
+        allNotifs.forEach(n => n.status_baca = 1);
+        renderNotifs();
     });
-    loadTaskNotifs();
-    renderNotifs();
+
+    // Filter chips
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            currentFilter = chip.dataset.filter;
+            renderNotifs();
+        });
+    });
+
+    loadNotifs();
 })();
 </script>
 </body>

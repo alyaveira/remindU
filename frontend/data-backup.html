@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RemindU - Data Backup</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        :root {
+            --purple: #8b5cf6;
+            --purple-dark: #7c3aed;
+            --purple-light: #ede9fe;
+            --bg: #f5f7fe;
+            --white: #ffffff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --border: #edf2f7;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body {
+            background: var(--bg);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        .bg-blob { position: fixed; border-radius: 50%; filter: blur(60px); opacity: 0.38; pointer-events: none; z-index: 0; }
+        .bg-blob-1 { width: 400px; height: 400px; background: var(--purple); top: -100px; right: -100px; }
+        .bg-blob-2 { width: 300px; height: 300px; background: #ec4899; bottom: -80px; left: -80px; }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: var(--white);
+            border-radius: 36px;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
+            z-index: 10;
+        }
+        .page-content { padding: 28px 24px 36px; }
+        .header { display: flex; align-items: center; margin-bottom: 28px; gap: 16px; position: relative; justify-content: center; }
+        .btn-back { position: absolute; left: 0; background: none; border: none; color: var(--purple); cursor: pointer; padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+        .btn-back:hover { background: var(--purple-light); }
+        .btn-back i { font-size: 22px; }
+        h2 { font-size: 22px; font-weight: 600; color: var(--text); }
+
+        .info-card {
+            background: linear-gradient(135deg, var(--purple-light), #fce7f3);
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(139,92,246,0.2);
+        }
+        .info-card p { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+        .info-card strong { color: var(--purple); }
+
+        .backup-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: #f8fafc;
+            border-radius: 20px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+        }
+        .backup-item-left { display: flex; align-items: center; gap: 14px; }
+        .backup-item-left i { font-size: 22px; color: var(--purple); }
+        .backup-item-label { font-size: 14px; font-weight: 600; color: var(--text); }
+        .backup-item-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        .backup-item-value { font-size: 14px; font-weight: 500; color: var(--text-muted); max-width: 180px; text-align: right; word-break: break-all; }
+
+        .btn-action {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 28px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+            margin-bottom: 12px;
+        }
+        .btn-export {
+            background: var(--purple);
+            color: white;
+            box-shadow: 0 4px 12px rgba(139,92,246,0.3);
+        }
+        .btn-export:hover { background: var(--purple-dark); transform: translateY(-2px); }
+        .btn-danger {
+            background: #fff1f2;
+            color: #e53e3e;
+            border: 1px solid #fecaca;
+        }
+        .btn-danger:hover { background: #fee2e2; }
+
+        .section-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            margin: 24px 0 12px;
+        }
+
+        .toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px);
+            background: #1e293b; color: white; padding: 12px 24px; border-radius: 40px;
+            font-size: 14px; font-weight: 500; z-index: 9999; transition: transform 0.3s ease; white-space: nowrap;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        @media (min-width: 768px) { .page-content { padding: 40px 48px; } }
+    </style>
+</head>
+<body>
+<div class="bg-blob bg-blob-1"></div>
+<div class="bg-blob bg-blob-2"></div>
+
+<div class="container">
+    <div class="page-content">
+        <div class="header">
+            <button class="btn-back" id="backBtn"><i class="material-icons-round">arrow_back</i></button>
+            <h2>Data Backup</h2>
+        </div>
+
+        <div class="info-card">
+            <p>Data backup memungkinkan kamu <strong>mengekspor semua task</strong> ke file JSON yang bisa disimpan di perangkat kamu. File ini bisa digunakan untuk keperluan arsip atau pemulihan data.</p>
+        </div>
+
+        <div class="section-label">Informasi Akun</div>
+
+        <div class="backup-item">
+            <div class="backup-item-left">
+                <i class="material-icons-round">email</i>
+                <div>
+                    <div class="backup-item-label">Email Akun</div>
+                    <div class="backup-item-sub">Terdaftar</div>
+                </div>
+            </div>
+            <div class="backup-item-value" id="emailDisplay">—</div>
+        </div>
+
+        <div class="backup-item">
+            <div class="backup-item-left">
+                <i class="material-icons-round">assignment</i>
+                <div>
+                    <div class="backup-item-label">Jumlah Task</div>
+                    <div class="backup-item-sub">Total semua task</div>
+                </div>
+            </div>
+            <div class="backup-item-value" id="taskCount">Memuat...</div>
+        </div>
+
+        <div class="backup-item">
+            <div class="backup-item-left">
+                <i class="material-icons-round">check_circle</i>
+                <div>
+                    <div class="backup-item-label">Task Selesai</div>
+                    <div class="backup-item-sub">Dari total task</div>
+                </div>
+            </div>
+            <div class="backup-item-value" id="taskDone">—</div>
+        </div>
+
+        <div class="section-label">Backup &amp; Restore</div>
+
+        <button class="btn-action btn-export" id="btnExport">
+            <i class="material-icons-round">download</i> Export Data (JSON)
+        </button>
+
+        <button class="btn-action" style="background:#f1f5f9;color:#334155;border:1px solid var(--border);" id="btnImport">
+            <i class="material-icons-round">upload</i> Import Data (JSON)
+        </button>
+        <input type="file" id="importFile" accept=".json" style="display:none;">
+
+        <div class="section-label">Zona Berbahaya</div>
+
+        <button class="btn-action btn-danger" id="btnDeleteAll">
+            <i class="material-icons-round">delete_forever</i> Hapus Semua Task
+        </button>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    const API_URL = 'http://localhost:3000/api';
+    const userData = JSON.parse(localStorage.getItem('remindu_user') || '{}');
+    const userEmail = userData.email;
+    if (!userEmail) { window.location.href = 'welcome.html'; }
+
+    function maskEmail(email) {
+        const [local, domain] = email.split('@');
+        if (local.length <= 2) return email;
+        return local[0] + '*'.repeat(Math.min(local.length - 2, 5)) + local[local.length - 1] + '@' + domain;
+    }
+
+    document.getElementById('emailDisplay').textContent = maskEmail(userEmail);
+
+    function showToast(msg, isError = false) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.style.background = isError ? '#e53e3e' : '#1e293b';
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    let allTasks = [];
+
+    async function loadTasks() {
+        try {
+            const res = await fetch(`${API_URL}/tasks`, { headers: { 'X-User-Email': userEmail } });
+            if (!res.ok) throw new Error();
+            allTasks = await res.json();
+            document.getElementById('taskCount').textContent = allTasks.length + ' task';
+            document.getElementById('taskDone').textContent = allTasks.filter(t => t.selesai).length + ' task';
+        } catch {
+            document.getElementById('taskCount').textContent = 'Gagal memuat';
+            document.getElementById('taskDone').textContent = '—';
+        }
+    }
+    loadTasks();
+
+    // Export JSON
+    document.getElementById('btnExport').addEventListener('click', () => {
+        if (allTasks.length === 0) { showToast('Tidak ada task untuk diekspor', true); return; }
+        const exportData = {
+            export_date: new Date().toISOString(),
+            user_email: userEmail,
+            total_tasks: allTasks.length,
+            tasks: allTasks
+        };
+        const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `remindu_backup_${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('✅ Data berhasil diekspor!');
+    });
+
+    // Import JSON
+    document.getElementById('btnImport').addEventListener('click', () => {
+        document.getElementById('importFile').click();
+    });
+    document.getElementById('importFile').addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        try {
+            const text = await file.text();
+            const data = JSON.parse(text);
+            if (!data.tasks || !Array.isArray(data.tasks)) throw new Error('Format file tidak valid');
+            if (!confirm(`Akan mengimpor ${data.tasks.length} task. Lanjutkan?`)) return;
+
+            let imported = 0;
+            for (const task of data.tasks) {
+                try {
+                    await fetch(`${API_URL}/tasks`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-User-Email': userEmail },
+                        body: JSON.stringify({
+                            judul: task.judul,
+                            kategori: task.kategori || 'personal',
+                            notes: task.notes || null,
+                            due_date: task.due_date || null,
+                            remind_at: task.remind_at || null
+                        })
+                    });
+                    imported++;
+                } catch {}
+            }
+            showToast(`✅ ${imported} task berhasil diimpor!`);
+            loadTasks();
+        } catch (err) {
+            showToast('Gagal membaca file: ' + err.message, true);
+        }
+        e.target.value = '';
+    });
+
+    // Delete all tasks
+    document.getElementById('btnDeleteAll').addEventListener('click', async () => {
+        if (allTasks.length === 0) { showToast('Tidak ada task untuk dihapus'); return; }
+        if (!confirm(`Yakin ingin menghapus semua ${allTasks.length} task? Tindakan ini tidak bisa dibatalkan!`)) return;
+        let deleted = 0;
+        for (const task of allTasks) {
+            try {
+                await fetch(`${API_URL}/tasks/${task.id_task}`, {
+                    method: 'DELETE',
+                    headers: { 'X-User-Email': userEmail }
+                });
+                deleted++;
+            } catch {}
+        }
+        showToast(`🗑️ ${deleted} task berhasil dihapus`);
+        loadTasks();
+    });
+
+    document.getElementById('backBtn').addEventListener('click', () => {
+        window.location.href = 'profil.html';
+    });
+</script>
+</body>
+</html>

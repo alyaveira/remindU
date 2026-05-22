@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>RemindU - Statistik</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        :root {
+            --purple: #8b5cf6;
+            --purple-dark: #7c3aed;
+            --purple-light: #ede9fe;
+            --blue: #3b82f6;
+            --orange: #f97316;
+            --green: #10b981;
+            --amber: #f59e0b;
+            --bg: #f5f7fe;
+            --white: #ffffff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --border: #edf2f7;
+            --sidebar-w: 260px;
+            --sidebar-collapsed-w: 72px;
+            --header-h: 64px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+        body { background: var(--bg); min-height: 100vh; overflow-x: hidden; position: relative; }
+        .bg-blob { position: fixed; border-radius: 50%; filter: blur(60px); opacity: 0.38; pointer-events: none; z-index: 0; }
+        .bg-blob-1 { width: 400px; height: 400px; background: var(--purple); top: -100px; right: -100px; }
+        .bg-blob-2 { width: 300px; height: 300px; background: #ec4899; bottom: -80px; left: -80px; }
+        .layout { display: flex; min-height: 100vh; position: relative; z-index: 5; }
+
+        /* SIDEBAR */
+        .sidebar { width: var(--sidebar-w); background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 200; transition: width 0.3s cubic-bezier(0.4,0,0.2,1), transform 0.3s; overflow: hidden; box-shadow: 2px 0 20px rgba(0,0,0,0.04); }
+        .sidebar.collapsed { width: var(--sidebar-collapsed-w); }
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 199; backdrop-filter: blur(2px); }
+        .sidebar-overlay.show { display: block; }
+        .sidebar-header { display: flex; align-items: center; justify-content: space-between; padding: 0 16px; height: var(--header-h); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+        .brand-wrap { display: flex; align-items: center; gap: 10px; overflow: hidden; }
+        .brand-logo { width: 36px; height: 36px; border-radius: 12px; background: linear-gradient(135deg, #1e3a8a, #8b5cf6); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px; font-weight: 900; color: white; }
+        .brand-name { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(135deg, #1e3a8a, #3b82f6, #8b5cf6, #ec4899); -webkit-background-clip: text; background-clip: text; color: transparent; white-space: nowrap; overflow: hidden; transition: opacity 0.2s, width 0.3s; }
+        .sidebar.collapsed .brand-name { opacity: 0; width: 0; }
+        .toggle-btn { width: 32px; height: 32px; border-radius: 10px; border: none; background: var(--bg); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: background 0.2s, color 0.2s; flex-shrink: 0; }
+        .toggle-btn:hover { background: var(--purple-light); color: var(--purple); }
+        .toggle-btn i { font-size: 20px; transition: transform 0.3s; }
+        .sidebar.collapsed .toggle-btn i { transform: rotate(180deg); }
+        .sidebar-user { padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+        .sidebar-user:hover { background: var(--bg); }
+        .sidebar-avatar { width: 40px; height: 40px; border-radius: 14px; background: linear-gradient(135deg, var(--purple), #ec4899); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; color: white; flex-shrink: 0; background-size: cover; background-position: center; }
+        .sidebar-user-info { overflow: hidden; transition: opacity 0.2s; }
+        .sidebar.collapsed .sidebar-user-info { opacity: 0; width: 0; }
+        .sidebar-user-name { font-weight: 600; font-size: 14px; color: var(--text); white-space: nowrap; }
+        .sidebar-user-email { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
+        .sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; overflow-x: hidden; }
+        .sidebar-nav::-webkit-scrollbar { width: 4px; }
+        .sidebar-nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        .nav-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; padding: 8px 10px 4px; white-space: nowrap; overflow: hidden; transition: opacity 0.2s; }
+        .sidebar.collapsed .nav-label { opacity: 0; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 14px; cursor: pointer; transition: all 0.2s; color: var(--text-muted); margin-bottom: 2px; white-space: nowrap; overflow: hidden; }
+        .nav-item:hover { background: var(--bg); color: var(--purple); }
+        .nav-item.active { background: var(--purple-light); color: var(--purple); font-weight: 600; }
+        .nav-item i { font-size: 22px; flex-shrink: 0; }
+        .nav-item-label { font-size: 14px; transition: opacity 0.2s; }
+        .sidebar.collapsed .nav-item-label { opacity: 0; width: 0; }
+        .nav-badge { margin-left: auto; background: var(--purple); color: white; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; flex-shrink: 0; transition: opacity 0.2s; }
+        .sidebar.collapsed .nav-badge { opacity: 0; }
+        .sidebar-footer { padding: 12px 10px 16px; border-top: 1px solid var(--border); flex-shrink: 0; }
+
+        /* MAIN */
+        .main { flex: 1; margin-left: var(--sidebar-w); transition: margin-left 0.3s cubic-bezier(0.4,0,0.2,1); min-height: 100vh; display: flex; flex-direction: column; }
+        .main.expanded { margin-left: var(--sidebar-collapsed-w); }
+
+        /* TOPBAR */
+        .topbar { height: var(--header-h); background: var(--white); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 8px rgba(0,0,0,0.04); }
+        .topbar-left { display: flex; align-items: center; gap: 12px; }
+        .topbar-mobile-toggle { display: none; width: 36px; height: 36px; border-radius: 10px; border: none; background: var(--bg); cursor: pointer; align-items: center; justify-content: center; color: var(--text); transition: background 0.2s; }
+        .topbar-mobile-toggle:hover { background: var(--purple-light); }
+        .topbar-mobile-toggle i { font-size: 22px; }
+        .topbar-greeting { font-size: 15px; font-weight: 600; color: var(--text); }
+        .topbar-date { font-size: 12px; color: var(--text-muted); }
+        .topbar-right { display: flex; align-items: center; gap: 10px; }
+        .topbar-icon-btn { width: 36px; height: 36px; border-radius: 10px; border: none; background: var(--bg); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: all 0.2s; position: relative; }
+        .topbar-icon-btn:hover { background: var(--purple-light); color: var(--purple); }
+        .topbar-icon-btn i { font-size: 20px; }
+        .notif-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--orange); border: 2px solid var(--white); }
+        .topbar-avatar { width: 36px; height: 36px; border-radius: 12px; background: linear-gradient(135deg, var(--purple), #ec4899); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; color: white; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; position: relative; background-size: cover; background-position: center; }
+        .topbar-avatar:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(139,92,246,0.3); }
+        .dropdown { position: absolute; top: 44px; right: 0; background: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); width: 170px; overflow: hidden; z-index: 300; display: none; border: 1px solid var(--border); animation: dropFade 0.18s ease; }
+        @keyframes dropFade { from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);} }
+        .dropdown.show { display: block; }
+        .dd-item { padding: 12px 16px; display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; color: var(--text); transition: background 0.15s; }
+        .dd-item:hover { background: var(--bg); }
+        .dd-item.danger { color: #e53e3e; border-top: 1px solid var(--border); }
+        .dd-item i { font-size: 18px; }
+        .relative { position: relative; }
+
+        /* PAGE CONTENT */
+        .page-content { flex: 1; padding: 28px; max-width: 900px; width: 100%; margin: 0 auto; }
+
+        /* PAGE HEADER */
+        .page-header { margin-bottom: 24px; animation: fadeUp 0.5s ease both; }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);} }
+        .page-header h1 { font-size: 24px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 10px; }
+        .page-header h1 i { color: var(--purple); }
+        .page-header p { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
+
+        /* PERIOD FILTER */
+        .period-row { display: flex; gap: 8px; margin-bottom: 24px; animation: fadeUp 0.5s 0.05s ease both; }
+        .period-btn { background: var(--white); padding: 8px 20px; border-radius: 40px; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; border: 1px solid var(--border); transition: all 0.2s; }
+        .period-btn.active { background: var(--purple); color: white; border-color: var(--purple); box-shadow: 0 2px 8px rgba(139,92,246,0.25); }
+        .period-btn:hover:not(.active) { background: var(--purple-light); color: var(--purple); }
+
+        /* SUMMARY GRID */
+        .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; animation: fadeUp 0.5s 0.1s ease both; }
+        .sum-card { background: var(--white); border-radius: 20px; padding: 20px 16px; text-align: center; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.03); transition: transform 0.2s, box-shadow 0.2s; }
+        .sum-card:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+        .sum-icon { font-size: 26px; margin-bottom: 8px; }
+        .sum-num { font-size: 30px; font-weight: 800; line-height: 1; }
+        .sum-label { font-size: 12px; color: var(--text-muted); margin-top: 6px; font-weight: 500; }
+        .sum-card.c1 .sum-num { color: var(--blue); }
+        .sum-card.c2 .sum-num { color: var(--green); }
+        .sum-card.c3 .sum-num { color: var(--orange); }
+
+        /* CHART ROW */
+        .chart-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; animation: fadeUp 0.5s 0.15s ease both; }
+        .card { background: var(--white); border-radius: 20px; padding: 20px; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+        .card-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .card-title i { color: var(--purple); font-size: 18px; }
+
+        /* DONUT CHART */
+        .donut-wrap { display: flex; align-items: center; gap: 20px; }
+        .donut-svg-wrap { position: relative; width: 110px; height: 110px; flex-shrink: 0; }
+        .donut-svg-wrap svg { transform: rotate(-90deg); }
+        .donut-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .donut-pct { font-size: 20px; font-weight: 800; color: var(--purple); }
+        .donut-pct-label { font-size: 10px; color: var(--text-muted); }
+        .legend { display: flex; flex-direction: column; gap: 8px; }
+        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        .legend-name { color: var(--text); font-weight: 500; }
+        .legend-pct { color: var(--text-muted); font-size: 12px; margin-left: auto; }
+
+        /* BAR CHART */
+        .bar-chart { display: flex; flex-direction: column; gap: 12px; }
+        .bar-row { display: flex; align-items: center; gap: 10px; }
+        .bar-label { font-size: 12px; color: var(--text-muted); width: 60px; flex-shrink: 0; text-align: right; }
+        .bar-bg { flex: 1; height: 10px; background: #f1f5f9; border-radius: 10px; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 10px; transition: width 0.8s cubic-bezier(0.4,0,0.2,1); width: 0; }
+        .bar-val { font-size: 12px; font-weight: 600; color: var(--text); width: 30px; }
+
+        /* TASK LIST */
+        .task-list-section { animation: fadeUp 0.5s 0.2s ease both; }
+        .task-list-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .task-list-title { font-size: 16px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
+        .task-list-title i { color: var(--purple); }
+
+        .stat-task-item { background: var(--white); border-radius: 16px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; border: 1px solid var(--border); margin-bottom: 10px; transition: transform 0.2s, box-shadow 0.2s; animation: fadeUp 0.3s ease both; }
+        .stat-task-item:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.06); }
+        .cat-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        .stat-task-body { flex: 1; }
+        .stat-task-title { font-weight: 500; font-size: 14px; color: var(--text); }
+        .stat-task-meta { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+        .stat-task-status { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+        .status-done { background: #d1fae5; color: #065f46; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+
+        /* BOTTOM NAV */
+        .bottom-nav { display: none; background: var(--white); border-top: 1px solid var(--border); position: fixed; bottom: 0; left: 0; right: 0; z-index: 200; padding: 8px 12px 16px; justify-content: space-around; box-shadow: 0 -4px 16px rgba(0,0,0,0.06); }
+        .bnav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; color: #94a3b8; cursor: pointer; padding: 6px 12px; border-radius: 16px; transition: all 0.2s; flex: 1; }
+        .bnav-item i { font-size: 22px; }
+        .bnav-item.active { color: var(--purple); background: var(--purple-light); }
+        .bnav-item:hover:not(.active) { color: var(--purple); }
+
+        .empty-state { text-align: center; padding: 48px 20px; color: var(--text-muted); }
+        .empty-state i { font-size: 48px; opacity: 0.4; margin-bottom: 12px; display: block; }
+
+        @media (max-width: 900px) {
+            .sidebar { transform: translateX(-100%); width: var(--sidebar-w) !important; box-shadow: none; }
+            .sidebar.mobile-open { transform: translateX(0); box-shadow: 4px 0 30px rgba(0,0,0,0.15); }
+            .main { margin-left: 0 !important; padding-bottom: 80px; }
+            .topbar-mobile-toggle { display: flex !important; }
+            .bottom-nav { display: flex; }
+            .chart-row { grid-template-columns: 1fr; }
+            .page-content { padding: 16px; }
+            .topbar { padding: 0 16px; }
+        }
+        @media (max-width: 480px) {
+            .summary-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+            .sum-num { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+<div class="bg-blob bg-blob-1"></div>
+<div class="bg-blob bg-blob-2"></div>
+<div class="layout">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-wrap">
+                <div class="brand-logo">R</div>
+                <div class="brand-name">RemindU</div>
+            </div>
+            <button class="toggle-btn" id="sidebarToggle"><i class="material-icons-round">chevron_left</i></button>
+        </div>
+        <div class="sidebar-user" id="sidebarUser">
+            <div class="sidebar-avatar" id="sidebarAvatar">A</div>
+            <div class="sidebar-user-info">
+                <div class="sidebar-user-name" id="sidebarName">User</div>
+                <div class="sidebar-user-email" id="sidebarEmail">user@email.com</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-label">Menu Utama</div>
+            <div class="nav-item" data-nav="home"><i class="material-icons-round">home</i><span class="nav-item-label">Beranda</span></div>
+            <div class="nav-item" data-nav="calendar"><i class="material-icons-round">calendar_month</i><span class="nav-item-label">Kalender</span></div>
+            <div class="nav-item" data-nav="notification"><i class="material-icons-round">notifications</i><span class="nav-item-label">Notifikasi</span><span class="nav-badge" id="notifBadge">0</span></div>
+            <div class="nav-label" style="margin-top:8px;">Lainnya</div>
+            <div class="nav-item" data-nav="ai"><i class="material-icons-round">auto_awesome</i><span class="nav-item-label">AI Motivasi</span></div>
+            <div class="nav-item active" data-nav="statistic"><i class="material-icons-round">bar_chart</i><span class="nav-item-label">Statistik</span></div>
+            <div class="nav-item" data-nav="settings"><i class="material-icons-round">settings</i><span class="nav-item-label">Pengaturan</span></div>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="nav-item" id="sidebarLogout" style="color:#e53e3e;"><i class="material-icons-round">logout</i><span class="nav-item-label">Keluar</span></div>
+        </div>
+    </aside>
+
+    <main class="main" id="mainContent">
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="topbar-mobile-toggle" id="mobileMenuBtn" style="display:none;"><i class="material-icons-round">menu</i></button>
+                <div>
+                    <div class="topbar-greeting" id="topbarGreeting">Statistik</div>
+                    <div class="topbar-date" id="topbarDate"></div>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-icon-btn" id="topbarNotif"><i class="material-icons-round">notifications_none</i><span class="notif-dot" id="notifDot" style="display:none;"></span></button>
+                <div class="topbar-avatar relative" id="topbarAvatar">
+                    <span id="topbarAvatarChar">A</span>
+                    <div class="dropdown" id="dropdown">
+                        <div class="dd-item" id="ddProfile"><i class="material-icons-round">person</i> Profil</div>
+                        <div class="dd-item danger" id="ddLogout"><i class="material-icons-round">logout</i> Keluar</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-content">
+            <div class="page-header">
+                <h1><i class="material-icons-round">bar_chart</i> Statistik Task</h1>
+                <p>Pantau produktivitas dan progres tugas kamu</p>
+            </div>
+
+            <div class="period-row">
+                <div class="period-btn active" data-period="week">Minggu Ini</div>
+                <div class="period-btn" data-period="month">Bulan Ini</div>
+                <div class="period-btn" data-period="all">Semua Waktu</div>
+            </div>
+
+            <div class="summary-grid">
+                <div class="sum-card c1"><div class="sum-icon">📌</div><div class="sum-num" id="totalTasks">0</div><div class="sum-label">Total Task</div></div>
+                <div class="sum-card c2"><div class="sum-icon">✅</div><div class="sum-num" id="completedTasks">0</div><div class="sum-label">Selesai</div></div>
+                <div class="sum-card c3"><div class="sum-icon">⏳</div><div class="sum-num" id="pendingTasks">0</div><div class="sum-label">Tertunda</div></div>
+            </div>
+
+            <div class="chart-row">
+                <!-- Donut Chart -->
+                <div class="card">
+                    <div class="card-title"><i class="material-icons-round">donut_large</i> Distribusi Kategori</div>
+                    <div class="donut-wrap">
+                        <div class="donut-svg-wrap">
+                            <svg width="110" height="110" viewBox="0 0 110 110" id="donutSvg">
+                                <circle cx="55" cy="55" r="42" fill="none" stroke="#f1f5f9" stroke-width="14"/>
+                                <!-- segments rendered by JS -->
+                            </svg>
+                            <div class="donut-center">
+                                <div class="donut-pct" id="donutPct">0%</div>
+                                <div class="donut-pct-label">selesai</div>
+                            </div>
+                        </div>
+                        <div class="legend" id="donutLegend"></div>
+                    </div>
+                </div>
+
+                <!-- Bar Chart by Category -->
+                <div class="card">
+                    <div class="card-title"><i class="material-icons-round">bar_chart</i> Task per Kategori</div>
+                    <div class="bar-chart" id="barChart"></div>
+                </div>
+            </div>
+
+            <!-- Task List -->
+            <div class="task-list-section">
+                <div class="task-list-header">
+                    <div class="task-list-title"><i class="material-icons-round">list_alt</i> Daftar Task</div>
+                </div>
+                <div id="taskListStat"></div>
+            </div>
+        </div>
+    </main>
+
+    <nav class="bottom-nav">
+        <div class="bnav-item" data-nav="home"><i class="material-icons-round">home</i><span>Home</span></div>
+        <div class="bnav-item" data-nav="calendar"><i class="material-icons-round">calendar_month</i><span>Kalender</span></div>
+        <div class="bnav-item" data-nav="notification"><i class="material-icons-round">notifications</i><span>Notif</span></div>
+        <div class="bnav-item active" data-nav="statistic"><i class="material-icons-round">bar_chart</i><span>Statistik</span></div>
+    </nav>
+</div>
+
+<script>
+const API_URL = 'http://localhost:3000/api';
+const userData = JSON.parse(localStorage.getItem('remindu_user') || '{}');
+const userEmail = userData.email;
+if (!userEmail) { window.location.href = 'welcome.html'; }
+
+const firstName = userEmail.split('@')[0];
+const displayName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
+
+// Avatar
+function updateAvatar() {
+    const saved = localStorage.getItem('user_avatar');
+    const sa = document.getElementById('sidebarAvatar');
+    const tc = document.getElementById('topbarAvatarChar');
+    const ta = document.getElementById('topbarAvatar');
+    if (!saved) {
+        const def = userEmail.charAt(0).toUpperCase();
+        sa.textContent = def; tc.textContent = def;
+        sa.style.backgroundImage = ''; ta.style.backgroundImage = '';
+    } else if (saved.startsWith('data:image')) {
+        sa.textContent = ''; sa.style.backgroundImage = `url(${saved})`; sa.style.backgroundSize = 'cover';
+        tc.textContent = ''; ta.style.backgroundImage = `url(${saved})`; ta.style.backgroundSize = 'cover';
+    } else {
+        sa.textContent = saved; tc.textContent = saved;
+        sa.style.backgroundImage = ''; ta.style.backgroundImage = '';
+    }
+}
+updateAvatar();
+document.getElementById('sidebarName').textContent = displayName;
+document.getElementById('sidebarEmail').textContent = userEmail;
+document.getElementById('topbarGreeting').textContent = `Statistik Task`;
+const now = new Date();
+document.getElementById('topbarDate').textContent = now.toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+// Sidebar toggle
+const sidebar = document.getElementById('sidebar');
+const mainContent = document.getElementById('mainContent');
+const overlay = document.getElementById('sidebarOverlay');
+document.getElementById('sidebarToggle').addEventListener('click', () => {
+    if (window.innerWidth > 900) {
+        sidebar.classList.toggle('collapsed');
+        mainContent.classList.toggle('expanded');
+    }
+});
+document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+    sidebar.classList.add('mobile-open'); overlay.classList.add('show');
+});
+overlay.addEventListener('click', () => {
+    sidebar.classList.remove('mobile-open'); overlay.classList.remove('show');
+});
+document.querySelectorAll('[data-nav]').forEach(el => {
+    el.addEventListener('click', () => {
+        const n = el.dataset.nav;
+        const map = { home:'home.html', calendar:'calendar.html', notification:'notification.html', ai:'ai-motivation.html', settings:'settings.html', statistic:'statistic.html' };
+        if (map[n]) window.location.href = map[n];
+    });
+});
+document.getElementById('sidebarUser').addEventListener('click', () => window.location.href = 'profil.html');
+document.getElementById('sidebarLogout').addEventListener('click', () => { localStorage.removeItem('remindu_user'); window.location.href = 'welcome.html'; });
+document.getElementById('ddProfile').addEventListener('click', () => window.location.href = 'profil.html');
+document.getElementById('ddLogout').addEventListener('click', () => { localStorage.removeItem('remindu_user'); window.location.href = 'welcome.html'; });
+document.getElementById('topbarAvatar').addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.getElementById('dropdown').classList.toggle('show');
+});
+document.addEventListener('click', () => document.getElementById('dropdown').classList.remove('show'));
+document.getElementById('topbarNotif').addEventListener('click', () => window.location.href = 'notification.html');
+
+// ===== DATA & CHARTS =====
+let allTasks = [];
+let currentPeriod = 'week';
+
+const CAT_COLORS = { study: '#3b82f6', personal: '#f97316', health: '#10b981', work: '#f59e0b' };
+const CAT_LABELS = { study: '📚 Study', personal: '🧑 Personal', health: '💪 Health', work: '💼 Work' };
+
+async function loadTasks() {
+    try {
+        const res = await fetch(`${API_URL}/tasks`, { headers: { 'X-User-Email': userEmail } });
+        allTasks = await res.json();
+    } catch {
+        allTasks = [];
+    }
+    renderAll();
+}
+
+function filterByPeriod(tasks, period) {
+    const now = new Date();
+    if (period === 'all') return tasks;
+    if (period === 'week') {
+        const weekAgo = new Date(now - 7 * 86400000);
+        return tasks.filter(t => new Date(t.dibuat_pada || t.due_date || now) >= weekAgo);
+    }
+    if (period === 'month') {
+        return tasks.filter(t => {
+            const d = new Date(t.dibuat_pada || t.due_date || now);
+            return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+        });
+    }
+    return tasks;
+}
+
+function renderAll() {
+    const tasks = filterByPeriod(allTasks, currentPeriod);
+    const total = tasks.length;
+    const completed = tasks.filter(t => t.selesai).length;
+    const pending = total - completed;
+    const pct = total === 0 ? 0 : Math.round((completed / total) * 100);
+
+    document.getElementById('totalTasks').textContent = total;
+    document.getElementById('completedTasks').textContent = completed;
+    document.getElementById('pendingTasks').textContent = pending;
+
+    renderDonut(tasks, pct);
+    renderBarChart(tasks);
+    renderTaskList(tasks);
+}
+
+function renderDonut(tasks, pct) {
+    document.getElementById('donutPct').textContent = pct + '%';
+    const svg = document.getElementById('donutSvg');
+    // Remove old segments
+    [...svg.querySelectorAll('.seg')].forEach(el => el.remove());
+
+    const cats = ['study', 'personal', 'health', 'work'];
+    const total = tasks.length;
+    const r = 42, cx = 55, cy = 55;
+    const circumference = 2 * Math.PI * r;
+    const legend = document.getElementById('donutLegend');
+    legend.innerHTML = '';
+
+    let offset = 0;
+    cats.forEach(cat => {
+        const count = tasks.filter(t => t.kategori === cat).length;
+        if (count === 0) return;
+        const fraction = count / total;
+        const dash = fraction * circumference;
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('class', 'seg');
+        circle.setAttribute('cx', cx); circle.setAttribute('cy', cy); circle.setAttribute('r', r);
+        circle.setAttribute('fill', 'none');
+        circle.setAttribute('stroke', CAT_COLORS[cat] || '#8b5cf6');
+        circle.setAttribute('stroke-width', '14');
+        circle.setAttribute('stroke-dasharray', `${dash} ${circumference - dash}`);
+        circle.setAttribute('stroke-dashoffset', -offset * circumference);
+        svg.appendChild(circle);
+        offset += fraction;
+
+        const li = document.createElement('div');
+        li.className = 'legend-item';
+        li.innerHTML = `<div class="legend-dot" style="background:${CAT_COLORS[cat]}"></div><span class="legend-name">${CAT_LABELS[cat] || cat}</span><span class="legend-pct">${Math.round(fraction * 100)}%</span>`;
+        legend.appendChild(li);
+    });
+
+    if (total === 0) {
+        legend.innerHTML = '<div style="color:#94a3b8;font-size:13px;">Belum ada task</div>';
+    }
+}
+
+function renderBarChart(tasks) {
+    const container = document.getElementById('barChart');
+    container.innerHTML = '';
+    const cats = ['study', 'personal', 'health', 'work'];
+    const max = Math.max(...cats.map(c => tasks.filter(t => t.kategori === c).length), 1);
+
+    cats.forEach(cat => {
+        const count = tasks.filter(t => t.kategori === c).length;
+        // fix: use cat not c
+        const cnt = tasks.filter(t => t.kategori === cat).length;
+        const pct = Math.round((cnt / max) * 100);
+        const row = document.createElement('div');
+        row.className = 'bar-row';
+        row.innerHTML = `
+            <div class="bar-label">${cat.charAt(0).toUpperCase() + cat.slice(1)}</div>
+            <div class="bar-bg"><div class="bar-fill" style="background:${CAT_COLORS[cat]};width:${pct}%"></div></div>
+            <div class="bar-val">${cnt}</div>
+        `;
+        container.appendChild(row);
+    });
+}
+
+function renderTaskList(tasks) {
+    const container = document.getElementById('taskListStat');
+    if (tasks.length === 0) {
+        container.innerHTML = `<div class="empty-state"><i class="material-icons-round">assignment</i><p>Belum ada task pada periode ini.</p></div>`;
+        return;
+    }
+    const sorted = [...tasks].sort((a, b) => new Date(b.dibuat_pada || 0) - new Date(a.dibuat_pada || 0));
+    container.innerHTML = sorted.map((t, i) => {
+        const due = t.due_date ? new Date(t.due_date).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' }) : 'Tanpa deadline';
+        return `
+            <div class="stat-task-item" style="animation-delay:${i * 0.04}s">
+                <div class="cat-dot" style="background:${CAT_COLORS[t.kategori] || '#8b5cf6'}"></div>
+                <div class="stat-task-body">
+                    <div class="stat-task-title">${t.judul}</div>
+                    <div class="stat-task-meta">📅 ${due} · ${CAT_LABELS[t.kategori] || t.kategori}</div>
+                </div>
+                <span class="stat-task-status ${t.selesai ? 'status-done' : 'status-pending'}">${t.selesai ? '✅ Selesai' : '⏳ Tertunda'}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+// Period filter
+document.querySelectorAll('.period-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentPeriod = btn.dataset.period;
+        renderAll();
+    });
+});
+
+// Notif badge
+async function loadNotifCount() {
+    try {
+        const res = await fetch(`${API_URL}/notifications`, { headers: { 'X-User-Email': userEmail } });
+        const data = await res.json();
+        const unread = data.filter(n => !n.status_baca).length;
+        const badge = document.getElementById('notifBadge');
+        const dot = document.getElementById('notifDot');
+        if (unread > 0) { badge.textContent = unread; dot.style.display = 'block'; }
+        else { badge.textContent = '0'; dot.style.display = 'none'; }
+    } catch {}
+}
+
+loadTasks();
+loadNotifCount();
+
+// Mobile responsiveness
+function handleResize() {
+    if (window.innerWidth <= 900) {
+        document.getElementById('mobileMenuBtn').style.display = 'flex';
+    } else {
+        document.getElementById('mobileMenuBtn').style.display = 'none';
+        sidebar.classList.remove('mobile-open');
+        overlay.classList.remove('show');
+    }
+}
+window.addEventListener('resize', handleResize);
+handleResize();
+</script>
+</body>
+</html>

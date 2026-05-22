@@ -4,164 +4,104 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>RemindU - Profil</title>
-    <!-- Google Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, sans-serif;
+        :root {
+            --purple: #8b5cf6;
+            --purple-dark: #7c3aed;
+            --purple-light: #ede9fe;
+            --bg: #f5f7fe;
+            --white: #ffffff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --border: #edf2f7;
         }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
         body {
-            background: linear-gradient(145deg, #f5f7fe 0%, #eef2fa 100%);
-            padding: 20px;
+            background: var(--bg);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-        .container {
-            max-width: 600px;
-            width: 100%;
-            margin: 0 auto;
-            background: white;
-            border-radius: 36px;
-            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-        .page-content {
-            padding: 28px 24px 36px;
-        }
-        /* Header dengan back button */
-        .header {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 32px;
+            padding: 20px;
             position: relative;
-            justify-content: center;
+            overflow-x: hidden;
         }
-        .btn-back {
-            position: absolute;
-            left: 0;
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #8b5cf6;
-            padding: 8px;
-            border-radius: 50%;
-            transition: background 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .bg-blob { position: fixed; border-radius: 50%; filter: blur(60px); opacity: 0.38; pointer-events: none; z-index: 0; }
+        .bg-blob-1 { width: 400px; height: 400px; background: var(--purple); top: -100px; right: -100px; }
+        .bg-blob-2 { width: 300px; height: 300px; background: #ec4899; bottom: -80px; left: -80px; }
+        .container {
+            max-width: 600px; width: 100%; background: var(--white);
+            border-radius: 36px; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1);
+            overflow: hidden; position: relative; z-index: 10;
         }
-        .btn-back:hover {
-            background: #f1f5f9;
+        .page-content { padding: 28px 24px 36px; }
+        .header { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; position: relative; justify-content: center; }
+        .btn-back { position: absolute; left: 0; background: none; border: none; font-size: 24px; cursor: pointer; color: var(--purple); padding: 8px; border-radius: 50%; transition: background 0.2s; display: flex; align-items: center; justify-content: center; }
+        .btn-back:hover { background: var(--purple-light); }
+        h2 { font-size: 24px; font-weight: 600; color: var(--text); }
+
+        /* User card di atas */
+        .user-card {
+            background: linear-gradient(135deg, var(--purple) 0%, #6d28d9 60%, #4f46e5 100%);
+            border-radius: 24px; padding: 20px 20px 20px 20px;
+            display: flex; align-items: center; gap: 16px;
+            margin-bottom: 24px; color: white;
+            box-shadow: 0 8px 24px rgba(139,92,246,0.3);
+            cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+            position: relative; overflow: hidden;
         }
-        h2 {
-            font-size: 24px;
-            font-weight: 600;
-            color: #1e293b;
-        }
-        /* Menu list */
-        .menu-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 32px;
-        }
-        .menu-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 20px;
-            background: #f8fafc;
-            border-radius: 28px;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 1px solid #edf2f7;
-        }
-        .menu-item:hover {
-            background: #f1f5f9;
-            transform: translateX(6px);
-        }
-        .menu-left {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-        .menu-icon {
-            font-size: 24px;
-            color: #8b5cf6;
-        }
-        .menu-text {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-        .menu-title {
-            font-weight: 600;
-            color: #1e293b;
-            font-size: 16px;
-        }
-        .menu-sub {
-            font-size: 13px;
-            color: #64748b;
-        }
-        .arrow-icon {
-            color: #94a3b8;
-            font-size: 20px;
-        }
-        /* Tombol logout terpisah di tengah */
-        .logout-wrapper {
-            display: flex;
-            justify-content: center;
-            margin-top: 16px;
-        }
-        .logout-btn {
-            background: #e53e3e;
-            color: white;
-            border: none;
-            padding: 14px 28px;
-            border-radius: 60px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.2s;
-            box-shadow: 0 4px 12px rgba(229,62,62,0.3);
-            width: auto;
-            min-width: 160px;
-            justify-content: center;
-        }
-        .logout-btn:hover {
-            background: #c53030;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(229,62,62,0.4);
-        }
-        .logout-btn:active {
-            transform: translateY(0);
-        }
-        .logout-btn i {
-            font-size: 20px;
-        }
-        hr {
-            margin: 20px 0;
-            border: none;
-            border-top: 1px solid #edf2f7;
-        }
-        @media (min-width: 768px) {
-            .page-content {
-                padding: 40px 48px;
-            }
-        }
+        .user-card::before { content: ''; position: absolute; top: -40px; right: -30px; width: 130px; height: 130px; border-radius: 50%; background: rgba(255,255,255,0.09); }
+        .user-card:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(139,92,246,0.4); }
+        .user-card-avatar { width: 56px; height: 56px; border-radius: 18px; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 700; flex-shrink: 0; background-size: cover; background-position: center; }
+        .user-card-info { flex: 1; }
+        .user-card-name { font-size: 18px; font-weight: 700; margin-bottom: 3px; }
+        .user-card-email { font-size: 12px; opacity: 0.85; }
+        .user-card-badge { font-size: 11px; background: rgba(255,255,255,0.2); border-radius: 20px; padding: 3px 10px; margin-top: 6px; display: inline-block; }
+        .user-card-arrow { font-size: 20px; opacity: 0.7; }
+
+        .menu-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+        .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 18px; background: #f8fafc; border-radius: 22px; cursor: pointer; transition: all 0.2s; border: 1px solid var(--border); }
+        .menu-item:hover { background: var(--purple-light); transform: translateX(5px); border-color: rgba(139,92,246,0.2); }
+        .menu-left { display: flex; align-items: center; gap: 14px; }
+        .menu-icon { font-size: 22px; color: var(--purple); }
+        .menu-text { display: flex; flex-direction: column; gap: 1px; }
+        .menu-title { font-weight: 600; color: var(--text); font-size: 15px; }
+        .menu-sub { font-size: 12px; color: var(--text-muted); }
+        .arrow-icon { color: #94a3b8; font-size: 20px; }
+
+        .section-divider { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; margin: 20px 4px 10px; }
+
+        .logout-wrapper { display: flex; justify-content: center; margin-top: 8px; }
+        .logout-btn { background: #e53e3e; color: white; border: none; padding: 13px 28px; border-radius: 60px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; box-shadow: 0 4px 12px rgba(229,62,62,0.3); }
+        .logout-btn:hover { background: #c53030; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(229,62,62,0.4); }
+        .logout-btn i { font-size: 20px; }
+
+        /* About modal */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 999; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .modal-overlay.show { display: flex; }
+        .modal { background: var(--white); border-radius: 28px; padding: 32px 28px; max-width: 340px; width: 90%; text-align: center; animation: modalIn 0.25s ease; }
+        @keyframes modalIn { from{opacity:0;transform:scale(0.9);}to{opacity:1;transform:scale(1);} }
+        .modal-icon { font-size: 48px; margin-bottom: 12px; }
+        .modal h3 { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+        .modal p { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 6px; }
+        .modal-close { background: var(--purple); color: white; border: none; padding: 12px 28px; border-radius: 40px; font-weight: 600; cursor: pointer; margin-top: 16px; width: 100%; font-size: 15px; transition: background 0.2s; }
+        .modal-close:hover { background: var(--purple-dark); }
+
+        /* Language modal */
+        .lang-list { display: flex; flex-direction: column; gap: 8px; margin: 12px 0 16px; text-align: left; }
+        .lang-option { padding: 12px 16px; border-radius: 16px; border: 2px solid var(--border); cursor: pointer; font-size: 14px; font-weight: 500; color: var(--text); transition: all 0.2s; display: flex; align-items: center; gap: 10px; }
+        .lang-option:hover { border-color: var(--purple); background: var(--purple-light); }
+        .lang-option.active { border-color: var(--purple); background: var(--purple-light); color: var(--purple); font-weight: 700; }
+        .lang-option span { margin-left: auto; font-size: 16px; }
+
+        @media (min-width: 768px) { .page-content { padding: 40px 48px; } }
     </style>
 </head>
 <body>
+<div class="bg-blob bg-blob-1"></div>
+<div class="bg-blob bg-blob-2"></div>
+
 <div class="container">
     <div class="page-content">
         <div class="header">
@@ -169,65 +109,85 @@
             <h2>Profil</h2>
         </div>
 
+        <!-- User Card -->
+        <div class="user-card" id="userCardBtn">
+            <div class="user-card-avatar" id="profileAvatar">A</div>
+            <div class="user-card-info">
+                <div class="user-card-name" id="profileName">User</div>
+                <div class="user-card-email" id="profileEmail">user@email.com</div>
+                <div class="user-card-badge" id="profileTaskBadge">0 task aktif</div>
+            </div>
+            <i class="material-icons-round user-card-arrow">chevron_right</i>
+        </div>
+
+        <div class="section-divider">Akun</div>
         <div class="menu-list">
-            <!-- Your account -->
             <div class="menu-item" id="yourAccount">
                 <div class="menu-left">
-                    <i class="material-icons-round menu-icon">person</i>
+                    <i class="material-icons-round menu-icon">manage_accounts</i>
                     <div class="menu-text">
                         <span class="menu-title">Your account</span>
-                        <span class="menu-sub">Edit info</span>
+                        <span class="menu-sub">Edit nama & avatar</span>
                     </div>
                 </div>
                 <i class="material-icons-round arrow-icon">chevron_right</i>
             </div>
-
-            <!-- Privacy -->
             <div class="menu-item" id="privacy">
                 <div class="menu-left">
                     <i class="material-icons-round menu-icon">lock</i>
                     <div class="menu-text">
                         <span class="menu-title">Privacy</span>
+                        <span class="menu-sub">Email, password, telepon</span>
                     </div>
                 </div>
                 <i class="material-icons-round arrow-icon">chevron_right</i>
             </div>
-
-            <!-- Data backup -->
             <div class="menu-item" id="dataBackup">
                 <div class="menu-left">
                     <i class="material-icons-round menu-icon">backup</i>
                     <div class="menu-text">
                         <span class="menu-title">Data backup</span>
-                    </div>
-                </div>
-                <i class="material-icons-round arrow-icon">chevron_right</i>
-            </div>
-
-            <!-- Language -->
-            <div class="menu-item" id="language">
-                <div class="menu-left">
-                    <i class="material-icons-round menu-icon">language</i>
-                    <div class="menu-text">
-                        <span class="menu-title">Language</span>
-                    </div>
-                </div>
-                <i class="material-icons-round arrow-icon">chevron_right</i>
-            </div>
-
-            <!-- About -->
-            <div class="menu-item" id="about">
-                <div class="menu-left">
-                    <i class="material-icons-round menu-icon">info</i>
-                    <div class="menu-text">
-                        <span class="menu-title">About</span>
+                        <span class="menu-sub">Export & import data task</span>
                     </div>
                 </div>
                 <i class="material-icons-round arrow-icon">chevron_right</i>
             </div>
         </div>
 
-        <!-- Tombol logout di tengah -->
+        <div class="section-divider">Lainnya</div>
+        <div class="menu-list">
+            <div class="menu-item" id="statistic">
+                <div class="menu-left">
+                    <i class="material-icons-round menu-icon">bar_chart</i>
+                    <div class="menu-text">
+                        <span class="menu-title">Statistik</span>
+                        <span class="menu-sub">Progres & produktivitas</span>
+                    </div>
+                </div>
+                <i class="material-icons-round arrow-icon">chevron_right</i>
+            </div>
+            <div class="menu-item" id="language">
+                <div class="menu-left">
+                    <i class="material-icons-round menu-icon">language</i>
+                    <div class="menu-text">
+                        <span class="menu-title">Language</span>
+                        <span class="menu-sub" id="langSub">Indonesia</span>
+                    </div>
+                </div>
+                <i class="material-icons-round arrow-icon">chevron_right</i>
+            </div>
+            <div class="menu-item" id="about">
+                <div class="menu-left">
+                    <i class="material-icons-round menu-icon">info</i>
+                    <div class="menu-text">
+                        <span class="menu-title">About</span>
+                        <span class="menu-sub">Versi & info aplikasi</span>
+                    </div>
+                </div>
+                <i class="material-icons-round arrow-icon">chevron_right</i>
+            </div>
+        </div>
+
         <div class="logout-wrapper">
             <button class="logout-btn" id="logoutBtn">
                 <i class="material-icons-round">logout</i> Logout
@@ -236,40 +196,116 @@
     </div>
 </div>
 
+<!-- About Modal -->
+<div class="modal-overlay" id="aboutModal">
+    <div class="modal">
+        <div class="modal-icon">🔔</div>
+        <h3>RemindU</h3>
+        <p>Aplikasi manajemen tugas & pengingat cerdas dengan dukungan AI.</p>
+        <p style="margin-top:8px;"><strong>Versi:</strong> 1.0.0</p>
+        <p><strong>Build:</strong> 2026</p>
+        <p style="margin-top:8px;font-size:12px;">Dibuat dengan ❤️ untuk produktivitas yang lebih baik.</p>
+        <button class="modal-close" id="aboutClose">Tutup</button>
+    </div>
+</div>
+
+<!-- Language Modal -->
+<div class="modal-overlay" id="langModal">
+    <div class="modal">
+        <div class="modal-icon">🌐</div>
+        <h3>Pilih Bahasa</h3>
+        <div class="lang-list">
+            <div class="lang-option active" data-lang="id">🇮🇩 Indonesia <span>✓</span></div>
+            <div class="lang-option" data-lang="en">🇬🇧 English</div>
+            <div class="lang-option" data-lang="zh">🇨🇳 Mandarin</div>
+            <div class="lang-option" data-lang="ja">🇯🇵 Japan</div>
+            <div class="lang-option" data-lang="nl">🇳🇱 Dutch</div>
+        </div>
+        <button class="modal-close" id="langClose">Simpan</button>
+    </div>
+</div>
+
 <script>
-    // Cek login
+    const API_URL = 'http://localhost:3000/api';
     const userData = JSON.parse(localStorage.getItem('remindu_user') || '{}');
-    if (!userData.email) {
-        alert('Sesi login tidak ditemukan. Silakan login ulang.');
-        window.location.href = 'welcome.html';
+    if (!userData.email) { alert('Sesi login tidak ditemukan.'); window.location.href = 'welcome.html'; }
+    const userEmail = userData.email;
+
+    // Avatar
+    function loadAvatar() {
+        const saved = localStorage.getItem('user_avatar');
+        const el = document.getElementById('profileAvatar');
+        if (!saved) {
+            el.textContent = userEmail.charAt(0).toUpperCase();
+            el.style.backgroundImage = '';
+        } else if (saved.startsWith('data:image')) {
+            el.textContent = '';
+            el.style.backgroundImage = `url(${saved})`;
+        } else {
+            el.textContent = saved;
+            el.style.backgroundImage = '';
+        }
     }
+    loadAvatar();
+    document.getElementById('profileEmail').textContent = userEmail;
 
-    // Back button
-    document.getElementById('backBtn').addEventListener('click', () => {
-        window.location.href = 'home.html';
+    // Load profile name & task count
+    async function loadProfile() {
+        try {
+            const res = await fetch(`${API_URL}/profile`, { headers: { 'X-User-Email': userEmail } });
+            const data = await res.json();
+            if (data.nama_depan) document.getElementById('profileName').textContent = data.nama_depan + ' ' + (data.nama_belakang || '');
+        } catch { document.getElementById('profileName').textContent = userEmail.split('@')[0]; }
+
+        try {
+            const res2 = await fetch(`${API_URL}/tasks`, { headers: { 'X-User-Email': userEmail } });
+            const tasks = await res2.json();
+            const active = tasks.filter(t => !t.selesai).length;
+            document.getElementById('profileTaskBadge').textContent = `${active} task aktif`;
+        } catch {}
+    }
+    loadProfile();
+
+    // Language
+    const langNames = { id: 'Indonesia', en: 'English', zh: 'Mandarin', ja: 'Japan', nl: 'Dutch' };
+    let currentLang = localStorage.getItem('remindu_lang') || 'id';
+    document.getElementById('langSub').textContent = langNames[currentLang] || 'Indonesia';
+    document.querySelectorAll('.lang-option').forEach(opt => {
+        if (opt.dataset.lang === currentLang) opt.classList.add('active');
+        opt.addEventListener('click', () => {
+            document.querySelectorAll('.lang-option').forEach(o => { o.classList.remove('active'); o.querySelector('span') && o.querySelector('span').remove(); });
+            opt.classList.add('active');
+            const sp = document.createElement('span'); sp.textContent = '✓'; opt.appendChild(sp);
+            currentLang = opt.dataset.lang;
+        });
+    });
+    document.getElementById('langClose').addEventListener('click', () => {
+        localStorage.setItem('remindu_lang', currentLang);
+        document.getElementById('langSub').textContent = langNames[currentLang];
+        document.getElementById('langModal').classList.remove('show');
     });
 
-    // Menu actions (demo)
-    document.getElementById('yourAccount').addEventListener('click', () => {
-    window.location.href = 'editprofil.html';
-    });
-    document.getElementById('privacy').addEventListener('click', () => {
-        alert('Pengaturan privasi akan segera hadir.');
-    });
-    document.getElementById('dataBackup').addEventListener('click', () => {
-        alert('Cadangan data akan segera hadir.');
-    });
-    document.getElementById('language').addEventListener('click', () => {
-        alert('Pilihan bahasa akan segera hadir.');
-    });
-    document.getElementById('about').addEventListener('click', () => {
-        alert('RemindU - Aplikasi manajemen tugas.\nVersi 1.0.0');
+    // Navigation
+    document.getElementById('backBtn').addEventListener('click', () => window.location.href = 'home.html');
+    document.getElementById('userCardBtn').addEventListener('click', () => window.location.href = 'editprofil.html');
+    document.getElementById('yourAccount').addEventListener('click', () => window.location.href = 'editprofil.html');
+    document.getElementById('privacy').addEventListener('click', () => window.location.href = 'privacy.html');
+    document.getElementById('dataBackup').addEventListener('click', () => window.location.href = 'data_backup.html');
+    document.getElementById('statistic').addEventListener('click', () => window.location.href = 'statistic.html');
+    document.getElementById('language').addEventListener('click', () => document.getElementById('langModal').classList.add('show'));
+    document.getElementById('about').addEventListener('click', () => document.getElementById('aboutModal').classList.add('show'));
+    document.getElementById('aboutClose').addEventListener('click', () => document.getElementById('aboutModal').classList.remove('show'));
+
+    // Close modals on overlay click
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('show'); });
     });
 
-    // Logout button
     document.getElementById('logoutBtn').addEventListener('click', () => {
-        localStorage.removeItem('remindu_user');
-        window.location.href = 'welcome.html';
+        if (confirm('Yakin ingin keluar?')) {
+            localStorage.removeItem('remindu_user');
+            window.location.href = 'welcome.html';
+        }
     });
 </script>
 </body>

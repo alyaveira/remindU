@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const db = require('./db');
+const db = require('./db'); // file koneksi database
 
 const app = express();
 const PORT = 3000;
@@ -10,7 +10,7 @@ const PORT = 3000;
 app.use(cors());
 app.use(bodyParser.json());
 
-// ========== Helper ==========
+// ========== Helper: ambil id_pengguna dari email ==========
 function getUserIdFromEmail(email, callback) {
     const sql = 'SELECT id_pengguna FROM data_pengguna WHERE email = ?';
     db.query(sql, [email], (err, results) => {
@@ -23,7 +23,6 @@ function getUserIdFromEmail(email, callback) {
 app.post('/api/register', async (req, res) => {
     const { firstName, lastName, email, password, terms } = req.body;
 
-    // Validasi defensif
     if (!firstName || !lastName) return res.status(400).json({ error: 'Nama depan dan belakang wajib diisi' });
     if (!email || !email.includes('@')) return res.status(400).json({ error: 'Email tidak valid' });
     if (!password || password.length < 8 || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
@@ -31,7 +30,6 @@ app.post('/api/register', async (req, res) => {
     }
     if (!terms) return res.status(400).json({ error: 'Harus menyetujui Terms & Conditions' });
 
-    // Cek email sudah terdaftar
     db.query('SELECT email FROM data_pengguna WHERE email = ?', [email], async (err, results) => {
         if (err) return res.status(500).json({ error: err.message });
         if (results.length > 0) return res.status(400).json({ error: 'Email sudah terdaftar' });
@@ -84,6 +82,48 @@ app.post('/api/login', (req, res) => {
     });
 });
 
+// ========== PROFILE (GET) ==========
+app.get('/api/profile', (req, res) => {
+    const userEmail = req.headers['x-user-email'];
+    if (!userEmail) return res.status(401).json({ error: 'Email tidak ditemukan' });
+
+    const sql = 'SELECT nama_depan, nama_belakang, email FROM data_pengguna WHERE email = ?';
+    db.query(sql, [userEmail], (err, results) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (results.length === 0) return res.status(404).json({ error: 'User tidak ditemukan' });
+        res.json(results[0]);
+    });
+});
+
+// ========== PROFILE (UPDATE) ==========
+app.put('/api/profile', async (req, res) => {
+    const userEmail = req.headers['x-user-email'];
+    const { firstName, lastName, newPassword, confirmPassword } = req.body;
+    if (!userEmail) return res.status(401).json({ error: 'Email tidak ditemukan' });
+    if (!firstName || !lastName) return res.status(400).json({ error: 'Nama depan dan belakang wajib diisi' });
+
+    if (newPassword || confirmPassword) {
+        if (newPassword !== confirmPassword) return res.status(400).json({ error: 'Konfirmasi password baru tidak cocok' });
+        if (newPassword.length < 8 || !/[a-z]/.test(newPassword) || !/[0-9]/.test(newPassword)) {
+            return res.status(400).json({ error: 'Password minimal 8 karakter, huruf kecil & angka' });
+        }
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        const sql = 'UPDATE data_pengguna SET nama_depan = ?, nama_belakang = ?, kata_sandi = ? WHERE email = ?';
+        db.query(sql, [firstName, lastName, hashedPassword, userEmail], (err, result) => {
+            if (err) return res.status(500).json({ error: err.message });
+            if (result.affectedRows === 0) return res.status(404).json({ error: 'User tidak ditemukan' });
+            res.json({ success: true, message: 'Profil dan password berhasil diperbarui' });
+        });
+    } else {
+        const sql = 'UPDATE data_pengguna SET nama_depan = ?, nama_belakang = ? WHERE email = ?';
+        db.query(sql, [firstName, lastName, userEmail], (err, result) => {
+            if (err) return res.status(500).json({ error: err.message });
+            if (result.affectedRows === 0) return res.status(404).json({ error: 'User tidak ditemukan' });
+            res.json({ success: true, message: 'Profil berhasil diperbarui' });
+        });
+    }
+});
+
 // ========== TASKS ENDPOINTS ==========
 app.get('/api/tasks', (req, res) => {
     const userEmail = req.headers['x-user-email'];
@@ -91,7 +131,7 @@ app.get('/api/tasks', (req, res) => {
 
     getUserIdFromEmail(userEmail, (userId) => {
         if (!userId) return res.status(404).json({ error: 'User tidak ditemukan' });
-        const sql = `SELECT id_task, judul, notes, due_date, remind_at, kategori, selesai 
+        const sql = `SELECT id_task, judul, notes, due_date, remind_at, kategori, selesai, dibuat_pada
                      FROM tasks WHERE id_pengguna = ? ORDER BY dibuat_pada DESC`;
         db.query(sql, [userId], (err, results) => {
             if (err) return res.status(500).json({ error: err.message });
@@ -146,51 +186,31 @@ app.delete('/api/tasks/:id', (req, res) => {
     });
 });
 
-// ========== GET PROFILE ==========
-app.get('/api/profile', (req, res) => {
+// ========== NOTIFIKASI (opsional) ==========
+app.get('/api/notifications', (req, res) => {
     const userEmail = req.headers['x-user-email'];
     if (!userEmail) return res.status(401).json({ error: 'Email tidak ditemukan' });
 
-    const sql = 'SELECT nama_depan, nama_belakang, email FROM data_pengguna WHERE email = ?';
-    db.query(sql, [userEmail], (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
-        if (results.length === 0) return res.status(404).json({ error: 'User tidak ditemukan' });
-        res.json(results[0]);
+    getUserIdFromEmail(userEmail, (userId) => {
+        if (!userId) return res.status(404).json({ error: 'User tidak ditemukan' });
+        // Contoh notifikasi sederhana: deadline dalam 24 jam
+        const sql = `SELECT id_task, judul, due_date FROM tasks 
+                     WHERE id_pengguna = ? AND selesai = 0 AND due_date IS NOT NULL 
+                     AND due_date BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 1 DAY)`;
+        db.query(sql, [userId], (err, results) => {
+            if (err) return res.status(500).json({ error: err.message });
+            const notif = results.map(task => ({
+                id: task.id_task,
+                type: 'deadline',
+                icon: '⏰',
+                title: 'Deadline Mendekat!',
+                msg: `Task "${task.judul}" akan jatuh tempo kurang dari 24 jam.`,
+                time: new Date().toISOString(),
+                read: false
+            }));
+            res.json(notif);
+        });
     });
-});
-
-// ========== UPDATE PROFILE (nama & password) ==========
-app.put('/api/profile', async (req, res) => {
-    const userEmail = req.headers['x-user-email'];
-    const { firstName, lastName, newPassword, confirmPassword } = req.body;
-
-    if (!userEmail) return res.status(401).json({ error: 'Email tidak ditemukan' });
-    if (!firstName || !lastName) return res.status(400).json({ error: 'Nama depan dan belakang wajib diisi' });
-
-    // Jika ada permintaan ganti password
-    if (newPassword || confirmPassword) {
-        if (newPassword !== confirmPassword) {
-            return res.status(400).json({ error: 'Konfirmasi password baru tidak cocok' });
-        }
-        if (newPassword.length < 8 || !/[a-z]/.test(newPassword) || !/[0-9]/.test(newPassword)) {
-            return res.status(400).json({ error: 'Password minimal 8 karakter, huruf kecil & angka' });
-        }
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
-        const sql = 'UPDATE data_pengguna SET nama_depan = ?, nama_belakang = ?, kata_sandi = ? WHERE email = ?';
-        db.query(sql, [firstName, lastName, hashedPassword, userEmail], (err, result) => {
-            if (err) return res.status(500).json({ error: err.message });
-            if (result.affectedRows === 0) return res.status(404).json({ error: 'User tidak ditemukan' });
-            res.json({ success: true, message: 'Profil dan password berhasil diperbarui' });
-        });
-    } else {
-        // Hanya update nama
-        const sql = 'UPDATE data_pengguna SET nama_depan = ?, nama_belakang = ? WHERE email = ?';
-        db.query(sql, [firstName, lastName, userEmail], (err, result) => {
-            if (err) return res.status(500).json({ error: err.message });
-            if (result.affectedRows === 0) return res.status(404).json({ error: 'User tidak ditemukan' });
-            res.json({ success: true, message: 'Profil berhasil diperbarui' });
-        });
-    }
 });
 
 app.listen(PORT, () => {

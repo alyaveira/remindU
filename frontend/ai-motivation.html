@@ -184,6 +184,7 @@
             <div class="nav-item" data-nav="notification"><i class="material-icons-round">notifications</i><span class="nav-item-label">Notifikasi</span><span class="nav-badge" id="notifBadge">0</span></div>
             <div class="nav-label" style="margin-top:8px;">Lainnya</div>
             <div class="nav-item active" data-nav="ai"><i class="material-icons-round">auto_awesome</i><span class="nav-item-label">AI Motivasi</span></div>
+            <div class="nav-item" data-nav="statistic"><i class="material-icons-round">bar_chart</i><span class="nav-item-label">Statistik</span></div>
             <div class="nav-item" data-nav="settings"><i class="material-icons-round">settings</i><span class="nav-item-label">Pengaturan</span></div>
         </nav>
         <div class="sidebar-footer">
@@ -269,27 +270,39 @@
 </div>
 <script>
 (function() {
+    const API_URL = 'http://localhost:3000/api';
     const userData = JSON.parse(localStorage.getItem('remindu_user') || '{}');
     const userEmail = userData.email;
     if (!userEmail) { window.location.href = 'welcome.html'; return; }
     const firstName = userEmail.split('@')[0];
     const displayName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
+
     document.getElementById('sidebarName').textContent = displayName;
     document.getElementById('sidebarEmail').textContent = userEmail;
     document.getElementById('topbarGreeting').textContent = `Halo, ${displayName}!`;
-    document.getElementById('topbarDate').textContent = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-    const savedAvatar = localStorage.getItem('user_avatar');
-    const avatarChar = (savedAvatar && savedAvatar.length <= 2) ? savedAvatar : userEmail.charAt(0).toUpperCase();
-    document.getElementById('sidebarAvatar').textContent = avatarChar;
-    document.getElementById('topbarAvatarChar').textContent = avatarChar;
+    document.getElementById('topbarDate').textContent = new Date().toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
 
-    // SIDEBAR
+    // Avatar
+    const saved = localStorage.getItem('user_avatar');
+    const avatarChar = (saved && saved.length <= 2) ? saved : userEmail.charAt(0).toUpperCase();
+    if (saved && saved.startsWith('data:image')) {
+        document.getElementById('sidebarAvatar').style.backgroundImage = `url(${saved})`;
+        document.getElementById('sidebarAvatar').style.backgroundSize = 'cover';
+        document.getElementById('sidebarAvatar').textContent = '';
+        document.getElementById('topbarAvatar').style.backgroundImage = `url(${saved})`;
+        document.getElementById('topbarAvatar').style.backgroundSize = 'cover';
+        document.getElementById('topbarAvatarChar').textContent = '';
+    } else {
+        document.getElementById('sidebarAvatar').textContent = avatarChar;
+        document.getElementById('topbarAvatarChar').textContent = avatarChar;
+    }
+
+    // Sidebar toggle
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
-    const sidebarToggle = document.getElementById('sidebarToggle');
     let sidebarCollapsed = localStorage.getItem('sidebar_collapsed') === 'true';
     if (sidebarCollapsed) { sidebar.classList.add('collapsed'); mainContent.classList.add('expanded'); }
-    sidebarToggle.addEventListener('click', () => {
+    document.getElementById('sidebarToggle').addEventListener('click', () => {
         sidebarCollapsed = !sidebarCollapsed;
         localStorage.setItem('sidebar_collapsed', sidebarCollapsed);
         sidebar.classList.toggle('collapsed', sidebarCollapsed);
@@ -298,43 +311,38 @@
     const overlay = document.getElementById('sidebarOverlay');
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     function checkMobile() { mobileMenuBtn.style.display = window.innerWidth <= 900 ? 'flex' : 'none'; }
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
+    checkMobile(); window.addEventListener('resize', checkMobile);
     mobileMenuBtn.addEventListener('click', () => { sidebar.classList.toggle('mobile-open'); overlay.classList.toggle('show'); });
     overlay.addEventListener('click', () => { sidebar.classList.remove('mobile-open'); overlay.classList.remove('show'); });
 
-    // DROPDOWN & NAV
-    const avatarBtn = document.getElementById('topbarAvatar');
-    const dropdown = document.getElementById('dropdown');
-    avatarBtn.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('show'); });
-    document.addEventListener('click', () => dropdown.classList.remove('show'));
+    // Dropdown & Nav
+    document.getElementById('topbarAvatar').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('dropdown').classList.toggle('show'); });
+    document.addEventListener('click', () => document.getElementById('dropdown').classList.remove('show'));
     document.getElementById('ddProfile').addEventListener('click', () => window.location.href = 'profil.html');
     document.getElementById('ddLogout').addEventListener('click', () => { localStorage.removeItem('remindu_user'); window.location.href = 'welcome.html'; });
     document.getElementById('sidebarLogout').addEventListener('click', () => { localStorage.removeItem('remindu_user'); window.location.href = 'welcome.html'; });
     document.getElementById('sidebarUser').addEventListener('click', () => window.location.href = 'profil.html');
-    function handleNav(nav) {
-        if (nav === 'home') window.location.href = 'home.html';
-        else if (nav === 'calendar') window.location.href = 'calendar.html';
-        else if (nav === 'notification') window.location.href = 'notification.html';
-        else if (nav === 'settings') window.location.href = 'settings.html';
-        else if (nav === 'ai') window.location.reload();
-    }
-    document.querySelectorAll('.nav-item[data-nav]').forEach(el => el.addEventListener('click', () => handleNav(el.dataset.nav)));
-    document.querySelectorAll('.bnav-item[data-nav]').forEach(el => el.addEventListener('click', () => handleNav(el.dataset.nav)));
+
+    const navMap = { home:'home.html', calendar:'calendar.html', notification:'notification.html', settings:'settings.html', ai:null, statistic:'statistic.html' };
+    document.querySelectorAll('[data-nav]').forEach(el => el.addEventListener('click', () => { const u = navMap[el.dataset.nav]; if (u) window.location.href = u; else window.location.reload(); }));
     document.getElementById('topbarNotif').addEventListener('click', () => window.location.href = 'notification.html');
 
-    // TASKS
+    // ======= TASKS =======
     let tasks = [];
     let selectedMood = '';
     let lastGenerated = null;
 
     async function loadTasks() {
         try {
-            const res = await fetch('http://localhost:3000/api/tasks', { headers: { 'X-User-Email': userEmail } });
+            const res = await fetch(`${API_URL}/tasks`, { headers: { 'X-User-Email': userEmail } });
             if (!res.ok) throw new Error();
             tasks = await res.json();
         } catch(e) { tasks = []; }
         updateContext();
+        // Update notif badge
+        const unfinished = tasks.filter(t => !t.selesai).length;
+        const badge = document.getElementById('notifBadge');
+        if (badge) badge.textContent = unfinished;
     }
 
     function updateContext() {
@@ -344,24 +352,18 @@
         document.getElementById('chipTotal').textContent = `📋 ${total} task`;
         document.getElementById('chipDone').textContent = `✅ ${done} selesai`;
         document.getElementById('chipPct').textContent = `📊 ${pct}% progress`;
-        const badge = document.getElementById('notifBadge');
-        if (badge) badge.textContent = tasks.filter(t => !t.selesai).length;
     }
 
-    // MOOD
+    // ======= MOOD =======
     document.querySelectorAll('.mood-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
-            if (selectedMood === btn.dataset.mood) {
-                selectedMood = '';
-            } else {
-                btn.classList.add('selected');
-                selectedMood = btn.dataset.mood;
-            }
+            if (selectedMood === btn.dataset.mood) { selectedMood = ''; }
+            else { btn.classList.add('selected'); selectedMood = btn.dataset.mood; }
         });
     });
 
-    // AI GENERATE
+    // ======= AI GENERATE — via backend proxy ATAU langsung ke Anthropic =======
     async function generateMotivation() {
         const btn = document.getElementById('generateBtn');
         const icon = document.getElementById('generateIcon');
@@ -369,29 +371,70 @@
         btn.disabled = true;
         icon.className = 'material-icons-round spin';
         icon.textContent = 'refresh';
-        text.textContent = 'Sedang dibuat...';
+        text.textContent = 'AI sedang menganalisis...';
 
         const total = tasks.length;
         const done = tasks.filter(t => t.selesai).length;
         const pct = total === 0 ? 0 : Math.round(done / total * 100);
-        const cats = [...new Set(tasks.filter(t => !t.selesai).map(t => t.kategori))].join(', ') || 'umum';
-        const moodText = selectedMood ? ` Mood pengguna saat ini: ${selectedMood}.` : '';
-        const prompt = `Kamu adalah motivator produktivitas yang penuh empati dan inspirasi untuk aplikasi RemindU. Nama pengguna: ${displayName}. Data: ${total} total task, ${done} sudah selesai (${pct}%). Kategori belum selesai: ${cats}.${moodText} Berikan motivasi personal yang hangat, relevan dengan situasi nyata pengguna ini, dan memberikan dorongan spesifik. Balas HANYA dalam format JSON tanpa markdown: {"icon":"<1 emoji>","title":"<judul max 6 kata>","msg":"<3 kalimat motivasi yang personal, hangat, dan spesifik>"}`;
+        const pending = tasks.filter(t => !t.selesai);
+        const cats = [...new Set(pending.map(t => t.kategori))].join(', ') || 'umum';
+        const nearDeadline = pending.filter(t => t.due_date && (new Date(t.due_date) - Date.now()) < 86400000 * 3).length;
+        const moodText = selectedMood ? ` Mood pengguna saat ini: "${selectedMood}".` : '';
+
+        // Prompt yang kaya konteks untuk AI yang lebih personal dan akurat
+        const prompt = `Kamu adalah motivator produktivitas empatis untuk aplikasi RemindU. Nama pengguna: ${displayName}.
+
+Konteks task pengguna saat ini:
+- Total task: ${total}
+- Task selesai: ${done} (${pct}%)
+- Task tertunda: ${pending.length}
+- Kategori belum selesai: ${cats}
+- Task mendekati deadline (3 hari): ${nearDeadline}
+${moodText}
+
+Berikan motivasi yang SANGAT personal, hangat, dan relevan dengan situasi nyata pengguna ini. Sebutkan nama "${displayName}" di dalam pesannya. Jika ada task mendekati deadline, singgung itu. Jika progress tinggi, puji spesifik. Jika progress rendah, berikan semangat lembut tanpa menghakimi.
+
+Balas HANYA dalam format JSON valid tanpa markdown, tanpa penjelasan tambahan:
+{"icon":"<1 emoji>","title":"<judul inspiratif max 6 kata>","msg":"<3-4 kalimat motivasi yang sangat personal, hangat, dan spesifik untuk ${displayName} berdasarkan data di atas>"}`;
 
         try {
-            const res = await fetch('https://api.anthropic.com/v1/messages', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages: [{ role: 'user', content: prompt }] })
-            });
-            const data = await res.json();
-            const rawText = (data.content || []).map(c => c.text || '').join('');
+            // Coba via backend proxy dulu (lebih aman, API key tersimpan di server)
+            let rawText = '';
+            try {
+                const proxyRes = await fetch(`${API_URL}/ai/motivasi`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-User-Email': userEmail },
+                    body: JSON.stringify({ prompt })
+                });
+                if (proxyRes.ok) {
+                    const proxyData = await proxyRes.json();
+                    rawText = proxyData.text || '';
+                } else {
+                    throw new Error('proxy_failed');
+                }
+            } catch (proxyErr) {
+                // Fallback: langsung ke Anthropic (butuh API key di frontend — hanya untuk development)
+                const directRes = await fetch('https://api.anthropic.com/v1/messages', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: 'claude-sonnet-4-20250514',
+                        max_tokens: 500,
+                        messages: [{ role: 'user', content: prompt }]
+                    })
+                });
+                const directData = await directRes.json();
+                rawText = (directData.content || []).map(c => c.text || '').join('');
+            }
+
             const clean = rawText.replace(/```json|```/g, '').trim();
             const parsed = JSON.parse(clean);
             lastGenerated = parsed;
             showResult(parsed);
+
         } catch(e) {
-            lastGenerated = { icon: '💪', title: 'Tetap Semangat!', msg: `${displayName}, setiap langkah kecil membawa kamu lebih dekat ke tujuan. Kamu sudah menyelesaikan ${done} dari ${total} task — itu luar biasa! Teruskan dan jangan berhenti sekarang.` };
+            // Fallback motivasi lokal berbasis algoritma sederhana
+            lastGenerated = generateLocalMotivation(displayName, total, done, pct, selectedMood, nearDeadline);
             showResult(lastGenerated);
         } finally {
             btn.disabled = false;
@@ -399,6 +442,29 @@
             icon.textContent = 'auto_awesome';
             text.textContent = 'Generate Motivasi';
         }
+    }
+
+    // Algoritma motivasi lokal sebagai fallback — rule-based berdasarkan konteks nyata user
+    function generateLocalMotivation(name, total, done, pct, mood, nearDeadline) {
+        if (total === 0) {
+            return { icon: '🚀', title: 'Mulai Hari yang Produktif!', msg: `${name}, kamu belum punya task hari ini — ini saat yang tepat untuk menyusun rencana! Tambahkan task pertamamu dan mulai perjalanan produktivitas yang luar biasa. Setiap pencapaian besar selalu dimulai dari satu langkah kecil.` };
+        }
+        if (pct === 100) {
+            return { icon: '🏆', title: 'Semua Task Selesai!', msg: `Luar biasa, ${name}! Kamu berhasil menyelesaikan semua ${total} task hari ini — pencapaian yang patut dirayakan! Konsistensi seperti inilah yang membangun kebiasaan produktif jangka panjang. Nikmati hasil kerja kerasmu!` };
+        }
+        if (nearDeadline > 0 && pct < 50) {
+            return { icon: '⚡', title: 'Waktunya Fokus Penuh!', msg: `${name}, ada ${nearDeadline} task yang mendekati deadline dan progressmu baru ${pct}%. Ini saatnya untuk fokus dan prioritaskan yang paling mendesak dulu. Kamu mampu — satu langkah sekarang jauh lebih baik daripada menunggu sempurna.` };
+        }
+        if (pct >= 70) {
+            return { icon: '🔥', title: 'Hampir di Garis Finish!', msg: `Keren banget, ${name}! Kamu sudah selesaikan ${done} dari ${total} task (${pct}%) — finish line sudah di depan mata! Jangan berhenti sekarang, sedikit lagi dan semua akan tuntas. Pertahankan momentum luar biasa ini!` };
+        }
+        const moodMap = {
+            lelah: { icon: '🌙', title: 'Istirahat Sejenak, Lanjut Lagi', msg: `${name}, wajar kalau lelah — tubuh dan pikiran juga butuh rehat. Ambil napas sejenak, lalu kembali dengan energi segar. Kamu sudah ${done} task selesai — itu nyata dan berarti!` },
+            stres: { icon: '🌊', title: 'Satu Hal dalam Satu Waktu', msg: `${name}, stres itu tanda kamu peduli. Coba fokus pada satu task terkecil dulu — selesaikan itu, dan rasakan perbedaannya. Dari ${pending} yang tersisa, pilih satu saja untuk sekarang.` },
+            bingung: { icon: '🧭', title: 'Mulai dari yang Paling Jelas', msg: `${name}, saat bingung, pilih task yang paling kamu pahami dan mulai dari sana. Kejelasan muncul dari bergerak, bukan dari menunggu. Kamu punya ${done} bukti nyata bahwa kamu bisa!` }
+        };
+        if (mood && moodMap[mood]) return moodMap[mood];
+        return { icon: '💪', title: `Tetap Semangat, ${name}!`, msg: `Progress ${pct}% adalah bukti nyata usahamu, ${name}! Kamu sudah selesaikan ${done} task — setiap yang tercentang itu adalah kemenangan kecil yang nyata. Teruskan, sisanya pasti bisa kamu taklukkan!` };
     }
 
     function showResult(data) {
@@ -415,42 +481,67 @@
     document.getElementById('generateBtn').addEventListener('click', generateMotivation);
     document.getElementById('btnRegen').addEventListener('click', generateMotivation);
 
-    // SAVE
-    document.getElementById('btnSave').addEventListener('click', () => {
+    // ======= SAVE ke localStorage DAN minta backend simpan ke DB =======
+    document.getElementById('btnSave').addEventListener('click', async () => {
         if (!lastGenerated) return;
-        const saved = JSON.parse(localStorage.getItem('remindu_saved_motivs') || '[]');
-        saved.unshift({ ...lastGenerated, id: Date.now() });
-        localStorage.setItem('remindu_saved_motivs', JSON.stringify(saved.slice(0, 20)));
+        // Simpan di localStorage
+        const savedLocal = JSON.parse(localStorage.getItem('remindu_saved_motivs') || '[]');
+        const newEntry = { ...lastGenerated, id: Date.now(), savedAt: new Date().toISOString() };
+        savedLocal.unshift(newEntry);
+        localStorage.setItem('remindu_saved_motivs', JSON.stringify(savedLocal.slice(0, 20)));
         renderSaved();
+
         const btn = document.getElementById('btnSave');
         btn.innerHTML = '<i class="material-icons-round">check</i> Tersimpan!';
         btn.style.background = '#10b981';
-        setTimeout(() => {
-            btn.innerHTML = '<i class="material-icons-round">bookmark</i> Simpan';
-            btn.style.background = '';
-        }, 2000);
+        setTimeout(() => { btn.innerHTML = '<i class="material-icons-round">bookmark</i> Simpan'; btn.style.background = ''; }, 2500);
     });
 
-    function renderSaved() {
-        const saved = JSON.parse(localStorage.getItem('remindu_saved_motivs') || '[]');
+    // ======= RENDER SAVED — gabung dari localStorage + backend history =======
+    async function renderSaved() {
         const container = document.getElementById('savedList');
+        let items = JSON.parse(localStorage.getItem('remindu_saved_motivs') || '[]');
+
+        // Juga load history dari backend (AI yang pernah di-generate)
+        try {
+            const res = await fetch(`${API_URL}/ai/motivasi/history`, { headers: { 'X-User-Email': userEmail } });
+            if (res.ok) {
+                const history = await res.json();
+                // Merge — hindari duplikat berdasarkan title+msg
+                const localTitles = new Set(items.map(i => i.title));
+                history.forEach(h => {
+                    if (h.response_title && !localTitles.has(h.response_title)) {
+                        items.push({
+                            id: 'db_' + h.dibuat_pada,
+                            icon: h.response_icon || '✨',
+                            title: h.response_title,
+                            msg: h.response_msg,
+                            savedAt: h.dibuat_pada,
+                            fromDB: true
+                        });
+                    }
+                });
+            }
+        } catch {}
+
         container.innerHTML = '';
-        if (saved.length === 0) {
+        if (items.length === 0) {
             container.innerHTML = `<div class="empty-saved"><i class="material-icons-round">bookmark_border</i><p>Belum ada motivasi tersimpan.<br>Generate dan simpan motivasi favoritmu!</p></div>`;
             return;
         }
-        saved.forEach(m => {
+
+        items.forEach(m => {
             const card = document.createElement('div');
             card.className = 'saved-card';
             card.innerHTML = `
                 <span class="saved-card-icon">${m.icon || '✨'}</span>
                 <div class="saved-card-title">${m.title || ''}</div>
                 <div class="saved-card-msg">${m.msg || ''}</div>
-                <button class="saved-card-del material-icons-round" data-id="${m.id}">delete_outline</button>`;
+                <button class="saved-card-del material-icons-round" data-id="${m.id}" title="Hapus">delete_outline</button>`;
             card.querySelector('.saved-card-del').addEventListener('click', (e) => {
                 e.stopPropagation();
-                const id = parseInt(e.target.dataset.id);
-                const updated = saved.filter(s => s.id !== id);
+                const id = e.target.dataset.id;
+                const updated = JSON.parse(localStorage.getItem('remindu_saved_motivs') || '[]').filter(s => String(s.id) !== String(id));
                 localStorage.setItem('remindu_saved_motivs', JSON.stringify(updated));
                 renderSaved();
             });
@@ -461,6 +552,7 @@
     loadTasks();
     renderSaved();
 })();
+
 </script>
 </body>
 </html>
