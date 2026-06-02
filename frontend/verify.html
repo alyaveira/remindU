@@ -88,16 +88,32 @@
         }
     });
 
+    let resendCooldown = false;
     document.getElementById('resendCodeLink').addEventListener('click', async (e) => {
         e.preventDefault();
-        if (resendTimer) return;
-        // Kirim permintaan resend OTP ke backend (perlu buat endpoint /api/resend-otp)
-        // Untuk sementara, kita lakukan registrasi ulang? Atau kita bisa panggil endpoint baru.
-        // Sederhananya: kita kirim ulang request ke /api/register? Tapi nanti bikin user duplikat.
-        // Lebih baik buat endpoint khusus. Karena backend belum ada, kita kasih alert saja.
-        alert('Fitur resend OTP belum diimplementasikan di backend. Silakan registrasi ulang.');
-        // Jika ingin simpel, kita arahkan ke register.html
-        // window.location.href = 'register.html';
+        if (resendCooldown) { document.getElementById('otpError').innerText = 'Tunggu sebelum kirim ulang'; return; }
+        resendCooldown = true;
+        document.getElementById('resendCodeLink').style.opacity = '0.5';
+        try {
+            const res = await fetch(`${API_URL}/resend-otp`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: pendingEmail })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error);
+            document.getElementById('otpError').innerText = '';
+            alert(`OTP baru: ${data.otp}\n(Di produksi, OTP dikirim via email)`);
+            startTimer(60);
+            document.getElementById('verifyBtn').disabled = false;
+        } catch (err) {
+            document.getElementById('otpError').innerText = err.message;
+        } finally {
+            setTimeout(() => {
+                resendCooldown = false;
+                document.getElementById('resendCodeLink').style.opacity = '1';
+            }, 30000);
+        }
     });
 </script>
 </body>

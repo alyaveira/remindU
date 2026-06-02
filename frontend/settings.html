@@ -181,6 +181,7 @@
             <div class="nav-item" data-nav="notification"><i class="material-icons-round">notifications</i><span class="nav-item-label">Notifikasi</span><span class="nav-badge" id="notifBadge">0</span></div>
             <div class="nav-label" style="margin-top:8px;">Lainnya</div>
             <div class="nav-item" data-nav="ai"><i class="material-icons-round">auto_awesome</i><span class="nav-item-label">AI Motivasi</span></div>
+            <div class="nav-item" data-nav="statistic"><i class="material-icons-round">bar_chart</i><span class="nav-item-label">Statistik</span></div>
             <div class="nav-item active" data-nav="settings"><i class="material-icons-round">settings</i><span class="nav-item-label">Pengaturan</span></div>
         </nav>
         <div class="sidebar-footer">
@@ -446,6 +447,7 @@
         else if (nav === 'notification') window.location.href = 'notification.html';
         else if (nav === 'settings') window.location.reload();
         else if (nav === 'ai') window.location.href = 'ai-motivation.html';
+        else if (nav === 'statistic') window.location.href = 'statistic.html';
     }
     document.querySelectorAll('.nav-item[data-nav]').forEach(el => el.addEventListener('click', () => handleNav(el.dataset.nav)));
     document.querySelectorAll('.bnav-item[data-nav]').forEach(el => el.addEventListener('click', () => handleNav(el.dataset.nav)));

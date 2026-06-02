@@ -6,9 +6,6 @@
     <title>RemindU - Kalender</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <style>
-        /* (STYLE SAMA PERSIS DENGAN YANG ANDA KIRIMKAN, TIDAK SAYA UBAH UNTUK MENGHEMAT RUANG) */
-        /* ... pastikan semua style dari kode Anda tetap ada ... */
-        /* Saya akan tulis ulang style secara lengkap agar tidak ada yang hilang, tapi saya singkat di sini karena konten sama */
         :root {
             --purple: #8b5cf6;
             --purple-dark: #7c3aed;
@@ -134,10 +131,7 @@
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <div class="brand-wrap">
-                <div class="brand-logo">R</div>
-                <div class="brand-name">RemindU</div>
-            </div>
+            <div class="brand-wrap"><div class="brand-logo">R</div><div class="brand-name">RemindU</div></div>
             <button class="toggle-btn" id="sidebarToggle"><i class="material-icons-round">chevron_left</i></button>
         </div>
         <div class="sidebar-user" id="sidebarUser">
@@ -154,6 +148,7 @@
             <div class="nav-item" data-nav="notification"><i class="material-icons-round">notifications</i><span class="nav-item-label">Notifikasi</span><span class="nav-badge" id="notifBadge">0</span></div>
             <div class="nav-label" style="margin-top:8px;">Lainnya</div>
             <div class="nav-item" data-nav="ai"><i class="material-icons-round">auto_awesome</i><span class="nav-item-label">AI Motivasi</span></div>
+            <div class="nav-item" data-nav="statistic"><i class="material-icons-round">bar_chart</i><span class="nav-item-label">Statistik</span></div>
             <div class="nav-item" data-nav="settings"><i class="material-icons-round">settings</i><span class="nav-item-label">Pengaturan</span></div>
         </nav>
         <div class="sidebar-footer">
@@ -164,10 +159,7 @@
         <header class="topbar">
             <div class="topbar-left">
                 <button class="topbar-mobile-toggle" id="mobileMenuBtn"><i class="material-icons-round">menu</i></button>
-                <div>
-                    <div class="topbar-greeting" id="topbarGreeting">Halo!</div>
-                    <div class="topbar-date" id="topbarDate"></div>
-                </div>
+                <div><div class="topbar-greeting" id="topbarGreeting">Halo!</div><div class="topbar-date" id="topbarDate"></div></div>
             </div>
             <div class="topbar-right">
                 <button class="topbar-icon-btn" id="topbarNotif"><i class="material-icons-round">notifications_none</i><span class="notif-dot" id="notifDot" style="display:none;"></span></button>
@@ -187,11 +179,7 @@
                     <div class="month-year" id="monthYear"></div>
                     <button id="nextMonth"><i class="material-icons-round">chevron_right</i></button>
                 </div>
-                <div class="weekdays">
-                    <div class="weekday">M</div><div class="weekday">T</div><div class="weekday">W</div>
-                    <div class="weekday">T</div><div class="weekday">F</div><div class="weekday">S</div>
-                    <div class="weekday">S</div>
-                </div>
+                <div class="weekdays"><div class="weekday">M</div><div class="weekday">T</div><div class="weekday">W</div><div class="weekday">T</div><div class="weekday">F</div><div class="weekday">S</div><div class="weekday">S</div></div>
                 <div class="days" id="calendarDays"></div>
             </div>
             <div class="events-section">
@@ -239,8 +227,6 @@
     document.getElementById('topbarGreeting').textContent = `Halo, ${displayName}!`;
     document.getElementById('topbarDate').textContent = new Date().toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
     updateAvatar();
-
-    // Sidebar toggle
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
     const sidebarToggle = document.getElementById('sidebarToggle');
@@ -258,8 +244,6 @@
     checkMobile(); window.addEventListener('resize', checkMobile);
     mobileBtn.addEventListener('click', () => { sidebar.classList.toggle('mobile-open'); overlay.classList.toggle('show'); });
     overlay.addEventListener('click', () => { sidebar.classList.remove('mobile-open'); overlay.classList.remove('show'); });
-
-    // Dropdown
     const avatarBtn = document.getElementById('topbarAvatar');
     const dropdown = document.getElementById('dropdown');
     avatarBtn.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('show'); });
@@ -268,8 +252,6 @@
     document.getElementById('ddLogout').addEventListener('click', () => { localStorage.removeItem('remindu_user'); window.location.href = 'welcome.html'; });
     document.getElementById('sidebarLogout').addEventListener('click', () => { localStorage.removeItem('remindu_user'); window.location.href = 'welcome.html'; });
     document.getElementById('sidebarUser').addEventListener('click', () => window.location.href = 'profil.html');
-
-    // Navigasi dengan AI Motivasi
     function handleNav(nav) {
         if (nav === 'home') window.location.href = 'home.html';
         else if (nav === 'calendar') window.location.reload();
@@ -280,8 +262,6 @@
     document.querySelectorAll('.nav-item[data-nav]').forEach(el => el.addEventListener('click', () => handleNav(el.dataset.nav)));
     document.querySelectorAll('.bnav-item[data-nav]').forEach(el => el.addEventListener('click', () => handleNav(el.dataset.nav)));
     document.getElementById('topbarNotif').addEventListener('click', () => handleNav('notification'));
-
-    // Kalender & Tasks
     let currentDate = new Date();
     let tasks = [];
     let selectedDate = null;
