@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>RemindU - Detail Task</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        :root {
+            --purple: #8b5cf6;
+            --purple-dark: #7c3aed;
+            --purple-light: #ede9fe;
+            --blue: #3b82f6;
+            --orange: #f97316;
+            --green: #10b981;
+            --amber: #f59e0b;
+            --bg: #f5f7fe;
+            --white: #ffffff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --border: #edf2f7;
+            --sidebar-w: 260px;
+            --sidebar-collapsed-w: 72px;
+            --header-h: 64px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+        body { background: var(--bg); min-height: 100vh; overflow-x: hidden; position: relative; }
+        .bg-blob { position: fixed; border-radius: 50%; filter: blur(60px); opacity: 0.38; pointer-events: none; z-index: 0; }
+        .bg-blob-1 { width: 400px; height: 400px; background: var(--purple); top: -100px; right: -100px; }
+        .bg-blob-2 { width: 300px; height: 300px; background: #ec4899; bottom: -80px; left: -80px; }
+        .layout { display: flex; min-height: 100vh; position: relative; z-index: 5; }
+
+        /* SIDEBAR (sama seperti home) */
+        .sidebar {
+            width: var(--sidebar-w); background: var(--white);
+            border-right: 1px solid var(--border);
+            display: flex; flex-direction: column;
+            position: fixed; top: 0; left: 0; bottom: 0; z-index: 200;
+            transition: width 0.3s cubic-bezier(0.4,0,0.2,1), transform 0.3s;
+            overflow: hidden; box-shadow: 2px 0 20px rgba(0,0,0,0.04);
+        }
+        .sidebar.collapsed { width: var(--sidebar-collapsed-w); }
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 199; backdrop-filter: blur(2px); }
+        .sidebar-overlay.show { display: block; }
+        .sidebar-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 16px; height: var(--header-h);
+            border-bottom: 1px solid var(--border); flex-shrink: 0;
+        }
+        .brand-wrap { display: flex; align-items: center; gap: 10px; overflow: hidden; }
+        .brand-logo { width: 36px; height: 36px; border-radius: 12px; background: linear-gradient(135deg, #1e3a8a, #8b5cf6); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px; font-weight: 900; color: white; }
+        .brand-name { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(135deg, #1e3a8a, #3b82f6, #8b5cf6, #ec4899); -webkit-background-clip: text; background-clip: text; color: transparent; white-space: nowrap; overflow: hidden; transition: opacity 0.2s, width 0.3s; }
+        .sidebar.collapsed .brand-name { opacity: 0; width: 0; }
+        .toggle-btn { width: 32px; height: 32px; border-radius: 10px; border: none; background: var(--bg); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: background 0.2s, color 0.2s; flex-shrink: 0; }
+        .toggle-btn:hover { background: var(--purple-light); color: var(--purple); }
+        .toggle-btn i { font-size: 20px; transition: transform 0.3s; }
+        .sidebar.collapsed .toggle-btn i { transform: rotate(180deg); }
+        .sidebar-user { padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+        .sidebar-user:hover { background: var(--bg); }
+        .sidebar-avatar { width: 40px; height: 40px; border-radius: 14px; background: linear-gradient(135deg, var(--purple), #ec4899); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; color: white; flex-shrink: 0; background-size: cover; background-position: center; }
+        .sidebar-user-info { overflow: hidden; transition: opacity 0.2s; }
+        .sidebar.collapsed .sidebar-user-info { opacity: 0; width: 0; }
+        .sidebar-user-name { font-weight: 600; font-size: 14px; color: var(--text); white-space: nowrap; }
+        .sidebar-user-email { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
+        .sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; overflow-x: hidden; }
+        .sidebar-nav::-webkit-scrollbar { width: 4px; }
+        .sidebar-nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        .nav-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; padding: 8px 10px 4px; white-space: nowrap; overflow: hidden; transition: opacity 0.2s; }
+        .sidebar.collapsed .nav-label { opacity: 0; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 14px; cursor: pointer; transition: all 0.2s; color: var(--text-muted); margin-bottom: 2px; white-space: nowrap; overflow: hidden; }
+        .nav-item:hover { background: var(--bg); color: var(--purple); }
+        .nav-item.active { background: var(--purple-light); color: var(--purple); font-weight: 600; }
+        .nav-item i { font-size: 22px; flex-shrink: 0; }
+        .nav-item-label { font-size: 14px; transition: opacity 0.2s; }
+        .sidebar.collapsed .nav-item-label { opacity: 0; width: 0; }
+        .nav-badge { margin-left: auto; background: var(--purple); color: white; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; flex-shrink: 0; transition: opacity 0.2s; }
+        .sidebar.collapsed .nav-badge { opacity: 0; }
+        .sidebar-footer { padding: 12px 10px 16px; border-top: 1px solid var(--border); flex-shrink: 0; }
+
+        .main { flex: 1; margin-left: var(--sidebar-w); transition: margin-left 0.3s cubic-bezier(0.4,0,0.2,1); min-height: 100vh; display: flex; flex-direction: column; }
+        .main.expanded { margin-left: var(--sidebar-collapsed-w); }
+
+        .topbar { height: var(--header-h); background: var(--white); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 8px rgba(0,0,0,0.04); }
+        .topbar-left { display: flex; align-items: center; gap: 12px; }
+        .topbar-mobile-toggle { display: none; width: 36px; height: 36px; border-radius: 10px; border: none; background: var(--bg); cursor: pointer; align-items: center; justify-content: center; color: var(--text); transition: background 0.2s; }
+        .topbar-mobile-toggle:hover { background: var(--purple-light); }
+        .topbar-mobile-toggle i { font-size: 22px; }
+        .topbar-greeting { font-size: 15px; font-weight: 600; color: var(--text); }
+        .topbar-date { font-size: 12px; color: var(--text-muted); }
+        .topbar-right { display: flex; align-items: center; gap: 10px; }
+        .topbar-icon-btn { width: 36px; height: 36px; border-radius: 10px; border: none; background: var(--bg); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: all 0.2s; position: relative; }
+        .topbar-icon-btn:hover { background: var(--purple-light); color: var(--purple); }
+        .topbar-icon-btn i { font-size: 20px; }
+        .notif-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--orange); border: 2px solid var(--white); }
+        .topbar-avatar { width: 36px; height: 36px; border-radius: 12px; background: linear-gradient(135deg, var(--purple), #ec4899); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; color: white; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; position: relative; background-size: cover; background-position: center; }
+        .topbar-avatar:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(139,92,246,0.3); }
+        .dropdown { position: absolute; top: 44px; right: 0; background: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); width: 170px; overflow: hidden; z-index: 300; display: none; border: 1px solid var(--border); animation: dropFade 0.18s ease; }
+        @keyframes dropFade { from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);} }
+        .dropdown.show { display: block; }
+        .dd-item { padding: 12px 16px; display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; color: var(--text); transition: background 0.15s; }
+        .dd-item:hover { background: var(--bg); }
+        .dd-item.danger { color: #e53e3e; border-top: 1px solid var(--border); }
+        .dd-item i { font-size: 18px; }
+
+        .page-content { flex: 1; padding: 28px; max-width: 800px; width: 100%; margin: 0 auto; }
+
+        /* Task Detail Card */
+        .detail-card {
+            background: var(--white);
+            border-radius: 28px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+            animation: fadeUp 0.5s ease both;
+        }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);} }
+        .detail-header {
+            background: linear-gradient(135deg, var(--purple) 0%, #6d28d9 100%);
+            padding: 28px 32px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .detail-header::before {
+            content: '';
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+        }
+        .detail-header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            word-break: break-word;
+        }
+        .detail-header .task-cat {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(4px);
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        .detail-body {
+            padding: 28px 32px;
+        }
+        .info-row {
+            display: flex;
+            margin-bottom: 24px;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .info-label {
+            width: 100px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+        .info-value {
+            flex: 1;
+            font-size: 15px;
+            color: var(--text);
+            word-break: break-word;
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #d1fae5;
+            color: #065f46;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .status-badge.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 32px;
+            flex-wrap: wrap;
+        }
+        .btn-edit {
+            background: var(--purple);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .btn-edit:hover {
+            background: var(--purple-dark);
+            transform: translateY(-2px);
+        }
+        .btn-back {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .btn-back:hover {
+            background: var(--purple-light);
+            color: var(--purple);
+            border-color: var(--purple-light);
+        }
+        .progress-section {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+        .progress-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+        .progress-bar-bg {
+            height: 8px;
+            background: var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--purple), #ec4899);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.5s;
+        }
+        .loading-state {
+            text-align: center;
+            padding: 60px;
+            color: var(--text-muted);
+        }
+        .error-state {
+            text-align: center;
+            padding: 60px;
+            color: #e53e3e;
+        }
+
+        .bottom-nav { display: none; background: var(--white); border-top: 1px solid var(--border); position: fixed; bottom: 0; left: 0; right: 0; z-index: 200; padding: 8px 12px 16px; justify-content: space-around; box-shadow: 0 -4px 16px rgba(0,0,0,0.06); }
+        .bnav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; color: #94a3b8; cursor: pointer; padding: 6px 12px; border-radius: 16px; transition: all 0.2s; flex: 1; }
+        .bnav-item i { font-size: 22px; }
+        .bnav-item.active { color: var(--purple); background: var(--purple-light); }
+        @media (max-width: 900px) {
+            .sidebar { transform: translateX(-100%); width: var(--sidebar-w) !important; }
+            .sidebar.mobile-open { transform: translateX(0); box-shadow: 4px 0 30px rgba(0,0,0,0.15); }
+            .main { margin-left: 0 !important; padding-bottom: 70px; }
+            .topbar-mobile-toggle { display: flex !important; }
+            .bottom-nav { display: flex; }
+            .page-content { padding: 16px; }
+            .topbar { padding: 0 16px; }
+        }
+        .relative { position: relative; }
+    </style>
+</head>
+<body>
+<div class="bg-blob bg-blob-1"></div>
+<div class="bg-blob bg-blob-2"></div>
+<div class="layout">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-wrap"><div class="brand-logo">R</div><div class="brand-name">RemindU</div></div>
+            <button class="toggle-btn" id="sidebarToggle"><i class="material-icons-round">chevron_left</i></button>
+        </div>
+        <div class="sidebar-user" id="sidebarUser">
+            <div class="sidebar-avatar" id="sidebarAvatar">A</div>
+            <div class="sidebar-user-info"><div class="sidebar-user-name" id="sidebarName">User</div><div class="sidebar-user-email" id="sidebarEmail">user@email.com</div></div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-label">Menu Utama</div>
+            <div class="nav-item" data-nav="home"><i class="material-icons-round">home</i><span class="nav-item-label">Beranda</span></div>
+            <div class="nav-item" data-nav="calendar"><i class="material-icons-round">calendar_month</i><span class="nav-item-label">Kalender</span></div>
+            <div class="nav-item" data-nav="notification"><i class="material-icons-round">notifications</i><span class="nav-item-label">Notifikasi</span><span class="nav-badge" id="notifBadge">0</span></div>
+            <div class="nav-label" style="margin-top:8px;">Lainnya</div>
+            <div class="nav-item" data-nav="ai"><i class="material-icons-round">auto_awesome</i><span class="nav-item-label">AI Motivasi</span></div>
+            <div class="nav-item" data-nav="statistic"><i class="material-icons-round">bar_chart</i><span class="nav-item-label">Statistik</span></div>
+            <div class="nav-item" data-nav="settings"><i class="material-icons-round">settings</i><span class="nav-item-label">Pengaturan</span></div>
+        </nav>
+        <div class="sidebar-footer"><div class="nav-item" id="sidebarLogout" style="color:#e53e3e;"><i class="material-icons-round">logout</i><span class="nav-item-label">Keluar</span></div></div>
+    </aside>
+
+    <main class="main" id="mainContent">
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="topbar-mobile-toggle" id="mobileMenuBtn"><i class="material-icons-round">menu</i></button>
+                <div><div class="topbar-greeting" id="topbarGreeting">Detail Task</div><div class="topbar-date" id="topbarDate"></div></div>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-icon-btn" id="topbarNotif"><i class="material-icons-round">notifications_none</i><span class="notif-dot" id="notifDot" style="display:none;"></span></button>
+                <div class="topbar-avatar relative" id="topbarAvatar"><span id="topbarAvatarChar">A</span><div class="dropdown" id="dropdown"><div class="dd-item" id="ddProfile"><i class="material-icons-round">person</i> Profil</div><div class="dd-item danger" id="ddLogout"><i class="material-icons-round">logout</i> Keluar</div></div></div>
+            </div>
+        </header>
+
+        <div class="page-content">
+            <div id="taskDetailContainer">
+                <div class="loading-state"><i class="material-icons-round" style="font-size:48px">hourglass_top</i><br>Memuat detail task...</div>
+            </div>
+        </div>
+    </main>
+
+    <nav class="bottom-nav">
+        <div class="bnav-item" data-nav="home"><i class="material-icons-round">home</i><span>Home</span></div>
+        <div class="bnav-item" data-nav="calendar"><i class="material-icons-round">calendar_month</i><span>Kalender</span></div>
+        <div class="bnav-item" data-nav="notification"><i class="material-icons-round">notifications</i><span>Notif</span></div>
+        <div class="bnav-item" data-nav="settings"><i class="material-icons-round">settings</i><span>Setting</span></div>
+    </nav>
+</div>
+
+<script>
+    const API_URL = 'http://localhost:3000/api';
+    const userData = JSON.parse(localStorage.getItem('remindu_user') || '{}');
+    const userEmail = userData.email;
+    if (!userEmail) { alert('Sesi login tidak ditemukan.'); window.location.href = 'welcome.html'; }
+
+    // Ambil ID task dari URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const taskId = urlParams.get('id');
+
+    if (!taskId) {
+        document.getElementById('taskDetailContainer').innerHTML = '<div class="error-state"><i class="material-icons-round" style="font-size:48px">error</i><br>Task ID tidak ditemukan.<br><button class="btn-back" style="margin-top:16px;" onclick="window.location.href=\'home.html\'">Kembali ke Home</button></div>';
+    } else {
+        loadTaskDetail(taskId);
+    }
+
+    // ===== FUNGSI AVATAR & SIDEBAR SAMA SEPERTI HOME =====
+    function updateAvatar() {
+        const saved = localStorage.getItem('user_avatar');
+        const sidebarAvatar = document.getElementById('sidebarAvatar');
+        const topbarSpan = document.getElementById('topbarAvatarChar');
+        const topbarDiv = document.getElementById('topbarAvatar');
+        if (!saved) {
+            const def = userEmail.charAt(0).toUpperCase();
+            sidebarAvatar.textContent = def;
+            topbarSpan.textContent = def;
+            sidebarAvatar.style.backgroundImage = '';
+            topbarDiv.style.backgroundImage = '';
+        } else if (saved.startsWith('data:image')) {
+            sidebarAvatar.textContent = '';
+            sidebarAvatar.style.backgroundImage = `url(${saved})`;
+            sidebarAvatar.style.backgroundSize = 'cover';
+            topbarSpan.textContent = '';
+            topbarDiv.style.backgroundImage = `url(${saved})`;
+            topbarDiv.style.backgroundSize = 'cover';
+        } else {
+            sidebarAvatar.textContent = saved;
+            topbarSpan.textContent = saved;
+            sidebarAvatar.style.backgroundImage = '';
+            topbarDiv.style.backgroundImage = '';
+        }
+    }
+    const firstName = userEmail.split('@')[0];
+    const displayName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
+    document.getElementById('sidebarName').textContent = displayName;
+    document.getElementById('sidebarEmail').textContent = userEmail;
+    document.getElementById('topbarGreeting').textContent = `Detail Task`;
+    document.getElementById('topbarDate').textContent = new Date().toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+    updateAvatar();
+
+    // Sidebar toggle
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    let sidebarCollapsed = localStorage.getItem('sidebar_collapsed') === 'true';
+    if (sidebarCollapsed) { sidebar.classList.add('collapsed'); mainContent.classList.add('expanded'); }
+    sidebarToggle.addEventListener('click', () => {
+        sidebarCollapsed = !sidebarCollapsed;
+        localStorage.setItem('sidebar_collapsed', sidebarCollapsed);
+        sidebar.classList.toggle('collapsed', sidebarCollapsed);
+        mainContent.classList.toggle('expanded', sidebarCollapsed);
+    });
+    const overlay = document.getElementById('sidebarOverlay');
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    function checkMobile() { mobileMenuBtn.style.display = window.innerWidth <= 900 ? 'flex' : 'none'; }
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    mobileMenuBtn.addEventListener('click', () => { sidebar.classList.toggle('mobile-open'); overlay.classList.toggle('show'); });
+    overlay.addEventListener('click', () => { sidebar.classList.remove('mobile-open'); overlay.classList.remove('show'); });
+
+    // Dropdown
+    const avatarBtn = document.getElementById('topbarAvatar');
+    const dropdown = document.getElementById('dropdown');
+    avatarBtn.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('show'); });
+    document.addEventListener('click', () => dropdown.classList.remove('show'));
+    document.getElementById('ddProfile').addEventListener('click', () => window.location.href = 'profil.html');
+    document.getElementById('ddLogout').addEventListener('click', () => { localStorage.removeItem('remindu_user'); window.location.href = 'welcome.html'; });
+    document.getElementById('sidebarLogout').addEventListener('click', () => { localStorage.removeItem('remindu_user'); window.location.href = 'welcome.html'; });
+    document.getElementById('sidebarUser').addEventListener('click', () => window.location.href = 'profil.html');
+
+    // Navigasi
+    function handleNav(nav) {
+        if (nav === 'home') window.location.href = 'home.html';
+        else if (nav === 'calendar') window.location.href = 'calendar.html';
+        else if (nav === 'notification') window.location.href = 'notification.html';
+        else if (nav === 'settings') window.location.href = 'settings.html';
+        else if (nav === 'ai') window.location.href = 'ai-motivation.html';
+        else if (nav === 'statistic') window.location.href = 'statistic.html';
+    }
+    document.querySelectorAll('.nav-item[data-nav]').forEach(el => el.addEventListener('click', () => handleNav(el.dataset.nav)));
+    document.querySelectorAll('.bnav-item[data-nav]').forEach(el => el.addEventListener('click', () => handleNav(el.dataset.nav)));
+    document.getElementById('topbarNotif').addEventListener('click', () => handleNav('notification'));
+
+    // ===== LOAD TASK DETAIL =====
+    async function loadTaskDetail(id) {
+        try {
+            const response = await fetch(`${API_URL}/tasks`, { headers: { 'X-User-Email': userEmail } });
+            if (!response.ok) throw new Error('Gagal mengambil data task');
+            const tasks = await response.json();
+            const task = tasks.find(t => t.id_task == id);
+            if (!task) throw new Error('Task tidak ditemukan');
+            renderTaskDetail(task);
+        } catch (err) {
+            document.getElementById('taskDetailContainer').innerHTML = `<div class="error-state"><i class="material-icons-round" style="font-size:48px">error</i><br>${err.message}<br><button class="btn-back" style="margin-top:16px;" onclick="window.location.href='home.html'">Kembali ke Home</button></div>`;
+        }
+    }
+
+    function getCatLabel(cat) {
+        const labels = { study:'Study', personal:'Personal', health:'Health', work:'Work' };
+        return labels[cat] || cat;
+    }
+    function getCatColor(cat) {
+        const colors = { study:'#3b82f6', personal:'#f97316', health:'#10b981', work:'#f59e0b' };
+        return colors[cat] || '#8b5cf6';
+    }
+    function formatDate(dateStr) {
+        if (!dateStr) return 'Tidak ditentukan';
+        const d = new Date(dateStr);
+        return d.toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' });
+    }
+
+    function renderTaskDetail(task) {
+        const container = document.getElementById('taskDetailContainer');
+        const isDone = task.selesai;
+        const statusClass = isDone ? 'status-badge' : 'status-badge pending';
+        const statusText = isDone ? '✅ Selesai' : '⏳ Tertunda';
+        const catColor = getCatColor(task.kategori);
+        // Hitung progress estimasi berdasarkan deadline (jika ada)
+        let progressPercent = 0;
+        if (task.due_date && !isDone) {
+            const now = Date.now();
+            const due = new Date(task.due_date).getTime();
+            const created = task.dibuat_pada ? new Date(task.dibuat_pada).getTime() : now - 7*86400000;
+            const total = due - created;
+            const elapsed = now - created;
+            if (total > 0) progressPercent = Math.min(100, Math.max(0, Math.round((elapsed / total) * 100)));
+        } else if (isDone) progressPercent = 100;
+
+        container.innerHTML = `
+            <div class="detail-card">
+                <div class="detail-header">
+                    <h1>${escapeHtml(task.judul)}</h1>
+                    <span class="task-cat" style="background:${catColor}20; color:${catColor};">${getCatLabel(task.kategori)}</span>
+                </div>
+                <div class="detail-body">
+                    <div class="info-row">
+                        <div class="info-label">Catatan</div>
+                        <div class="info-value">${task.notes ? escapeHtml(task.notes) : '<span style="color:var(--text-muted);">Tidak ada catatan</span>'}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Deadline</div>
+                        <div class="info-value">${formatDate(task.due_date)}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Status</div>
+                        <div class="info-value"><span class="${statusClass}">${statusText}</span></div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Dibuat</div>
+                        <div class="info-value">${formatDate(task.dibuat_pada)}</div>
+                    </div>
+                    ${task.due_date ? `
+                    <div class="progress-section">
+                        <div class="progress-label">Progress waktu menuju deadline</div>
+                        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${progressPercent}%"></div></div>
+                        <div style="font-size:12px; color:var(--text-muted); margin-top:8px;">${progressPercent}% waktu telah berlalu</div>
+                    </div>
+                    ` : ''}
+                    <div class="action-buttons">
+                        <button class="btn-back" id="backBtn"><i class="material-icons-round">arrow_back</i> Kembali</button>
+                        <button class="btn-edit" id="editBtn"><i class="material-icons-round">edit</i> Edit Task</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.getElementById('backBtn').addEventListener('click', () => window.location.href = 'home.html');
+        document.getElementById('editBtn').addEventListener('click', () => {
+            alert(`Fitur edit task untuk ID ${task.id_task} akan segera hadir.`);
+            // Bisa redirect ke halaman edit jika dibuat nanti
+        });
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;');
+    }
+</script>
+</body>
+</html>
