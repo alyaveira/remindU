@@ -4,326 +4,279 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>RemindU - Login</title>
+    <!-- Google Identity Services (One Tap + Sign-In Button) -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
-        /* --- ROOT VARIABLES (sama seperti welcome) --- */
         :root {
-            --purple: #8b5cf6;
-            --purple-dark: #7c3aed;
-            --purple-light: #ede9fe;
-            --bg: #f5f7fe;
-            --white: #ffffff;
-            --text: #0f172a;
-            --text-muted: #64748b;
-            --border: #edf2f7;
+            --purple:#8b5cf6; --purple-dark:#7c3aed; --purple-light:#ede9fe;
+            --bg:#f5f7fe; --white:#ffffff; --text:#0f172a; --text-muted:#64748b; --border:#edf2f7;
         }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',system-ui,-apple-system,'Inter',sans-serif; }
+        body { background:var(--bg); min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; position:relative; overflow-x:hidden; overflow-y:auto; }
+        .bg-blob { position:fixed; border-radius:50%; filter:blur(60px); opacity:0.38; pointer-events:none; z-index:0; }
+        .bg-blob-1 { width:400px; height:400px; background:var(--purple); top:-100px; right:-100px; }
+        .bg-blob-2 { width:300px; height:300px; background:#ec4899; bottom:-80px; left:-80px; }
+        .card { max-width:500px; width:100%; background:var(--white); border-radius:36px; box-shadow:0 20px 35px -12px rgba(0,0,0,0.1); padding:40px 28px; position:relative; z-index:10; animation:fadeSlide 0.4s ease both; }
+        @keyframes fadeSlide { from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);} }
+        h2 { font-size:28px; margin-bottom:6px; color:var(--text); font-weight:700; }
+        .subtitle { color:var(--text-muted); margin-bottom:24px; font-size:15px; }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, -apple-system, 'Inter', sans-serif;
+        /* Inputs */
+        .form-group { position:relative; margin-bottom:14px; }
+        .form-group input {
+            width:100%; padding:14px 20px 14px 48px; background:#f3f4f9;
+            border:1.5px solid transparent; border-radius:60px; font-size:15px; outline:none; transition:all 0.2s;
         }
+        .form-group input:focus { border-color:var(--purple); background:var(--white); box-shadow:0 0 0 4px rgba(139,92,246,0.1); }
+        .form-group .field-icon { position:absolute; left:16px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:20px; pointer-events:none; }
+        .form-group .eye-toggle { position:absolute; right:16px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:var(--text-muted); font-size:20px; padding:4px; }
+        .form-group .eye-toggle:hover { color:var(--purple); }
+        .error-msg { color:#e53e3e; font-size:12px; padding:0 4px; margin-top:4px; display:none; }
+        .error-msg.show { display:block; }
 
-        /* --- BG DECORATION (blob + warna latar dari welcome) --- */
-        body {
-            background: var(--bg);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            position: relative;
-            overflow-x: hidden;
-            overflow-y: auto;
-        }
+        /* Remember & Forgot */
+        .flex-between { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; font-size:14px; }
+        .remember-row { display:flex; align-items:center; gap:8px; }
+        .remember-row input[type=checkbox] { width:16px; height:16px; accent-color:var(--purple); cursor:pointer; }
+        .remember-row label { color:var(--text-muted); cursor:pointer; user-select:none; }
+        a { color:var(--purple); text-decoration:none; transition:opacity 0.2s; }
+        a:hover { opacity:0.8; text-decoration:underline; }
 
-        /* Elemen blur / blobs - persis dari welcome */
-        .bg-blob {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(60px);
-            opacity: 0.38;
-            pointer-events: none;
-            z-index: 0;
-        }
-        .bg-blob-1 {
-            width: 400px;
-            height: 400px;
-            background: var(--purple);
-            top: -100px;
-            right: -100px;
-        }
-        .bg-blob-2 {
-            width: 300px;
-            height: 300px;
-            background: #ec4899;
-            bottom: -80px;
-            left: -80px;
-        }
+        /* Login Button */
+        .btn-primary { background:var(--purple); color:white; border:none; border-radius:60px; padding:14px; width:100%; font-weight:700; font-size:15px; cursor:pointer; transition:all 0.2s ease; display:flex; align-items:center; justify-content:center; gap:8px; }
+        .btn-primary:hover { background:var(--purple-dark); transform:translateY(-2px); box-shadow:0 8px 20px rgba(139,92,246,0.3); }
+        .btn-primary:disabled { opacity:0.6; transform:none; cursor:not-allowed; }
 
-        /* --- CARD STYLE (dari login sederhana, tapi disesuaikan sedikit) --- */
-        .card {
-            max-width: 500px;
-            width: 100%;
-            background: var(--white);
-            border-radius: 36px;
-            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1);
-            padding: 40px 28px;
-            position: relative;
-            z-index: 10;
-            backdrop-filter: blur(0px);
-            transition: transform 0.2s ease, box-shadow 0.2s;
-        }
+        /* Divider */
+        .divider { display:flex; align-items:center; gap:12px; margin:20px 0; color:var(--text-muted); font-size:13px; }
+        .divider::before,.divider::after { content:''; flex:1; height:1px; background:var(--border); }
 
-        h2 {
-            font-size: 28px;
-            margin-bottom: 8px;
-            color: var(--text);
+        /* Google Button */
+        .btn-google {
+            width:100%; padding:12px 20px; border:1.5px solid var(--border); border-radius:60px;
+            background:white; color:#1a1a1a; font-size:15px; font-weight:600; cursor:pointer;
+            display:flex; align-items:center; justify-content:center; gap:12px;
+            transition:all 0.2s ease; position:relative;
         }
-        p {
-            margin-bottom: 24px;
-            color: var(--text-muted);
-        }
-        input {
-            width: 100%;
-            padding: 14px 20px;
-            background: #f3f4f9;
-            border: 1px solid transparent;
-            border-radius: 60px;
-            margin-bottom: 16px;
-            font-size: 15px;
-            outline: none;
-            transition: all 0.2s;
-        }
-        input:focus {
-            border-color: var(--purple);
-            background: var(--white);
-        }
-        button {
-            background: var(--purple);
-            color: white;
-            border: none;
-            border-radius: 60px;
-            padding: 14px;
-            width: 100%;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        button:hover {
-            background: var(--purple-dark);
-            transform: translateY(-2px);
-        }
-        .flex-between {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-        .remember-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .remember-row input {
-            width: auto;
-            margin: 0;
-            padding: 0;
-            accent-color: var(--purple);
-            transform: scale(1.1);
-            cursor: pointer;
-        }
-        .remember-row label {
-            color: var(--text-muted);
-            font-size: 14px;
-            cursor: pointer;
-            user-select: none;
-        }
-        .forgot-link {
-            text-align: right;
-            flex-shrink: 0;
-        }
-        .or-divider {
-            text-align: center;
-            margin: 20px 0;
-            color: #aaa;
-        }
-        /* Google button dengan ikon */
-        .google-btn {
-            background: var(--white);
-            border: 1px solid #ddd;
-            color: #333;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        .google-icon {
-            width: 20px;
-            height: 20px;
-        }
-        .link {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-        }
-        a {
-            color: var(--purple);
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        .error-msg {
-            color: #e53e3e;
-            font-size: 12px;
-            margin-top: -12px;
-            margin-bottom: 12px;
-        }
+        .btn-google:hover { background:#f8f9fa; border-color:#dadce0; box-shadow:0 2px 8px rgba(0,0,0,0.08); transform:translateY(-1px); }
+        .btn-google:active { transform:translateY(0); }
+        .btn-google img { width:20px; height:20px; }
+        .btn-google span { font-family:'Segoe UI',Arial,sans-serif; }
 
-        /* Back link style sederhana */
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            color: var(--purple);
-            font-weight: 500;
-            font-size: 14px;
-        }
+        /* OR with Google One Tap container */
+        #g_id_onload { display:none; }
 
-        @media (min-width: 768px) {
-            .card {
-                max-width: 550px;
-                padding: 48px 40px;
-            }
-        }
+        .signup-link { text-align:center; margin-top:20px; font-size:14px; color:var(--text-muted); }
+
+        /* Toast */
+        .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(80px); background:#1e293b; color:white; padding:12px 24px; border-radius:40px; font-size:14px; font-weight:500; z-index:9999; transition:transform 0.3s ease; white-space:nowrap; }
+        .toast.show { transform:translateX(-50%) translateY(0); }
+        .toast.success { background:#10b981; }
+        .toast.error { background:#e53e3e; }
+
+        /* Loading spinner */
+        .spinner { width:18px; height:18px; border:2.5px solid rgba(255,255,255,0.4); border-top-color:white; border-radius:50%; animation:spin 0.7s linear infinite; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+
+        .back-link { display:inline-block; margin-bottom:20px; color:var(--purple); font-weight:500; font-size:14px; }
+
+        @media (min-width:768px) { .card { max-width:550px; padding:48px 40px; } }
     </style>
 </head>
 <body>
+<div class="bg-blob bg-blob-1"></div>
+<div class="bg-blob bg-blob-2"></div>
 
-    <!-- Background Blobs persis dari welcome -->
-    <div class="bg-blob bg-blob-1"></div>
-    <div class="bg-blob bg-blob-2"></div>
+<!-- Google One Tap (muncul otomatis jika user belum login) -->
+<div id="g_id_onload"
+     data-client_id="YOUR_GOOGLE_CLIENT_ID"
+     data-callback="handleGoogleOneTap"
+     data-auto_prompt="true"
+     data-cancel_on_tap_outside="false">
+</div>
 
-    <div class="card">
-        <a href="welcome.html" class="back-link">← Back</a>
-        <h2>Log In</h2>
-        <p>Enter your details</p>
-        <form id="loginForm">
-            <input type="text" id="loginEmail" placeholder="Username or Email" autocomplete="username">
+<div class="card">
+    <a href="welcome.html" class="back-link">← Kembali</a>
+    <h2>Masuk</h2>
+    <p class="subtitle">Selamat datang kembali! Masukkan detail kamu.</p>
+
+    <form id="loginForm" novalidate>
+        <div class="form-group">
+            <span class="material-icons-round field-icon" style="font-family:'Material Icons Round'">email</span>
+            <input type="text" id="loginEmail" placeholder="Email atau Username" autocomplete="username">
             <div class="error-msg" id="loginEmailError"></div>
-            <input type="password" id="loginPassword" placeholder="Password">
+        </div>
+        <div class="form-group">
+            <span class="material-icons-round field-icon" style="font-family:'Material Icons Round'">lock</span>
+            <input type="password" id="loginPassword" placeholder="Password" autocomplete="current-password">
+            <button type="button" class="eye-toggle" id="eyeToggle" onclick="togglePwd()">
+                <span class="material-icons-round" style="font-family:'Material Icons Round';font-size:20px;">visibility_off</span>
+            </button>
             <div class="error-msg" id="loginPassError"></div>
-            
-            <div class="flex-between">
-                <div class="remember-row">
-                    <input type="checkbox" id="rememberMe">
-                    <label for="rememberMe">Remember Me</label>
-                </div>
-                <a href="#" id="forgotPwdLink" class="forgot-link">Forgot Password?</a>
+        </div>
+
+        <div class="flex-between">
+            <div class="remember-row">
+                <input type="checkbox" id="rememberMe">
+                <label for="rememberMe">Ingat Saya</label>
             </div>
-            
-            <button type="submit">Log in</button>
-        </form>
-        <div class="or-divider">OR</div>
-        <!-- Google button dengan ikon SVG -->
-        <button class="google-btn" id="googleLoginBtn">
-            <svg class="google-icon" viewBox="0 0 24 24">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-            </svg>
-            Continue With Google
+            <a href="#" id="forgotPwdLink">Lupa Password?</a>
+        </div>
+
+        <button type="submit" class="btn-primary" id="loginBtn">
+            <span id="loginBtnText">Masuk</span>
         </button>
-        <div class="link">Don't have an account? <a href="register.html">Sign Up</a></div>
+    </form>
+
+    <div class="divider">atau</div>
+
+    <!-- Google Sign-In Button (custom, lebih responsive dari default) -->
+    <button class="btn-google" id="googleLoginBtn" onclick="loginWithGoogle()">
+        <img src="https://lh3.googleusercontent.com/COxitqgJr1sJnIDe8-jiKhxDx1FrYbtRHKJ9z_hELisAlapwE9LPeM-Bg68oTqKpQmq=" alt="Google" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTkuNiAxMC4yM2MwLS42Mi0uMDUtMS4yMi0uMTUtMS44SDEwdjMuNDJoNS4wOWMtLjIyIDEuMTctLjg5IDIuMTYtMS45IDIuODR2Mi4zNmgzLjA3YzEuOC0xLjY2IDIuODQtNC4xIDIuODQtNi44MnoiIGZpbGw9IiM0Mjg1RjQiLz48cGF0aCBkPSJNMTAgMjBjMi41NCAwIDQuNjctLjg0IDYuMjMtMi4yN2wtMy4wNy0yLjM2Yy0uODQuNTYtMS45MS45LTMuMTYuOS0yLjQzIDAtNC40OS0xLjY0LTUuMjMtMy44NEgyLjQ4djIuNDRDNC4wMyAxNy43OCA2LjggMjAgMTAgMjB6IiBmaWxsPSIjMzRBODUzIi8+PHBhdGggZD0iTTQuNzcgMTIuNDNBNi4wMiA2LjAyIDAgMCAxIDQuNDcgMTBjMC0uODQuMTUtMS42NS40My0yLjQzVjUuMTNIMi40OEE5Ljk3IDkuOTcgMCAwIDAgMCAxMGMwIDEuNjEuMzggMy4xNCAxLjA1IDQuNWwyLjcyLTIuMDd6IiBmaWxsPSIjRkJCQzA1Ii8+PHBhdGggZD0iTTEwIDMuOTZjMS4zNyAwIDIuNi40NyAzLjU3IDEuNGwyLjY3LTIuNjdDMTQuNjUuOTcgMTIuNTIgMCAxMCAwIDYuOCAwIDQuMDMgMi4yMiAyLjQ4IDUuMTNsMyAyLjMxQzcuNTEgNS42IDkuNTcgMy45NiAxMCAzLjk2eiIgZmlsbD0iI0VBNDMzNSIvPjwvc3ZnPg=='">
+        <span>Lanjutkan dengan Google</span>
+    </button>
+
+    <div class="signup-link">
+        Belum punya akun? <a href="register.html">Daftar Sekarang</a>
     </div>
+</div>
 
-    <script>
-        const API_URL = 'http://localhost:3000/api';
-        const form = document.getElementById('loginForm');
-        const emailInput = document.getElementById('loginEmail');
-        const passwordInput = document.getElementById('loginPassword');
-        const emailError = document.getElementById('loginEmailError');
-        const passError = document.getElementById('loginPassError');
-        const rememberCheck = document.getElementById('rememberMe');
+<div class="toast" id="toast"></div>
 
-        // Validasi sederhana
-        function validate() {
-            let valid = true;
-            emailError.innerText = '';
-            passError.innerText = '';
-            const emailVal = emailInput.value.trim();
-            const passVal = passwordInput.value.trim();
+<!-- Material Icons (lightweight) -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 
-            if (!emailVal) {
-                emailError.innerText = 'Email or username is required';
-                valid = false;
-            } else if (!emailVal.includes('@') && emailVal.length < 3) {
-                emailError.innerText = 'Enter a valid email or username';
-                valid = false;
-            }
-            if (!passVal) {
-                passError.innerText = 'Password is required';
-                valid = false;
-            } else if (passVal.length < 4) {
-                passError.innerText = 'Password at least 4 characters';
-                valid = false;
-            }
-            return valid;
-        }
+<script>
+const API_URL = 'http://localhost:3000/api';
+const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID'; // Ganti dengan Client ID kamu
 
-        // Remember me handler
-        function handleRemember() {
-            if (rememberCheck.checked) {
-                localStorage.setItem('remindu_remember', 'true');
-                localStorage.setItem('remindu_saved_email', emailInput.value.trim());
-            } else {
-                localStorage.setItem('remindu_remember', 'false');
-                localStorage.removeItem('remindu_saved_email');
-            }
-        }
+// ===== INIT =====
+// Update Google One Tap client_id
+document.getElementById('g_id_onload').dataset.clientId = GOOGLE_CLIENT_ID;
 
-        // Load saved email
-        if (localStorage.getItem('remindu_remember') === 'true') {
-            const saved = localStorage.getItem('remindu_saved_email');
-            if (saved) {
-                emailInput.value = saved;
-                rememberCheck.checked = true;
-            }
-        }
+// Load saved email
+if (localStorage.getItem('remindu_remember') === 'true') {
+    const saved = localStorage.getItem('remindu_saved_email');
+    if (saved) { document.getElementById('loginEmail').value = saved; document.getElementById('rememberMe').checked = true; }
+}
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            if (!validate()) return;
-            handleRemember();
+// Cek error dari redirect Google
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('error') === 'google_failed') {
+    showToast('Login Google gagal. Coba lagi.', 'error');
+}
 
-            const email = emailInput.value.trim();
-            const password = passwordInput.value.trim();
+// ===== HELPER =====
+function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show ' + type;
+    setTimeout(() => t.classList.remove('show'), 4000);
+}
 
-            try {
-                const res = await fetch(`${API_URL}/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.error || 'Login failed');
-                localStorage.setItem('remindu_user', JSON.stringify({ email: data.email || email }));
-                window.location.href = 'home.html';
-            } catch (err) {
-                alert(err.message);
-            }
+function togglePwd() {
+    const inp = document.getElementById('loginPassword');
+    const btn = document.querySelector('#eyeToggle span');
+    if (inp.type === 'password') { inp.type = 'text'; btn.textContent = 'visibility'; }
+    else { inp.type = 'password'; btn.textContent = 'visibility_off'; }
+}
+
+function setLoginLoading(loading) {
+    const btn = document.getElementById('loginBtn');
+    btn.disabled = loading;
+    btn.innerHTML = loading
+        ? '<div class="spinner"></div>'
+        : '<span id="loginBtnText">Masuk</span>';
+}
+
+// ===== LOGIN LOKAL =====
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email    = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
+    const emailErr = document.getElementById('loginEmailError');
+    const passErr  = document.getElementById('loginPassError');
+
+    emailErr.className = 'error-msg'; passErr.className = 'error-msg';
+    let valid = true;
+    if (!email) { emailErr.textContent = 'Email wajib diisi'; emailErr.className = 'error-msg show'; valid = false; }
+    if (!password) { passErr.textContent = 'Password wajib diisi'; passErr.className = 'error-msg show'; valid = false; }
+    if (!valid) return;
+
+    if (document.getElementById('rememberMe').checked) {
+        localStorage.setItem('remindu_remember', 'true');
+        localStorage.setItem('remindu_saved_email', email);
+    } else {
+        localStorage.removeItem('remindu_remember');
+        localStorage.removeItem('remindu_saved_email');
+    }
+
+    setLoginLoading(true);
+    try {
+        const res  = await fetch(`${API_URL}/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
         });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Login gagal');
 
-        document.getElementById('forgotPwdLink').addEventListener('click', (e) => {
-            e.preventDefault();
-            alert('Password reset feature will be available soon.');
-        });
+        localStorage.setItem('remindu_user', JSON.stringify({
+            email: data.email || email,
+            firstName: data.nama_depan || email.split('@')[0],
+            provider: 'local'
+        }));
+        showToast('✅ Login berhasil! Mengalihkan...', 'success');
+        setTimeout(() => window.location.href = 'home.html', 800);
+    } catch (err) {
+        showToast(err.message, 'error');
+    } finally {
+        setLoginLoading(false);
+    }
+});
 
-        document.getElementById('googleLoginBtn').addEventListener('click', () => {
-            alert('Demo Google login — integration coming soon.');
+// ===== GOOGLE LOGIN — REDIRECT FLOW =====
+// Mengarahkan ke backend untuk OAuth2 redirect flow
+function loginWithGoogle() {
+    if (GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID') {
+        showToast('⚠️ Google Client ID belum dikonfigurasi di server. Hubungi admin.', 'error');
+        return;
+    }
+    window.location.href = 'http://localhost:3000/auth/google';
+}
+
+// ===== GOOGLE ONE TAP CALLBACK =====
+// Dipanggil ketika user memilih akun di One Tap popup
+async function handleGoogleOneTap(response) {
+    if (!response?.credential) return;
+    setLoginLoading(true);
+    try {
+        const res  = await fetch(`${API_URL}/auth/google-token`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ credential: response.credential })
         });
-    </script>
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Google login gagal');
+
+        localStorage.setItem('remindu_user', JSON.stringify({
+            email:     data.email,
+            firstName: data.nama_depan,
+            provider:  'google'
+        }));
+        showToast('✅ Login Google berhasil!', 'success');
+        setTimeout(() => window.location.href = 'home.html', 800);
+    } catch (err) {
+        showToast(err.message || 'Google login gagal', 'error');
+    } finally {
+        setLoginLoading(false);
+    }
+}
+
+document.getElementById('forgotPwdLink').addEventListener('click', (e) => {
+    e.preventDefault();
+    showToast('Fitur lupa password: masukkan email lama kamu → reset OTP akan dikirim via email.', '');
+});
+</script>
 </body>
 </html>

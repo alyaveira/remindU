@@ -5,80 +5,243 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RemindU - Daftar</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
-        body { background: linear-gradient(145deg, #f5f7fe 0%, #eef2fa 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .card { max-width: 550px; width: 100%; background: white; border-radius: 36px; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1); padding: 40px 28px; }
-        h2 { font-size: 28px; margin-bottom: 8px; }
-        p { margin-bottom: 24px; color: #4a5568; }
-        input { width: 100%; padding: 14px 20px; background: #f3f4f9; border: 1px solid transparent; border-radius: 60px; margin-bottom: 16px; font-size: 15px; outline: none; }
-        input:focus { border-color: #8b5cf6; background: white; }
-        .flex-row { display: flex; gap: 12px; }
-        .terms { display: flex; align-items: center; gap: 10px; margin: 16px 0; font-size: 13px; }
-        .terms input { width: 18px; margin: 0; }
-        button { background: #8b5cf6; color: white; border: none; border-radius: 60px; padding: 14px; width: 100%; font-weight: 600; cursor: pointer; }
-        .or-divider { text-align: center; margin: 20px 0; color: #aaa; }
-        .google-btn { background: white; border: 1px solid #ddd; color: #333; }
-        .link { text-align: center; margin-top: 20px; font-size: 14px; }
-        a { color: #8b5cf6; text-decoration: none; }
-        .error-msg { color: #e53e3e; font-size: 12px; margin-top: -12px; margin-bottom: 12px; }
+        :root { --purple:#8b5cf6; --purple-dark:#7c3aed; --purple-light:#ede9fe; --bg:#f5f7fe; --white:#fff; --text:#0f172a; --text-muted:#64748b; --border:#edf2f7; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',system-ui,-apple-system,'Inter',sans-serif; }
+        body { background:var(--bg); min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; position:relative; overflow-x:hidden; overflow-y:auto; }
+        .bg-blob { position:fixed; border-radius:50%; filter:blur(60px); opacity:0.38; pointer-events:none; z-index:0; }
+        .bg-blob-1 { width:400px; height:400px; background:var(--purple); top:-100px; right:-100px; }
+        .bg-blob-2 { width:300px; height:300px; background:#ec4899; bottom:-80px; left:-80px; }
+        .card { max-width:550px; width:100%; background:var(--white); border-radius:36px; box-shadow:0 20px 35px -12px rgba(0,0,0,0.1); padding:40px 28px; position:relative; z-index:10; animation:fadeSlide 0.4s ease both; }
+        @keyframes fadeSlide { from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);} }
+        h2 { font-size:28px; margin-bottom:6px; color:var(--text); font-weight:700; }
+        .subtitle { color:var(--text-muted); margin-bottom:24px; font-size:15px; }
+        .form-row { display:flex; gap:12px; }
+        .form-group { position:relative; margin-bottom:14px; flex:1; }
+        .form-group input, .form-group select {
+            width:100%; padding:13px 48px 13px 48px; background:#f3f4f9;
+            border:1.5px solid transparent; border-radius:60px; font-size:14px; outline:none; transition:all 0.2s;
+        }
+        .form-group input:focus { border-color:var(--purple); background:var(--white); box-shadow:0 0 0 4px rgba(139,92,246,0.1); }
+        .form-group .fi { position:absolute; left:16px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:18px; pointer-events:none; font-family:'Material Icons Round'; }
+        .form-group .eye { position:absolute; right:14px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:var(--text-muted); font-size:18px; font-family:'Material Icons Round'; }
+        .form-group .eye:hover { color:var(--purple); }
+        .err { color:#e53e3e; font-size:11px; padding:0 8px; margin-top:3px; display:none; }
+        .err.show { display:block; }
+        .password-hint { font-size:11px; color:#94a3b8; padding:2px 8px; }
+        .password-strength { height:4px; background:#f1f5f9; border-radius:4px; margin:6px 8px; overflow:hidden; }
+        .strength-fill { height:100%; border-radius:4px; width:0; transition:width 0.3s, background 0.3s; }
+        .terms { display:flex; align-items:center; gap:10px; margin:14px 0 18px; font-size:13px; color:var(--text-muted); }
+        .terms input { width:18px; height:18px; accent-color:var(--purple); cursor:pointer; flex-shrink:0; }
+        .terms label { cursor:pointer; line-height:1.4; }
+        .terms a { color:var(--purple); text-decoration:none; }
+        .btn-primary { background:var(--purple); color:white; border:none; border-radius:60px; padding:14px; width:100%; font-weight:700; font-size:15px; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:8px; }
+        .btn-primary:hover { background:var(--purple-dark); transform:translateY(-2px); box-shadow:0 8px 20px rgba(139,92,246,0.3); }
+        .btn-primary:disabled { opacity:0.6; transform:none; cursor:not-allowed; }
+        .divider { display:flex; align-items:center; gap:12px; margin:18px 0; color:var(--text-muted); font-size:13px; }
+        .divider::before,.divider::after { content:''; flex:1; height:1px; background:var(--border); }
+        .btn-google { width:100%; padding:12px 20px; border:1.5px solid var(--border); border-radius:60px; background:white; color:#1a1a1a; font-size:14px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:12px; transition:all 0.2s; }
+        .btn-google:hover { background:#f8f9fa; border-color:#dadce0; box-shadow:0 2px 8px rgba(0,0,0,0.08); transform:translateY(-1px); }
+        .link { text-align:center; margin-top:18px; font-size:14px; color:var(--text-muted); }
+        a { color:var(--purple); text-decoration:none; }
+        a:hover { text-decoration:underline; }
+        .back-link { display:inline-block; margin-bottom:18px; font-weight:500; font-size:14px; }
+        .spinner { width:18px; height:18px; border:2.5px solid rgba(255,255,255,0.4); border-top-color:white; border-radius:50%; animation:spin 0.7s linear infinite; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(80px); background:#1e293b; color:white; padding:12px 24px; border-radius:40px; font-size:14px; font-weight:500; z-index:9999; transition:transform 0.3s; white-space:nowrap; }
+        .toast.show { transform:translateX(-50%) translateY(0); }
+        .toast.success { background:#10b981; }
+        .toast.error { background:#e53e3e; }
+        @media (min-width:768px) { .card { padding:48px 40px; } }
     </style>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
+<div class="bg-blob bg-blob-1"></div>
+<div class="bg-blob bg-blob-2"></div>
+
 <div class="card">
-    <a href="login.html" style="display: inline-block; margin-bottom: 20px;">← Back</a>
-    <h2>Sign Up</h2>
-    <p>Create New Account</p>
-    <form id="signupForm">
-        <div class="flex-row">
-            <input type="text" id="firstName" placeholder="First Name*">
-            <input type="text" id="lastName" placeholder="Last Name*">
+    <a href="login.html" class="back-link">← Kembali ke Login</a>
+    <h2>Buat Akun</h2>
+    <p class="subtitle">Daftar gratis dan mulai kelola task kamu!</p>
+
+    <form id="signupForm" novalidate>
+        <div class="form-row">
+            <div class="form-group">
+                <span class="fi">person</span>
+                <input type="text" id="firstName" placeholder="Nama Depan*" autocomplete="given-name">
+                <div class="err" id="firstNameErr"></div>
+            </div>
+            <div class="form-group">
+                <span class="fi">person</span>
+                <input type="text" id="lastName" placeholder="Nama Belakang*" autocomplete="family-name">
+            </div>
         </div>
-        <div class="error-msg" id="nameError"></div>
-        <input type="email" id="signupEmail" placeholder="Email Address*">
-        <div class="error-msg" id="emailError"></div>
-        <input type="password" id="signupPassword" placeholder="Password*">
-        <div class="error-msg" id="passwordError"></div>
-        <input type="password" id="confirmPassword" placeholder="Confirm Password*">
-        <div class="error-msg" id="confirmError"></div>
+
+        <div class="form-group">
+            <span class="fi">email</span>
+            <input type="email" id="signupEmail" placeholder="Alamat Email*" autocomplete="email">
+            <div class="err" id="emailErr"></div>
+        </div>
+
+        <div class="form-group">
+            <span class="fi">lock</span>
+            <input type="password" id="signupPassword" placeholder="Buat Password*" autocomplete="new-password">
+            <button type="button" class="eye" onclick="togglePwd('signupPassword', this)">visibility_off</button>
+        </div>
+        <div class="password-strength"><div class="strength-fill" id="strengthFill"></div></div>
+        <div class="password-hint" id="strengthLabel">Password minimal 8 karakter, huruf kecil &amp; angka</div>
+        <div class="err" id="passwordErr"></div>
+
+        <div class="form-group">
+            <span class="fi">lock</span>
+            <input type="password" id="confirmPassword" placeholder="Konfirmasi Password*" autocomplete="new-password">
+            <button type="button" class="eye" onclick="togglePwd('confirmPassword', this)">visibility_off</button>
+            <div class="err" id="confirmErr"></div>
+        </div>
+
         <div class="terms">
-            <input type="checkbox" id="acceptTerms"> <label>I accept all terms and conditions</label>
+            <input type="checkbox" id="acceptTerms">
+            <label for="acceptTerms">Saya menyetujui <a href="#">Syarat & Ketentuan</a> dan <a href="#">Kebijakan Privasi</a> RemindU</label>
         </div>
-        <button type="submit">Sign in</button>
+
+        <button type="submit" class="btn-primary" id="signupBtn">
+            <span id="signupBtnText">Buat Akun</span>
+        </button>
     </form>
-    <div class="or-divider">OR</div>
-    <button class="google-btn" onclick="alert('Demo Google sign up')">Continue With Google</button>
-    <div class="link">Already Registered? <a href="login.html">Log in here</a></div>
+
+    <div class="divider">atau daftar dengan</div>
+
+    <button class="btn-google" onclick="registerWithGoogle()">
+        <svg width="20" height="20" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Lanjutkan dengan Google
+    </button>
+
+    <div class="link">Sudah punya akun? <a href="login.html">Masuk di sini</a></div>
 </div>
+
+<div class="toast" id="toast"></div>
+
 <script>
-    const API_URL = 'http://localhost:3000/api';
-    document.getElementById('signupForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const firstName = document.getElementById('firstName').value;
-        const lastName = document.getElementById('lastName').value;
-        const email = document.getElementById('signupEmail').value;
-        const password = document.getElementById('signupPassword').value;
-        const confirm = document.getElementById('confirmPassword').value;
-        const terms = document.getElementById('acceptTerms').checked;
+const API_URL = 'http://localhost:3000/api';
+const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID'; // Ganti dengan Client ID kamu
 
-        if (password !== confirm) { alert('Password dan konfirmasi tidak cocok'); return; }
-        if (!terms) { alert('Harus menyetujui syarat & ketentuan'); return; }
+function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.className = 'toast show ' + type;
+    setTimeout(() => t.classList.remove('show'), 4000);
+}
 
-        try {
-            const res = await fetch(`${API_URL}/register`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ firstName, lastName, email, password, terms })
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error);
-            // simpan email sementara di localStorage untuk ke halaman verifikasi
-            localStorage.setItem('pendingVerifyEmail', email);
-            alert(`Registrasi berhasil! Kode OTP: ${data.otp}\nCatat kode ini untuk verifikasi.`);
-            window.location.href = 'verify.html';
-        } catch (err) {
-            alert(err.message);
-        }
-    });
+function togglePwd(id, btn) {
+    const inp = document.getElementById(id);
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    btn.textContent = inp.type === 'password' ? 'visibility_off' : 'visibility';
+}
+
+// Password strength indicator
+document.getElementById('signupPassword').addEventListener('input', function () {
+    const val = this.value;
+    const fill = document.getElementById('strengthFill');
+    const label = document.getElementById('strengthLabel');
+    let score = 0;
+    if (val.length >= 8) score++;
+    if (/[a-z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[^a-zA-Z0-9]/.test(val)) score++;
+    const pct = score * 20;
+    const colors = ['', '#e53e3e', '#f97316', '#f59e0b', '#10b981', '#8b5cf6'];
+    const labels = ['', 'Sangat Lemah', 'Lemah', 'Cukup', 'Kuat', 'Sangat Kuat'];
+    fill.style.width = pct + '%';
+    fill.style.background = colors[score] || '';
+    label.textContent = score > 0 ? `Kekuatan: ${labels[score]}` : 'Password minimal 8 karakter, huruf kecil & angka';
+    label.style.color = colors[score] || '#94a3b8';
+});
+
+// Form validation
+function validateForm() {
+    let valid = true;
+    const clearErr = id => { const el = document.getElementById(id); if (el) { el.textContent = ''; el.className = 'err'; } };
+    const showErr  = (id, msg) => { const el = document.getElementById(id); if (el) { el.textContent = msg; el.className = 'err show'; } valid = false; };
+
+    clearErr('firstNameErr'); clearErr('emailErr'); clearErr('passwordErr'); clearErr('confirmErr');
+
+    const first    = document.getElementById('firstName').value.trim();
+    const email    = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value;
+    const confirm  = document.getElementById('confirmPassword').value;
+    const terms    = document.getElementById('acceptTerms').checked;
+
+    if (!first) showErr('firstNameErr', 'Nama depan wajib diisi');
+    if (!email || !email.includes('@')) showErr('emailErr', 'Email tidak valid');
+    if (!password || password.length < 8 || !/[a-z]/.test(password) || !/[0-9]/.test(password))
+        showErr('passwordErr', 'Password minimal 8 karakter, huruf kecil & angka');
+    if (password !== confirm) showErr('confirmErr', 'Konfirmasi password tidak cocok');
+    if (!terms) { showToast('⚠️ Harap menyetujui Syarat & Ketentuan', 'error'); valid = false; }
+    return valid;
+}
+
+document.getElementById('signupForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    const btn = document.getElementById('signupBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner"></div>';
+
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName  = document.getElementById('lastName').value.trim();
+    const email     = document.getElementById('signupEmail').value.trim();
+    const password  = document.getElementById('signupPassword').value;
+
+    try {
+        const res  = await fetch(`${API_URL}/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ firstName, lastName, email, password, terms: true })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Registrasi gagal');
+
+        localStorage.setItem('pendingVerifyEmail', email);
+        showToast('✅ Akun dibuat! Cek email untuk kode OTP.', 'success');
+        // Tampilkan OTP di alert jika SMTP belum aktif
+        if (data.otp) alert(`Kode OTP kamu: ${data.otp}\n(Catatan: Di produksi, OTP dikirim via email otomatis)`);
+        setTimeout(() => window.location.href = 'verify.html', 1000);
+    } catch (err) {
+        showToast(err.message, 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<span id="signupBtnText">Buat Akun</span>';
+    }
+});
+
+// Google Register (sama flow dengan login)
+function registerWithGoogle() {
+    if (GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID') {
+        showToast('⚠️ Google Login belum dikonfigurasi. Hubungi admin.', 'error');
+        return;
+    }
+    window.location.href = 'http://localhost:3000/auth/google';
+}
+
+// Google One Tap callback (sama dengan login)
+window.handleGoogleOneTap = async function (response) {
+    if (!response?.credential) return;
+    try {
+        const res  = await fetch(`${API_URL}/auth/google-token`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ credential: response.credential })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        localStorage.setItem('remindu_user', JSON.stringify({ email: data.email, firstName: data.nama_depan, provider: 'google' }));
+        showToast('✅ Daftar via Google berhasil!', 'success');
+        setTimeout(() => window.location.href = 'home.html', 800);
+    } catch (err) {
+        showToast(err.message || 'Google login gagal', 'error');
+    }
+};
 </script>
 </body>
 </html>

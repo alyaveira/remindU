@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RemindU - Memproses Login...</title>
+    <style>
+        :root { --purple:#8b5cf6; --bg:#f5f7fe; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',system-ui,sans-serif; }
+        body { background:var(--bg); min-height:100vh; display:flex; align-items:center; justify-content:center; }
+        .bg-blob { position:fixed; border-radius:50%; filter:blur(60px); opacity:0.38; pointer-events:none; z-index:0; }
+        .bg-blob-1 { width:400px; height:400px; background:var(--purple); top:-100px; right:-100px; }
+        .bg-blob-2 { width:300px; height:300px; background:#ec4899; bottom:-80px; left:-80px; }
+        .card { background:white; border-radius:36px; padding:48px 40px; max-width:400px; width:90%; text-align:center; box-shadow:0 20px 35px -12px rgba(0,0,0,0.1); position:relative; z-index:10; animation:pop 0.4s ease both; }
+        @keyframes pop { from{opacity:0;transform:scale(0.92);}to{opacity:1;transform:scale(1);} }
+        .google-icon { font-size:52px; margin-bottom:16px; display:block; animation:bounce 1s infinite alternate; }
+        @keyframes bounce { from{transform:translateY(0);}to{transform:translateY(-8px);} }
+        h2 { font-size:22px; font-weight:700; color:#1e293b; margin-bottom:8px; }
+        p { color:#64748b; font-size:14px; line-height:1.6; }
+        .progress-bar { height:4px; background:#ede9fe; border-radius:4px; margin-top:24px; overflow:hidden; }
+        .progress-fill { height:100%; background:linear-gradient(90deg,#8b5cf6,#ec4899); border-radius:4px; animation:load 1.5s ease-in-out forwards; }
+        @keyframes load { from{width:0%}to{width:100%} }
+        .status-icon { font-size:48px; margin-bottom:12px; display:none; }
+        .status-icon.show { display:block; animation:pop 0.3s ease; }
+    </style>
+</head>
+<body>
+<div class="bg-blob bg-blob-1"></div>
+<div class="bg-blob bg-blob-2"></div>
+<div class="card">
+    <span id="mainIcon" class="google-icon">🔐</span>
+    <span id="successIcon" class="status-icon">✅</span>
+    <span id="errorIcon" class="status-icon">❌</span>
+    <h2 id="title">Memverifikasi akun Google...</h2>
+    <p id="subtitle">Harap tunggu sebentar, kami sedang menyiapkan akun kamu.</p>
+    <div class="progress-bar" id="progressBar"><div class="progress-fill"></div></div>
+</div>
+
+<script>
+(function () {
+    const params  = new URLSearchParams(window.location.search);
+    const email   = params.get('email');
+    const name    = params.get('name');
+    const provider = params.get('provider');
+    const error   = params.get('error');
+
+    function setStatus(type, titleText, subText) {
+        document.getElementById('mainIcon').style.display = 'none';
+        document.getElementById('progressBar').style.display = 'none';
+        const icon = document.getElementById(type + 'Icon');
+        icon.classList.add('show');
+        document.getElementById('title').textContent = titleText;
+        document.getElementById('subtitle').textContent = subText;
+    }
+
+    if (error || !email) {
+        setStatus('error', 'Login Gagal', 'Terjadi kesalahan saat login dengan Google. Kamu akan diarahkan ke halaman login...');
+        setTimeout(() => window.location.href = 'login.html?error=google_failed', 2500);
+        return;
+    }
+
+    // Simpan data user ke localStorage
+    localStorage.setItem('remindu_user', JSON.stringify({
+        email:     decodeURIComponent(email),
+        firstName: decodeURIComponent(name || email.split('@')[0]),
+        provider:  provider || 'google'
+    }));
+
+    setStatus('success',
+        `Selamat Datang, ${decodeURIComponent(name || 'User')}! 👋`,
+        'Login Google berhasil. Mengalihkan ke dashboard...'
+    );
+    setTimeout(() => window.location.href = 'home.html', 1800);
+})();
+</script>
+</body>
+</html>

@@ -444,6 +444,7 @@
             <div class="nav-item" data-nav="calendar"><i class="material-icons-round">calendar_month</i><span class="nav-item-label">Kalender</span></div>
             <div class="nav-item" data-nav="notification"><i class="material-icons-round">notifications</i><span class="nav-item-label">Notifikasi</span><span class="nav-badge" id="notifBadge">0</span></div>
             <div class="nav-label" style="margin-top:8px;">Lainnya</div>
+            <div class="nav-item" data-nav="ai"><i class="material-icons-round">auto_awesome</i><span class="nav-item-label">AI Motivasi</span></div>
             <div class="nav-item" data-nav="statistic"><i class="material-icons-round">bar_chart</i><span class="nav-item-label">Statistik</span></div>
             <div class="nav-item" data-nav="settings"><i class="material-icons-round">settings</i><span class="nav-item-label">Pengaturan</span></div>
         </nav>
@@ -638,6 +639,8 @@
             else if (nav === 'calendar') window.location.href = 'calendar.html';
             else if (nav === 'notification') window.location.href = 'notification.html';
             else if (nav === 'settings') window.location.href = 'settings.html';
+            else if (nav === 'statistic') window.location.href = 'statistic.html';
+            else if (nav === 'ai') window.location.href = 'ai-motivation.html';
         }
         document.querySelectorAll('.nav-item[data-nav]').forEach(el => el.addEventListener('click', () => handleNav(el.dataset.nav)));
         document.querySelectorAll('.bnav-item[data-nav]').forEach(el => el.addEventListener('click', () => handleNav(el.dataset.nav)));
@@ -654,57 +657,94 @@
             window.location.href = 'home.html';
         });
 
+        // ---- Deadline preview H-berapa ----
+        const dueDateInput = document.getElementById('taskDueDate');
+        let deadlinePreviewEl = null;
+        function updateDeadlinePreview() {
+            const val = dueDateInput.value;
+            if (!val) { if (deadlinePreviewEl) deadlinePreviewEl.remove(); return; }
+            const diff = new Date(val) - Date.now();
+            const hours = diff / 3600000;
+            if (diff <= 0) { if (deadlinePreviewEl) deadlinePreviewEl.style.background = '#fee2e2'; return; }
+            const days = Math.floor(hours / 24);
+            const hLabel = days === 0 ? 'H-0 (Hari ini!)' : `H-${days} (${days === 1 ? 'Besok' : days + ' hari lagi'})`;
+            const color  = hours <= 24 ? '#fee2e2' : hours <= 72 ? '#fff7ed' : '#f0fdf4';
+            const tcolor = hours <= 24 ? '#b91c1c' : hours <= 72 ? '#c2410c' : '#15803d';
+            if (!deadlinePreviewEl) {
+                deadlinePreviewEl = document.createElement('div');
+                deadlinePreviewEl.style.cssText = `margin-top:8px;padding:8px 14px;border-radius:12px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;`;
+                dueDateInput.parentElement.appendChild(deadlinePreviewEl);
+            }
+            deadlinePreviewEl.style.background = color;
+            deadlinePreviewEl.style.color = tcolor;
+            deadlinePreviewEl.innerHTML = `⏰ ${hLabel} &nbsp;·&nbsp; ${Math.floor(hours)} jam lagi`;
+        }
+        dueDateInput.addEventListener('change', updateDeadlinePreview);
+
+        // ---- Save task ----
         document.getElementById('addBtn').addEventListener('click', async () => {
-            const judul = document.getElementById('taskTitle').value.trim();
-            const notes = document.getElementById('taskNotes').value.trim();
+            const judul    = document.getElementById('taskTitle').value.trim();
+            const notes    = document.getElementById('taskNotes').value.trim();
             const kategori = document.getElementById('taskCategory').value;
             const remindMe = document.getElementById('remindSwitch').checked;
-            let due_date = document.getElementById('taskDueDate').value;
-            let remind_at = null;
+            let due_date   = document.getElementById('taskDueDate').value;
+            let remind_at  = null;
 
-            if (judul === '') {
-                alert('Title tidak boleh kosong');
-                return;
-            }
-
-            if (remindMe && !due_date) {
-                alert('Harap isi due date jika ingin diingatkan');
-                return;
-            }
-            if (remindMe && due_date) {
-                remind_at = due_date;
-            }
+            if (!judul) { showToast('⚠️ Judul task tidak boleh kosong', 'error'); return; }
+            if (remindMe && !due_date) { showToast('⚠️ Harap isi due date untuk pengingat', 'error'); return; }
+            if (due_date && new Date(due_date) <= Date.now()) { showToast('⚠️ Deadline tidak boleh di masa lalu', 'error'); return; }
+            if (remindMe && due_date) remind_at = due_date;
             due_date = due_date || null;
 
-            const taskData = { judul, kategori, notes: notes || '', due_date, remind_at };
+            const addBtn = document.getElementById('addBtn');
+            addBtn.disabled = true;
+            addBtn.textContent = 'Menyimpan...';
 
             try {
                 const response = await fetch('http://localhost:3000/api/tasks', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-User-Email': userEmail
-                    },
-                    body: JSON.stringify(taskData)
+                    headers: { 'Content-Type': 'application/json', 'X-User-Email': userEmail },
+                    body: JSON.stringify({ judul, kategori, notes: notes || '', due_date, remind_at })
                 });
                 if (!response.ok) {
                     const err = await response.json();
                     throw new Error(err.error || 'Gagal menambah task');
                 }
-                window.location.href = 'home.html';
+                showToast('✅ Task berhasil ditambahkan!', 'success');
+                setTimeout(() => window.location.href = 'home.html', 900);
             } catch (err) {
-                alert('Error: ' + err.message);
+                showToast('Error: ' + err.message, 'error');
+                addBtn.disabled = false;
+                addBtn.textContent = 'Simpan';
             }
         });
 
-        // ========== UPDATE NOTIF BADGE (optional) ==========
+        // ========== TOAST ==========
+        function showToast(msg, type) {
+            let t = document.getElementById('_toast');
+            if (!t) {
+                t = document.createElement('div');
+                t.id = '_toast';
+                t.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:#1e293b;color:white;padding:12px 24px;border-radius:40px;font-size:14px;font-weight:500;z-index:9999;transition:transform 0.3s;white-space:nowrap;';
+                document.body.appendChild(t);
+            }
+            t.textContent = msg;
+            t.style.background = type === 'success' ? '#10b981' : type === 'error' ? '#e53e3e' : '#1e293b';
+            t.style.transform = 'translateX(-50%) translateY(0)';
+            setTimeout(() => t.style.transform = 'translateX(-50%) translateY(80px)', 3500);
+        }
+
+        // ========== NOTIF BADGE (real dari backend notifications) ==========
         async function updateNotifBadge() {
             try {
-                const res = await fetch('http://localhost:3000/api/tasks', { headers: { 'X-User-Email': userEmail } });
+                const res = await fetch('http://localhost:3000/api/notifications', { headers: { 'X-User-Email': userEmail } });
                 if (res.ok) {
-                    const tasks = await res.json();
+                    const notifs = await res.json();
+                    const unread = notifs.filter(n => !n.status_baca).length;
                     const badge = document.getElementById('notifBadge');
-                    if (badge) badge.textContent = tasks.filter(t => !t.selesai).length;
+                    const dot   = document.getElementById('notifDot');
+                    if (badge) badge.textContent = unread || '0';
+                    if (dot)   dot.style.display = unread > 0 ? 'block' : 'none';
                 }
             } catch(e) {}
         }
