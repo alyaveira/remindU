@@ -1,6 +1,7 @@
 {
   "name": "remindu-backend",
-  "version": "1.0.0",
+  "version": "2.0.0",
+  "description": "RemindU - Task Management & Reminder App dengan Google OAuth2 & Email Notification",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -11,9 +12,20 @@
     "mysql2": "^3.6.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
-    "body-parser": "^1.20.2"
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.3.1",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "google-auth-library": "^9.6.3",
+    "express-session": "^1.17.3",
+    "nodemailer": "^6.9.8",
+    "node-cron": "^3.0.3",
+    "node-fetch": "^2.7.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
