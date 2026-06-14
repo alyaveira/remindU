@@ -24,184 +24,66 @@
         .bg-blob { position:fixed; border-radius:50%; filter:blur(60px); opacity:0.38; pointer-events:none; z-index:0; }
         .bg-blob-1 { width:400px; height:400px; background:var(--purple); top:-100px; right:-100px; }
         .bg-blob-2 { width:300px; height:300px; background:#ec4899; bottom:-80px; left:-80px; }
-        .layout { display:flex; min-height:100vh; position:relative; z-index:5; }
 
-        /* SIDEBAR */
-        .sidebar { width:var(--sidebar-w); background:var(--white); border-right:1px solid var(--border); display:flex; flex-direction:column; position:fixed; top:0; left:0; bottom:0; z-index:200; transition:width 0.3s cubic-bezier(0.4,0,0.2,1),transform 0.3s; overflow:hidden; box-shadow:2px 0 20px rgba(0,0,0,0.04); }
-        .sidebar.collapsed { width:var(--sidebar-collapsed-w); }
-        .sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.35); z-index:199; backdrop-filter:blur(2px); }
-        .sidebar-overlay.show { display:block; }
-        .sidebar-header { display:flex; align-items:center; justify-content:space-between; padding:0 16px; height:var(--header-h); border-bottom:1px solid var(--border); flex-shrink:0; }
-        .brand-wrap { display:flex; align-items:center; gap:10px; overflow:hidden; }
-        .brand-logo { width:36px; height:36px; border-radius:12px; background:linear-gradient(135deg,#1e3a8a,#8b5cf6); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:18px; font-weight:900; color:white; }
-        .brand-name { font-size:20px; font-weight:800; letter-spacing:-0.5px; background:linear-gradient(135deg,#1e3a8a,#3b82f6,#8b5cf6,#ec4899); -webkit-background-clip:text; background-clip:text; color:transparent; white-space:nowrap; overflow:hidden; transition:opacity 0.2s,width 0.3s; }
-        .sidebar.collapsed .brand-name { opacity:0; width:0; }
-        .toggle-btn { width:32px; height:32px; border-radius:10px; border:none; background:var(--bg); cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--text-muted); transition:background 0.2s,color 0.2s; flex-shrink:0; }
-        .toggle-btn:hover { background:var(--purple-light); color:var(--purple); }
-        .toggle-btn i { font-size:20px; transition:transform 0.3s; }
-        .sidebar.collapsed .toggle-btn i { transform:rotate(180deg); }
-        .sidebar-user { padding:16px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:12px; cursor:pointer; transition:background 0.2s; flex-shrink:0; }
-        .sidebar-user:hover { background:var(--bg); }
-        .sidebar-avatar { width:40px; height:40px; border-radius:14px; background:linear-gradient(135deg,var(--purple),#ec4899); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:16px; color:white; flex-shrink:0; background-size:cover; background-position:center; }
-        .sidebar-user-info { overflow:hidden; transition:opacity 0.2s; }
-        .sidebar.collapsed .sidebar-user-info { opacity:0; width:0; }
-        .sidebar-user-name { font-weight:600; font-size:14px; color:var(--text); white-space:nowrap; }
-        .sidebar-user-email { font-size:11px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:160px; }
-        .sidebar-nav { flex:1; padding:12px 10px; overflow-y:auto; overflow-x:hidden; }
-        .sidebar-nav::-webkit-scrollbar { width:4px; }
-        .sidebar-nav::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
-        .nav-label { font-size:10px; font-weight:700; text-transform:uppercase; color:var(--text-muted); letter-spacing:1px; padding:8px 10px 4px; white-space:nowrap; overflow:hidden; transition:opacity 0.2s; }
-        .sidebar.collapsed .nav-label { opacity:0; }
-        .nav-item { display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:14px; cursor:pointer; transition:all 0.2s; color:var(--text-muted); margin-bottom:2px; white-space:nowrap; overflow:hidden; }
-        .nav-item:hover { background:var(--bg); color:var(--purple); }
-        .nav-item.active { background:var(--purple-light); color:var(--purple); font-weight:600; }
-        .nav-item i { font-size:22px; flex-shrink:0; }
-        .nav-item-label { font-size:14px; transition:opacity 0.2s; }
-        .sidebar.collapsed .nav-item-label { opacity:0; width:0; }
-        .nav-badge { margin-left:auto; background:var(--purple); color:white; font-size:10px; font-weight:700; padding:2px 7px; border-radius:20px; flex-shrink:0; transition:opacity 0.2s; }
-        .sidebar.collapsed .nav-badge { opacity:0; }
-        .sidebar-footer { padding:12px 10px 16px; border-top:1px solid var(--border); flex-shrink:0; }
+        .layout { display:flex; min-height:100vh; }
+        .main-content { flex:1; display:flex; flex-direction:column; min-height:100vh; overflow-y:auto; padding:24px; position:relative; z-index:10; }
+        .container { max-width:1000px; width:100%; margin:0 auto; display:flex; flex-direction:column; gap:24px; }
 
-        /* MAIN */
-        .main { flex:1; margin-left:var(--sidebar-w); transition:margin-left 0.3s cubic-bezier(0.4,0,0.2,1); min-height:100vh; display:flex; flex-direction:column; }
-        .main.expanded { margin-left:var(--sidebar-collapsed-w); }
+        /* Top Bar */
+        .top-bar { display:flex; align-items:center; justify-content:between; margin-bottom:12px; width:100%; }
+        .btn-back { background:none; border:none; color:var(--purple); font-weight:600; cursor:pointer; display:flex; align-items:center; gap:4px; padding:8px 12px; border-radius:12px; transition:background 0.2s; font-size:14px; }
+        .btn-back:hover { background:var(--purple-light); }
+        .page-title { font-size:24px; font-weight:800; color:var(--text); flex:1; text-align:center; margin-right:40px; }
 
-        /* TOPBAR */
-        .topbar { height:var(--header-h); background:var(--white); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; padding:0 28px; position:sticky; top:0; z-index:100; box-shadow:0 1px 8px rgba(0,0,0,0.04); }
-        .topbar-left { display:flex; align-items:center; gap:12px; }
-        .topbar-mobile-toggle { display:none; width:36px; height:36px; border-radius:10px; border:none; background:var(--bg); cursor:pointer; align-items:center; justify-content:center; color:var(--text); transition:background 0.2s; }
-        .topbar-mobile-toggle:hover { background:var(--purple-light); }
-        .topbar-mobile-toggle i { font-size:22px; }
-        .topbar-greeting { font-size:15px; font-weight:600; color:var(--text); }
-        .topbar-date { font-size:12px; color:var(--text-muted); }
-        .topbar-right { display:flex; align-items:center; gap:10px; }
-        .topbar-icon-btn { width:36px; height:36px; border-radius:10px; border:none; background:var(--bg); cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--text-muted); transition:all 0.2s; position:relative; }
-        .topbar-icon-btn:hover { background:var(--purple-light); color:var(--purple); }
-        .topbar-icon-btn i { font-size:20px; }
-        .notif-dot { position:absolute; top:6px; right:6px; width:8px; height:8px; border-radius:50%; background:var(--orange); border:2px solid var(--white); }
-        .topbar-avatar { width:36px; height:36px; border-radius:12px; background:linear-gradient(135deg,var(--purple),#ec4899); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:15px; color:white; cursor:pointer; transition:transform 0.2s,box-shadow 0.2s; position:relative; background-size:cover; background-position:center; }
-        .topbar-avatar:hover { transform:scale(1.05); box-shadow:0 4px 12px rgba(139,92,246,0.3); }
-        .dropdown { position:absolute; top:44px; right:0; background:white; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,0.12); width:170px; overflow:hidden; z-index:300; display:none; border:1px solid var(--border); animation:dropFade 0.18s ease; }
-        @keyframes dropFade { from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);} }
-        .dropdown.show { display:block; }
-        .dd-item { padding:12px 16px; display:flex; align-items:center; gap:10px; cursor:pointer; font-size:13px; color:var(--text); transition:background 0.15s; }
-        .dd-item:hover { background:var(--bg); }
-        .dd-item.danger { color:#e53e3e; border-top:1px solid var(--border); }
-        .dd-item i { font-size:18px; }
-        .relative { position:relative; }
+        /* Period Selector Chips */
+        .period-selector { display:flex; gap:10px; background:rgba(139,92,246,0.06); padding:6px; border-radius:16px; align-self:center; width:fit-content; }
+        .period-btn { background:none; border:none; padding:8px 20px; font-size:14px; font-weight:600; color:var(--text-muted); cursor:pointer; border-radius:12px; transition:all 0.2s; }
+        .period-btn.active { background:var(--white); color:var(--purple); box-shadow:0 4px 10px rgba(0,0,0,0.04); }
 
-        /* PAGE */
-        .page-content { flex:1; padding:28px; max-width:960px; width:100%; margin:0 auto; }
-        @keyframes fadeUp { from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);} }
+        /* Grid Ringkasan Numerik */
+        .summary-grid { display:grid; grid-template-columns:repeat(2, 1fr); gap:16px; }
+        .summary-card { background:var(--white); border-radius:24px; padding:20px; border:1px solid var(--border); display:flex; flex-direction:column; gap:4px; box-shadow:0 10px 25px rgba(0,0,0,0.01); }
+        .card-label { font-size:13px; font-weight:600; color:var(--text-muted); }
+        .card-value { font-size:28px; font-weight:800; color:var(--text); }
+        
+        /* Progress Circle Card */
+        .progress-card { background:var(--white); border-radius:28px; padding:24px; border:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:20px; box-shadow:0 10px 25px rgba(0,0,0,0.01); }
+        .progress-info { display:flex; flex-direction:column; gap:6px; }
+        .progress-title { font-size:18px; font-weight:700; color:var(--text); }
+        .progress-sub { font-size:13px; color:var(--text-muted); font-weight:500; }
+        .circle-box { position:relative; width:90px; height:90px; display:flex; align-items:center; justify-content:center; }
+        .circle-svg { transform:rotate(-90deg); width:100%; height:100%; }
+        .circle-bg { fill:none; stroke:#f1f5f9; stroke-width:8; }
+        .circle-bar { fill:none; stroke:var(--purple); stroke-width:8; stroke-dasharray:251.2; stroke-dashoffset:251.2; stroke-linecap:round; transition:stroke-dashoffset 0.5s ease; }
+        .circle-text { position:absolute; font-size:16px; font-weight:800; color:var(--text); }
 
-        /* BANNER */
-        .stat-banner { background:linear-gradient(135deg,var(--purple) 0%,#6d28d9 60%,#4f46e5 100%); border-radius:24px; padding:24px 28px; color:white; margin-bottom:24px; display:flex; align-items:center; justify-content:space-between; overflow:hidden; position:relative; box-shadow:0 8px 24px rgba(139,92,246,0.3); animation:fadeUp 0.5s ease both; }
-        .stat-banner::before { content:''; position:absolute; top:-60px; right:-40px; width:200px; height:200px; border-radius:50%; background:rgba(255,255,255,0.08); }
-        .stat-banner-text h2 { font-size:22px; font-weight:700; margin-bottom:4px; }
-        .stat-banner-text p { font-size:13px; opacity:0.85; }
-        .stat-banner-icon { font-size:52px; position:relative; z-index:1; animation:float 3s infinite ease-in-out; }
-        @keyframes float { 0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);} }
+        /* Task Performance List Section */
+        .list-section { background:var(--white); border-radius:28px; border:1px solid var(--border); padding:24px; box-shadow:0 10px 25px rgba(0,0,0,0.01); display:flex; flex-direction:column; gap:16px; }
+        .section-header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; }
+        .section-title { font-size:16px; font-weight:700; color:var(--text); }
+        
+        .task-filter-chips { display:flex; gap:8px; }
+        .task-filter-chip { background:#f1f5f9; border:none; padding:6px 14px; font-size:12px; font-weight:600; color:var(--text-muted); border-radius:30px; cursor:pointer; transition:all 0.2s; }
+        .task-filter-chip.active { background:var(--purple-light); color:var(--purple); }
 
-        /* PERIOD FILTER */
-        .period-row { display:flex; gap:8px; margin-bottom:20px; animation:fadeUp 0.5s 0.05s ease both; flex-wrap:wrap; }
-        .period-btn { background:var(--white); padding:8px 20px; border-radius:40px; font-size:13px; font-weight:500; color:var(--text-muted); cursor:pointer; border:1px solid var(--border); transition:all 0.2s; }
-        .period-btn.active { background:var(--purple); color:white; border-color:var(--purple); box-shadow:0 2px 8px rgba(139,92,246,0.25); }
-        .period-btn:hover:not(.active) { background:var(--purple-light); color:var(--purple); }
+        .task-list { display:flex; flex-direction:column; gap:12px; max-height:350px; overflow-y:auto; padding-right:4px; }
+        .task-row { display:flex; align-items:center; justify-content:space-between; padding:14px 16px; background:#f8fafc; border-radius:16px; border:1px solid var(--border); }
+        .row-left { display:flex; align-items:center; gap:12px; min-width:0; }
+        .row-icon { width:36px; height:36px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+        .row-icon.done { background:#e6f4ea; color:var(--green); }
+        .row-icon.pending { background:#fef3c7; color:var(--amber); }
+        .row-meta { display:flex; flex-direction:column; gap:2px; min-width:0; }
+        .row-title { font-size:14px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .row-date { font-size:11px; color:var(--text-muted); }
+        .badge-status { font-size:11px; font-weight:700; padding:4px 10px; border-radius:20px; }
+        .badge-status.done { background:#e6f4ea; color:var(--green); }
+        .badge-status.pending { background:#fef3c7; color:var(--amber); }
 
-        /* SUMMARY CARDS */
-        .summary-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:20px; animation:fadeUp 0.5s 0.1s ease both; }
-        .sum-card { background:var(--white); border-radius:20px; padding:20px 16px; text-align:center; border:1px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,0.03); transition:transform 0.2s,box-shadow 0.2s; }
-        .sum-card:hover { transform:translateY(-4px); box-shadow:0 8px 20px rgba(0,0,0,0.08); }
-        .sum-emoji { font-size:26px; margin-bottom:8px; }
-        .sum-num { font-size:32px; font-weight:800; line-height:1; }
-        .sum-label { font-size:11px; color:var(--text-muted); margin-top:6px; font-weight:500; text-transform:uppercase; letter-spacing:0.5px; }
-        .sum-card.c1 .sum-num { color:var(--blue); }
-        .sum-card.c2 .sum-num { color:var(--green); }
-        .sum-card.c3 .sum-num { color:var(--orange); }
+        .empty-state { text-align:center; padding:40px 20px; color:var(--text-muted); font-size:14px; display:flex; flex-direction:column; align-items:center; gap:8px; }
+        .empty-state i { font-size:36px; color:#cbd5e1; }
 
-        /* CHART ROW */
-        .chart-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; animation:fadeUp 0.5s 0.15s ease both; }
-        .card { background:var(--white); border-radius:20px; padding:20px; border:1px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,0.03); }
-        .card-title { font-size:15px; font-weight:700; color:var(--text); margin-bottom:16px; display:flex; align-items:center; gap:8px; }
-        .card-title i { color:var(--purple); font-size:18px; }
-
-        /* DONUT */
-        .donut-wrap { display:flex; align-items:center; gap:20px; }
-        .donut-svg-wrap { position:relative; width:120px; height:120px; flex-shrink:0; }
-        .donut-svg-wrap svg { transform:rotate(-90deg); }
-        .donut-center { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none; }
-        .donut-pct { font-size:22px; font-weight:800; color:var(--purple); }
-        .donut-pct-label { font-size:10px; color:var(--text-muted); font-weight:500; }
-        .legend { display:flex; flex-direction:column; gap:8px; flex:1; }
-        .legend-item { display:flex; align-items:center; gap:8px; font-size:12px; }
-        .legend-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
-        .legend-name { color:var(--text); font-weight:500; flex:1; }
-        .legend-pct { color:var(--text-muted); font-size:11px; }
-        .legend-count { font-weight:700; color:var(--text); font-size:11px; margin-left:4px; }
-
-        /* BAR CHART */
-        .bar-chart { display:flex; flex-direction:column; gap:14px; }
-        .bar-row { display:flex; align-items:center; gap:10px; }
-        .bar-label { font-size:12px; color:var(--text-muted); width:72px; flex-shrink:0; text-align:right; font-weight:500; }
-        .bar-bg { flex:1; height:12px; background:#f1f5f9; border-radius:10px; overflow:hidden; }
-        .bar-fill { height:100%; border-radius:10px; transition:width 0.8s cubic-bezier(0.4,0,0.2,1); }
-        .bar-val { font-size:12px; font-weight:700; color:var(--text); width:24px; text-align:left; }
-
-        /* COMPLETION RATE CARD */
-        .rate-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:20px; animation:fadeUp 0.5s 0.18s ease both; }
-        .rate-card { background:var(--white); border-radius:20px; padding:18px; border:1px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,0.03); }
-        .rate-card-header { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; color:var(--text-muted); margin-bottom:12px; }
-        .rate-card-header i { font-size:18px; color:var(--purple); }
-        .rate-progress-wrap { position:relative; height:8px; background:#f1f5f9; border-radius:10px; overflow:hidden; margin-bottom:8px; }
-        .rate-progress-fill { height:100%; border-radius:10px; transition:width 0.9s cubic-bezier(0.4,0,0.2,1); }
-        .rate-numbers { display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); }
-        .rate-big { font-size:28px; font-weight:800; }
-
-        /* TASK LIST */
-        .task-list-section { animation:fadeUp 0.5s 0.2s ease both; }
-        .task-list-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
-        .task-list-title { font-size:16px; font-weight:700; color:var(--text); display:flex; align-items:center; gap:8px; }
-        .task-list-title i { color:var(--purple); }
-        .task-filter-row { display:flex; gap:6px; }
-        .task-filter-chip { font-size:11px; padding:4px 12px; border-radius:20px; border:1px solid var(--border); cursor:pointer; background:var(--white); color:var(--text-muted); transition:all 0.2s; }
-        .task-filter-chip.active { background:var(--purple); color:white; border-color:var(--purple); }
-        .stat-task-item { background:var(--white); border-radius:16px; padding:14px 16px; display:flex; align-items:center; gap:12px; border:1px solid var(--border); margin-bottom:8px; transition:transform 0.2s,box-shadow 0.2s; animation:fadeUp 0.3s ease both; }
-        .stat-task-item:hover { transform:translateY(-2px); box-shadow:0 6px 16px rgba(0,0,0,0.06); }
-        .cat-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
-        .stat-task-body { flex:1; min-width:0; }
-        .stat-task-title { font-weight:500; font-size:14px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-        .stat-task-meta { font-size:11px; color:var(--text-muted); margin-top:3px; }
-        .stat-task-status { font-size:11px; font-weight:700; padding:4px 10px; border-radius:20px; white-space:nowrap; flex-shrink:0; }
-        .status-done { background:#d1fae5; color:#065f46; }
-        .status-pending { background:#fef3c7; color:#92400e; }
-        .empty-state { text-align:center; padding:48px 20px; color:var(--text-muted); background:var(--white); border-radius:20px; border:1px solid var(--border); }
-        .empty-state i { font-size:48px; opacity:0.4; margin-bottom:12px; display:block; }
-        .skeleton { background:linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:16px; }
-        @keyframes shimmer { 0%{background-position:200% 0}100%{background-position:-200% 0} }
-
-        /* BOTTOM NAV */
-        .bottom-nav { display:none; background:var(--white); border-top:1px solid var(--border); position:fixed; bottom:0; left:0; right:0; z-index:200; padding:8px 12px 16px; justify-content:space-around; box-shadow:0 -4px 16px rgba(0,0,0,0.06); }
-        .bnav-item { display:flex; flex-direction:column; align-items:center; gap:3px; font-size:10px; color:#94a3b8; cursor:pointer; padding:6px 12px; border-radius:16px; transition:all 0.2s; flex:1; }
-        .bnav-item i { font-size:22px; }
-        .bnav-item.active { color:var(--purple); background:var(--purple-light); }
-        .bnav-item:hover:not(.active) { color:var(--purple); }
-
-        @media (max-width:900px) {
-            .sidebar { transform:translateX(-100%); width:var(--sidebar-w) !important; box-shadow:none; }
-            .sidebar.mobile-open { transform:translateX(0); box-shadow:4px 0 30px rgba(0,0,0,0.15); }
-            .main { margin-left:0 !important; padding-bottom:80px; }
-            .topbar-mobile-toggle { display:flex !important; }
-            .bottom-nav { display:flex; }
-            .chart-row { grid-template-columns:1fr; }
-            .rate-row { grid-template-columns:1fr; }
-            .summary-grid { gap:8px; }
-            .page-content { padding:16px; }
-            .topbar { padding:0 16px; }
-        }
-        @media (max-width:480px) {
-            .sum-num { font-size:24px; }
-            .stat-banner { padding:18px; }
-            .stat-banner-icon { font-size:36px; }
+        @media(min-width: 600px) {
+            .summary-grid { grid-template-columns:repeat(4, 1fr); }
         }
 
         /* ========== DARK MODE CSS ========== */
@@ -236,351 +118,134 @@
     </style>
 </head>
 <body>
+
 <div class="bg-blob bg-blob-1"></div>
 <div class="bg-blob bg-blob-2"></div>
+
 <div class="layout">
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <div class="brand-wrap"><div class="brand-logo">R</div><div class="brand-name">RemindU</div></div>
-            <button class="toggle-btn" id="sidebarToggle"><i class="material-icons-round">chevron_left</i></button>
-        </div>
-        <div class="sidebar-user" id="sidebarUser">
-            <div class="sidebar-avatar" id="sidebarAvatar">A</div>
-            <div class="sidebar-user-info">
-                <div class="sidebar-user-name" id="sidebarName">User</div>
-                <div class="sidebar-user-email" id="sidebarEmail">user@email.com</div>
+    <main class="main-content">
+        <div class="container">
+            <div class="top-bar">
+                <button class="btn-back" id="backBtn">
+                    <i class="material-icons-round">arrow_back</i>
+                    <span data-i18n="statistic.btn_back">Kembali</span>
+                </button>
+                <h1 class="page-title" data-i18n="statistic.title">Statistik Aktivitas</h1>
             </div>
-        </div>
-        <nav class="sidebar-nav">
-            <div class="nav-label">Menu Utama</div>
-            <div class="nav-item" data-nav="home"><i class="material-icons-round">home</i><span class="nav-item-label">Beranda</span></div>
-            <div class="nav-item" data-nav="calendar"><i class="material-icons-round">calendar_month</i><span class="nav-item-label">Kalender</span></div>
-            <div class="nav-item" data-nav="notification"><i class="material-icons-round">notifications</i><span class="nav-item-label">Notifikasi</span><span class="nav-badge" id="notifBadge">0</span></div>
-            <div class="nav-label" style="margin-top:8px;">Lainnya</div>
-            <div class="nav-item" data-nav="ai"><i class="material-icons-round">auto_awesome</i><span class="nav-item-label">AI Motivasi</span></div>
-            <div class="nav-item active" data-nav="statistic"><i class="material-icons-round">bar_chart</i><span class="nav-item-label">Statistik</span></div>
-            <div class="nav-item" data-nav="settings"><i class="material-icons-round">settings</i><span class="nav-item-label">Pengaturan</span></div>
-        </nav>
-        <div class="sidebar-footer">
-            <div class="nav-item" id="sidebarLogout" style="color:#e53e3e;"><i class="material-icons-round">logout</i><span class="nav-item-label">Keluar</span></div>
-        </div>
-    </aside>
 
-    <main class="main" id="mainContent">
-        <header class="topbar">
-            <div class="topbar-left">
-                <button class="topbar-mobile-toggle" id="mobileMenuBtn"><i class="material-icons-round">menu</i></button>
-                <div>
-                    <div class="topbar-greeting" id="topbarGreeting">Statistik</div>
-                    <div class="topbar-date" id="topbarDate"></div>
+            <div class="period-selector">
+                <button class="period-btn active" data-period="all" data-i18n="statistic.period_all">Semua</button>
+                <button class="period-btn" data-period="today" data-i18n="statistic.period_today">Hari Ini</button>
+                <button class="period-btn" data-period="week" data-i18n="statistic.period_week">Minggu Ini</button>
+                <button class="period-btn" data-period="month" data-i18n="statistic.period_month">Bulan Ini</button>
+            </div>
+
+            <div class="progress-card">
+                <div class="progress-info">
+                    <span class="progress-title" data-i18n="statistic.completion_rate_title">Tingkat Penyelesaian</span>
+                    <span class="progress-sub" id="progressSubLabel">Menampilkan performa produktivitas total</span>
+                </div>
+                <div class="circle-box">
+                    <svg class="circle-svg">
+                        <circle class="circle-bg" cx="45" cy="45" r="40"></circle>
+                        <circle class="circle-bar" id="progressCircle" cx="45" cy="45" r="40"></circle>
+                    </svg>
+                    <div class="circle-text" id="progressText">0%</div>
                 </div>
             </div>
-            <div class="topbar-right">
-                <button class="topbar-icon-btn" id="topbarNotif"><i class="material-icons-round">notifications_none</i><span class="notif-dot" id="notifDot" style="display:none;"></span></button>
-                <div class="topbar-avatar relative" id="topbarAvatar">
-                    <span id="topbarAvatarChar">A</span>
-                    <div class="dropdown" id="dropdown">
-                        <div class="dd-item" id="ddProfile"><i class="material-icons-round">person</i> Profil</div>
-                        <div class="dd-item danger" id="ddLogout"><i class="material-icons-round">logout</i> Keluar</div>
-                    </div>
-                </div>
-            </div>
-        </header>
 
-        <div class="page-content">
-            <!-- BANNER -->
-            <div class="stat-banner">
-                <div class="stat-banner-text">
-                    <h2>Statistik Task</h2>
-                    <p>Pantau produktivitas & progres tugas kamu secara detail.</p>
-                </div>
-                <div class="stat-banner-icon">📊</div>
-            </div>
-
-            <!-- PERIOD FILTER -->
-            <div class="period-row">
-                <div class="period-btn active" data-period="week">Minggu Ini</div>
-                <div class="period-btn" data-period="month">Bulan Ini</div>
-                <div class="period-btn" data-period="all">Semua Waktu</div>
-            </div>
-
-            <!-- SUMMARY -->
             <div class="summary-grid">
-                <div class="sum-card c1">
-                    <div class="sum-emoji">📌</div>
-                    <div class="sum-num" id="totalTasks">–</div>
-                    <div class="sum-label">Total Task</div>
+                <div class="summary-card">
+                    <span class="card-label" data-i18n="statistic.label_total">Total Tugas</span>
+                    <span class="card-value" id="valTotal">0</span>
                 </div>
-                <div class="sum-card c2">
-                    <div class="sum-emoji">✅</div>
-                    <div class="sum-num" id="completedTasks">–</div>
-                    <div class="sum-label">Selesai</div>
+                <div class="summary-card">
+                    <span class="card-label" data-i18n="statistic.label_completed">Selesai</span>
+                    <span class="card-value" id="valDone" style="color:var(--green)">0</span>
                 </div>
-                <div class="sum-card c3">
-                    <div class="sum-emoji">⏳</div>
-                    <div class="sum-num" id="pendingTasks">–</div>
-                    <div class="sum-label">Tertunda</div>
+                <div class="summary-card">
+                    <span class="card-label" data-i18n="statistic.label_pending">Tertunda</span>
+                    <span class="card-value" id="valPending" style="color:var(--amber)">0</span>
                 </div>
-            </div>
-
-            <!-- CHARTS -->
-            <div class="chart-row">
-                <div class="card">
-                    <div class="card-title"><i class="material-icons-round">donut_large</i> Distribusi Kategori</div>
-                    <div class="donut-wrap">
-                        <div class="donut-svg-wrap">
-                            <svg width="120" height="120" viewBox="0 0 120 120" id="donutSvg">
-                                <circle cx="60" cy="60" r="46" fill="none" stroke="#f1f5f9" stroke-width="16"/>
-                            </svg>
-                            <div class="donut-center">
-                                <div class="donut-pct" id="donutPct">0%</div>
-                                <div class="donut-pct-label">selesai</div>
-                            </div>
-                        </div>
-                        <div class="legend" id="donutLegend">
-                            <div class="skeleton" style="height:18px;width:120px;border-radius:9px;"></div>
-                            <div class="skeleton" style="height:18px;width:100px;border-radius:9px;"></div>
-                            <div class="skeleton" style="height:18px;width:80px;border-radius:9px;"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-title"><i class="material-icons-round">bar_chart</i> Task per Kategori</div>
-                    <div class="bar-chart" id="barChart">
-                        <div class="skeleton" style="height:14px;border-radius:7px;"></div>
-                        <div class="skeleton" style="height:14px;width:80%;border-radius:7px;"></div>
-                        <div class="skeleton" style="height:14px;width:60%;border-radius:7px;"></div>
-                    </div>
+                <div class="summary-card">
+                    <span class="card-label" data-i18n="statistic.label_efficiency">Efisiensi</span>
+                    <span class="card-value" id="valEfficiency" style="color:var(--purple)">0%</span>
                 </div>
             </div>
 
-            <!-- COMPLETION RATE -->
-            <div class="rate-row">
-                <div class="rate-card">
-                    <div class="rate-card-header"><i class="material-icons-round">trending_up</i> Tingkat Penyelesaian</div>
-                    <div class="rate-big" id="rateNum" style="color:var(--purple);">0%</div>
-                    <div class="rate-progress-wrap" style="margin-top:10px;">
-                        <div class="rate-progress-fill" id="rateFill" style="background:var(--purple);width:0%;"></div>
-                    </div>
-                    <div class="rate-numbers">
-                        <span id="rateDone">0 selesai</span>
-                        <span id="rateTotal">dari 0 task</span>
+            <div class="list-section">
+                <div class="section-header">
+                    <span class="section-title" data-i18n="statistic.section_task_performance">Riwayat Performa Tugas</span>
+                    <div class="task-filter-chips">
+                        <button class="task-filter-chip active" data-tf="all" data-i18n="statistic.filter_all">Semua</button>
+                        <button class="task-filter-chip" data-tf="done" data-i18n="statistic.filter_done">Selesai</button>
+                        <button class="task-filter-chip" data-tf="pending" data-i18n="statistic.filter_pending">Belum</button>
                     </div>
                 </div>
-                <div class="rate-card">
-                    <div class="rate-card-header"><i class="material-icons-round">schedule</i> Task Mendekati Deadline</div>
-                    <div class="rate-big" id="nearDeadlineNum" style="color:var(--orange);">0</div>
-                    <div style="font-size:12px;color:var(--text-muted);margin-top:8px;">task jatuh tempo dalam 3 hari ke depan</div>
-                    <div style="margin-top:10px;" id="nearDeadlineList"></div>
-                </div>
+                <div class="task-list" id="taskListContainer">
+                    </div>
             </div>
 
-            <!-- TASK LIST -->
-            <div class="task-list-section">
-                <div class="task-list-header">
-                    <div class="task-list-title"><i class="material-icons-round">list_alt</i> Daftar Task</div>
-                    <div class="task-filter-row">
-                        <div class="task-filter-chip active" data-tf="all">Semua</div>
-                        <div class="task-filter-chip" data-tf="pending">Tertunda</div>
-                        <div class="task-filter-chip" data-tf="done">Selesai</div>
-                    </div>
-                </div>
-                <div id="taskListStat">
-                    <div class="skeleton" style="height:64px;margin-bottom:8px;border-radius:16px;"></div>
-                    <div class="skeleton" style="height:64px;margin-bottom:8px;border-radius:16px;opacity:0.7;"></div>
-                    <div class="skeleton" style="height:64px;border-radius:16px;opacity:0.4;"></div>
-                </div>
-            </div>
         </div>
     </main>
-
-    <nav class="bottom-nav">
-        <div class="bnav-item" data-nav="home"><i class="material-icons-round">home</i><span>Home</span></div>
-        <div class="bnav-item" data-nav="calendar"><i class="material-icons-round">calendar_month</i><span>Kalender</span></div>
-        <div class="bnav-item" data-nav="notification"><i class="material-icons-round">notifications</i><span>Notif</span></div>
-        <div class="bnav-item active" data-nav="statistic"><i class="material-icons-round">bar_chart</i><span>Statistik</span></div>
-    </nav>
 </div>
 
 <script>
-(function () {
+(() => {
     const API_URL = 'http://localhost:3000/api';
     const userData = JSON.parse(localStorage.getItem('remindu_user') || '{}');
     const userEmail = userData.email;
-    if (!userEmail) { window.location.href = 'welcome.html'; return; }
-    const firstName = userEmail.split('@')[0];
-    const displayName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
 
-    // --- Avatar ---
-    function setAvatar() {
-        const s = localStorage.getItem('user_avatar');
-        const sa = document.getElementById('sidebarAvatar');
-        const tc = document.getElementById('topbarAvatarChar');
-        const ta = document.getElementById('topbarAvatar');
-        if (!s) {
-            const d = userEmail.charAt(0).toUpperCase();
-            sa.textContent = d; tc.textContent = d;
-        } else if (s.startsWith('data:image')) {
-            sa.textContent = ''; sa.style.backgroundImage = `url(${s})`; sa.style.backgroundSize = 'cover';
-            tc.textContent = ''; ta.style.backgroundImage = `url(${s})`; ta.style.backgroundSize = 'cover';
-        } else {
-            sa.textContent = s; tc.textContent = s;
-        }
+    if (!userEmail) {
+        window.location.href = 'welcome.html';
+        return;
     }
-    setAvatar();
-    document.getElementById('sidebarName').textContent = displayName;
-    document.getElementById('sidebarEmail').textContent = userEmail;
-    document.getElementById('topbarGreeting').textContent = `Statistik — ${displayName}`;
-    document.getElementById('topbarDate').textContent = new Date().toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-
-    // --- Sidebar ---
-    const sidebar = document.getElementById('sidebar');
-    const main = document.getElementById('mainContent');
-    const overlay = document.getElementById('sidebarOverlay');
-    let collapsed = localStorage.getItem('sidebar_collapsed') === 'true';
-    if (collapsed) { sidebar.classList.add('collapsed'); main.classList.add('expanded'); }
-    document.getElementById('sidebarToggle').addEventListener('click', () => {
-        collapsed = !collapsed; localStorage.setItem('sidebar_collapsed', collapsed);
-        sidebar.classList.toggle('collapsed', collapsed); main.classList.toggle('expanded', collapsed);
-    });
-    const mobileBtn = document.getElementById('mobileMenuBtn');
-    function checkMobile() { mobileBtn.style.display = window.innerWidth <= 900 ? 'flex' : 'none'; }
-    checkMobile(); window.addEventListener('resize', checkMobile);
-    mobileBtn.addEventListener('click', () => { sidebar.classList.toggle('mobile-open'); overlay.classList.toggle('show'); });
-    overlay.addEventListener('click', () => { sidebar.classList.remove('mobile-open'); overlay.classList.remove('show'); });
-
-    // --- Nav ---
-    const navMap = { home:'home.html', calendar:'calendar.html', notification:'notification.html', settings:'settings.html', ai:'ai-motivation.html', statistic:null };
-    document.querySelectorAll('[data-nav]').forEach(el => el.addEventListener('click', () => { const u = navMap[el.dataset.nav]; if (u) window.location.href = u; }));
-    document.getElementById('topbarAvatar').addEventListener('click', e => { e.stopPropagation(); document.getElementById('dropdown').classList.toggle('show'); });
-    document.addEventListener('click', () => document.getElementById('dropdown').classList.remove('show'));
-    document.getElementById('ddProfile').addEventListener('click', () => window.location.href = 'profil.html');
-    document.getElementById('ddLogout').addEventListener('click', () => { localStorage.removeItem('remindu_user'); window.location.href = 'welcome.html'; });
-    document.getElementById('sidebarLogout').addEventListener('click', () => { localStorage.removeItem('remindu_user'); window.location.href = 'welcome.html'; });
-    document.getElementById('sidebarUser').addEventListener('click', () => window.location.href = 'profil.html');
-    document.getElementById('topbarNotif').addEventListener('click', () => window.location.href = 'notification.html');
-
-    // ===== DATA & RENDER =====
-    const CAT_COLORS  = { study:'#3b82f6', personal:'#f97316', health:'#10b981', work:'#f59e0b' };
-    const CAT_LABELS  = { study:'📚 Study', personal:'🧑 Personal', health:'💪 Health', work:'💼 Work' };
-    const CATS = ['study', 'personal', 'health', 'work'];
 
     let allTasks = [];
-    let currentPeriod = 'week';
-    let currentTaskFilter = 'all';
+    let currentPeriod = 'all'; // all, today, week, month
+    let currentTaskFilter = 'all'; // all, done, pending
 
-    // --- Load ---
+    document.getElementById('backBtn').addEventListener('click', () => {
+        window.location.href = 'profil.html';
+    });
+
+    // Ambil Data Task dari Backend API
     async function loadTasks() {
         try {
             const res = await fetch(`${API_URL}/tasks`, { headers: { 'X-User-Email': userEmail } });
             if (!res.ok) throw new Error();
             allTasks = await res.json();
-        } catch { allTasks = []; }
-        renderAll();
-        loadNotifCount();
+            renderAll();
+        } catch (err) {
+            console.error('Gagal memuat statistik data task:', err);
+            renderEmptyState();
+        }
     }
 
-    // --- Filter by period ---
+    // Filter berdasarkan periode waktu penanda jatuh tempo (due_date)
     function filterByPeriod(tasks) {
-        if (currentPeriod === 'all') return tasks;
         const now = new Date();
-        if (currentPeriod === 'week') {
-            const weekAgo = new Date(now.getTime() - 7 * 86400000);
-            return tasks.filter(t => new Date(t.dibuat_pada || now) >= weekAgo);
-        }
-        if (currentPeriod === 'month') {
-            return tasks.filter(t => {
-                const d = new Date(t.dibuat_pada || now);
-                return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-            });
-        }
-        return tasks;
-    }
-
-    // --- Render All ---
-    function renderAll() {
-        const tasks = filterByPeriod(allTasks);
-        const total = tasks.length;
-        const completed = tasks.filter(t => t.selesai).length;
-        const pending = total - completed;
-        const pct = total === 0 ? 0 : Math.round((completed / total) * 100);
-
-        // Summary cards — animate count up
-        animateCount('totalTasks', total);
-        animateCount('completedTasks', completed);
-        animateCount('pendingTasks', pending);
-
-        renderDonut(tasks, pct);
-        renderBarChart(tasks);
-        renderRateCard(tasks, total, completed, pct);
-        renderNearDeadline(tasks);
-        renderTaskList(tasks);
-    }
-
-    function animateCount(id, target) {
-        const el = document.getElementById(id);
-        let cur = 0;
-        const step = Math.max(1, Math.ceil(target / 20));
-        const timer = setInterval(() => {
-            cur = Math.min(cur + step, target);
-            el.textContent = cur;
-            if (cur >= target) clearInterval(timer);
-        }, 30);
-    }
-
-    // --- Donut Chart ---
-    function renderDonut(tasks, pct) {
-        document.getElementById('donutPct').textContent = pct + '%';
-        const svg = document.getElementById('donutSvg');
-        [...svg.querySelectorAll('.seg')].forEach(el => el.remove());
-        const legend = document.getElementById('donutLegend');
-        legend.innerHTML = '';
-
-        const total = tasks.length;
-        const r = 46, cx = 60, cy = 60;
-        const circ = 2 * Math.PI * r;
-        let usedCats = 0;
-
-        if (total === 0) {
-            // Empty donut
-            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            circle.setAttribute('class', 'seg');
-            circle.setAttribute('cx', cx); circle.setAttribute('cy', cy); circle.setAttribute('r', r);
-            circle.setAttribute('fill', 'none'); circle.setAttribute('stroke', '#e2e8f0'); circle.setAttribute('stroke-width', '16');
-            svg.appendChild(circle);
-            legend.innerHTML = '<div style="color:#94a3b8;font-size:13px;padding:8px 0;">Belum ada task</div>';
-            return;
-        }
-
-        let offset = 0;
-        CATS.forEach(cat => {
-            const count = tasks.filter(t => t.kategori === cat).length;
-            if (count === 0) return;
-            usedCats++;
-            const fraction = count / total;
-            const dash = fraction * circ;
-            const gap = circ - dash;
-            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            circle.setAttribute('class', 'seg');
-            circle.setAttribute('cx', cx); circle.setAttribute('cy', cy); circle.setAttribute('r', r);
-            circle.setAttribute('fill', 'none');
-            circle.setAttribute('stroke', CAT_COLORS[cat]);
-            circle.setAttribute('stroke-width', '16');
-            circle.setAttribute('stroke-dasharray', `${dash} ${gap}`);
-            circle.setAttribute('stroke-dashoffset', -(offset * circ));
-            circle.style.transition = 'stroke-dasharray 0.6s ease';
-            svg.appendChild(circle);
-            offset += fraction;
-
-            const li = document.createElement('div');
-            li.className = 'legend-item';
-            li.innerHTML = `<div class="legend-dot" style="background:${CAT_COLORS[cat]}"></div><span class="legend-name">${CAT_LABELS[cat]}</span><span class="legend-count">${count}</span><span class="legend-pct">(${Math.round(fraction * 100)}%)</span>`;
-            legend.appendChild(li);
+        return tasks.filter(task => {
+            if (currentPeriod === 'all') return true;
+            if (!task.due_date) return false;
+            
+            const dDate = new Date(task.due_date);
+            if (currentPeriod === 'today') {
+                return dDate.toDateString() === now.toDateString();
+            }
+            if (currentPeriod === 'week') {
+                const oneWeekAgo = new Date();
+                oneWeekAgo.setDate(now.getDate() - 7);
+                return dDate >= oneWeekAgo && dDate <= now;
+            }
+            if (currentPeriod === 'month') {
+                return dDate.getMonth() === now.getMonth() && dDate.getFullYear() === now.getFullYear();
+            }
+            return true;
         });
     }
 
+<<<<<<< HEAD
     // --- Bar Chart ---
     function renderBarChart(tasks) {
         const container = document.getElementById('barChart');
@@ -588,93 +253,111 @@
         const counts = {};
         CATS.forEach(cat => { counts[cat] = tasks.filter(t => t.kategori === cat).length; });
         const maxVal = Math.max(...Object.values(counts), 1);
+=======
+    // Hitung angka metrik & ubah UI
+    function renderAll() {
+        const filtered = filterByPeriod(allTasks);
+        
+        const total = filtered.length;
+        const done = filtered.filter(t => t.selesai).length;
+        const pending = total - done;
+        const rate = total > 0 ? Math.round((done / total) * 100) : 0;
+>>>>>>> bfc64c1 (clean: remove node_modules from tracking)
 
-        CATS.forEach(cat => {
-            const cnt = counts[cat];
-            const pct = Math.round((cnt / maxVal) * 100);
-            const row = document.createElement('div');
-            row.className = 'bar-row';
-            row.innerHTML = `
-                <div class="bar-label">${cat.charAt(0).toUpperCase() + cat.slice(1)}</div>
-                <div class="bar-bg">
-                    <div class="bar-fill" style="background:${CAT_COLORS[cat]};width:0%;" data-target="${pct}"></div>
-                </div>
-                <div class="bar-val">${cnt}</div>`;
-            container.appendChild(row);
-        });
-        // Animate bars
-        requestAnimationFrame(() => {
-            container.querySelectorAll('.bar-fill').forEach(fill => {
-                fill.style.width = fill.dataset.target + '%';
-            });
-        });
+        // Render Angka ke Dom Komponen Card
+        document.getElementById('valTotal').textContent = total;
+        document.getElementById('valDone').textContent = done;
+        document.getElementById('valPending').textContent = pending;
+        document.getElementById('valEfficiency').textContent = rate + '%';
+
+        // Render Animasi Svg Lingkaran Progres Ring
+        document.getElementById('progressText').textContent = rate + '%';
+        const circle = document.getElementById('progressCircle');
+        const radius = circle.r.baseVal.value;
+        const circumference = 2 * Math.PI * radius;
+        circle.style.strokeDasharray = `${circumference} ${circumference}`;
+        const offset = circumference - (rate / 100) * circumference;
+        circle.style.strokeDashoffset = offset;
+
+        // Pembaruan teks deskripsi penjelas sub label secara dinamis multi-bahasa
+        updateSubLabelText(total);
+
+        // Teruskan render list tugas terbawah
+        renderTaskList(filtered);
     }
 
-    // --- Rate Card ---
-    function renderRateCard(tasks, total, completed, pct) {
-        document.getElementById('rateNum').textContent = pct + '%';
-        document.getElementById('rateDone').textContent = `${completed} selesai`;
-        document.getElementById('rateTotal').textContent = `dari ${total} task`;
-        requestAnimationFrame(() => {
-            document.getElementById('rateFill').style.width = pct + '%';
-        });
-    }
+    function updateSubLabelText(count) {
+        const subLabel = document.getElementById('progressSubLabel');
+        if (!subLabel) return;
 
-    // --- Near Deadline ---
-    function renderNearDeadline(tasks) {
-        const now = Date.now();
-        const near = tasks.filter(t => !t.selesai && t.due_date && (new Date(t.due_date) - now) < 86400000 * 3 && (new Date(t.due_date) - now) > 0);
-        document.getElementById('nearDeadlineNum').textContent = near.length;
-        const list = document.getElementById('nearDeadlineList');
-        list.innerHTML = '';
-        near.slice(0, 3).forEach(t => {
-            const diff = new Date(t.due_date) - now;
-            const hours = Math.floor(diff / 3600000);
-            const label = hours < 24 ? `${hours} jam lagi` : `${Math.floor(diff / 86400000)} hari lagi`;
-            const div = document.createElement('div');
-            div.style.cssText = 'font-size:11px;color:var(--text-muted);padding:4px 0;border-bottom:1px solid var(--border);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
-            div.innerHTML = `<span style="color:var(--orange);font-weight:600;">⚡ ${label}</span> — ${t.judul}`;
-            list.appendChild(div);
-        });
-        if (near.length === 0) {
-            list.innerHTML = '<div style="font-size:11px;color:#10b981;font-weight:600;">✅ Semua aman, tidak ada yang mepet</div>';
+        if (window.t) {
+            subLabel.textContent = window.t(`statistic.desc_period_${currentPeriod}`, { count: count }) || `Menampilkan performa produktivitas`;
+        } else {
+            // Fallback manual bahasa Indonesia default jika lang.js tidak tersedia
+            const periodNames = { all: 'total', today: 'hari ini', week: 'minggu ini', month: 'bulan ini' };
+            subLabel.textContent = `Menampilkan performa produktivitas ${periodNames[currentPeriod]} (${count} tugas ditemukan)`;
         }
     }
 
-    // --- Task List ---
+    // Render baris list tugas performa
     function renderTaskList(tasks) {
-        const container = document.getElementById('taskListStat');
-        let filtered = tasks;
-        if (currentTaskFilter === 'done') filtered = tasks.filter(t => t.selesai);
-        if (currentTaskFilter === 'pending') filtered = tasks.filter(t => !t.selesai);
+        const container = document.getElementById('taskListContainer');
+        container.innerHTML = '';
 
-        if (filtered.length === 0) {
-            container.innerHTML = `<div class="empty-state"><i class="material-icons-round">assignment_turned_in</i><p>Tidak ada task di periode & filter ini.</p></div>`;
+        // Terapkan filter sekunder status baris (Semua / Selesai / Belum)
+        let displayTasks = tasks;
+        if (currentTaskFilter === 'done') displayTasks = tasks.filter(t => t.selesai);
+        if (currentTaskFilter === 'pending') displayTasks = tasks.filter(t => !t.selesai);
+
+        if (displayTasks.length === 0) {
+            renderEmptyState();
             return;
         }
-        const sorted = [...filtered].sort((a, b) => {
-            // Pending first, then by due_date
-            if (a.selesai !== b.selesai) return a.selesai ? 1 : -1;
-            return new Date(a.due_date || '9999') - new Date(b.due_date || '9999');
-        });
-        container.innerHTML = sorted.map((t, i) => {
-            const due = t.due_date
-                ? new Date(t.due_date).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' })
-                : 'Tanpa deadline';
-            const isNear = !t.selesai && t.due_date && (new Date(t.due_date) - Date.now()) < 86400000 * 3 && (new Date(t.due_date) - Date.now()) > 0;
-            return `
-            <div class="stat-task-item" style="animation-delay:${i * 0.03}s;">
-                <div class="cat-dot" style="background:${CAT_COLORS[t.kategori] || '#8b5cf6'}"></div>
-                <div class="stat-task-body">
-                    <div class="stat-task-title">${t.judul}</div>
-                    <div class="stat-task-meta">📅 ${due}${isNear ? ' ⚡' : ''} · ${CAT_LABELS[t.kategori] || t.kategori}</div>
+
+        displayTasks.forEach(task => {
+            const row = document.createElement('div');
+            row.className = 'task-row';
+
+            const dateStr = task.due_date ? new Date(task.due_date).toLocaleDateString(localStorage.getItem('remindu_lang') || 'id', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '-';
+            const isDone = task.selesai;
+            
+            const statusText = isDone 
+                ? (window.t ? window.t('statistic.status_done') : 'Selesai') 
+                : (window.t ? window.t('statistic.status_pending') : 'Tertunda');
+
+            row.innerHTML = `
+                <div class="row-left">
+                    <div class="row-icon ${isDone ? 'done' : 'pending'}">
+                        <i class="material-icons-round">${isDone ? 'task_alt' : 'radio_button_unchecked'}</i>
+                    </div>
+                    <div class="row-meta">
+                        <span class="row-title">${escapeHtml(task.judul)}</span>
+                        <span class="row-date">${dateStr}</span>
+                    </div>
                 </div>
-                <span class="stat-task-status ${t.selesai ? 'status-done' : 'status-pending'}">${t.selesai ? '✅ Selesai' : '⏳ Tertunda'}</span>
-            </div>`;
-        }).join('');
+                <span class="badge-status ${isDone ? 'done' : 'pending'}">${statusText}</span>
+            `;
+            container.appendChild(row);
+        });
     }
 
-    // --- Period filter ---
+    function renderEmptyState() {
+        const container = document.getElementById('taskListContainer');
+        const txtEmpty = window.t ? window.t('statistic.empty_tasks') : 'Tidak ada catatan tugas pada periode ini';
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="material-icons-round">analytics</i>
+                <span>${txtEmpty}</span>
+            </div>
+        `;
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
+    }
+
+    // --- Pemilih Filter Periode Atas ---
     document.querySelectorAll('.period-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
@@ -684,7 +367,7 @@
         });
     });
 
-    // --- Task filter ---
+    // --- Pemilih Filter Baris Status Bawah ---
     document.querySelectorAll('.task-filter-chip').forEach(chip => {
         chip.addEventListener('click', () => {
             document.querySelectorAll('.task-filter-chip').forEach(c => c.classList.remove('active'));
@@ -694,26 +377,12 @@
         });
     });
 
-    // --- Notif badge ---
-    async function loadNotifCount() {
-        try {
-            const res = await fetch(`${API_URL}/notifications`, { headers: { 'X-User-Email': userEmail } });
-            if (!res.ok) throw new Error();
-            const data = await res.json();
-            const unread = data.filter(n => !n.status_baca).length;
-            document.getElementById('notifBadge').textContent = unread > 0 ? unread : '0';
-            document.getElementById('notifDot').style.display = unread > 0 ? 'block' : 'none';
-        } catch {
-            // Fallback: count unfinished tasks as badge
-            const unfinished = allTasks.filter(t => !t.selesai).length;
-            document.getElementById('notifBadge').textContent = unfinished;
-        }
-    }
-
+    // Muat data awal halaman
     loadTasks();
 })();
 </script>
 
+<<<<<<< HEAD
 <button id="darkFab" style="position:fixed;bottom:88px;right:18px;z-index:9999;width:44px;height:44px;border-radius:50%;border:none;background:var(--purple);color:white;font-size:20px;cursor:pointer;box-shadow:0 4px 14px rgba(139,92,246,0.35);display:flex;align-items:center;justify-content:center;">🌙</button>
 <script>
 (function(){
@@ -726,6 +395,13 @@
         fab.textContent = next === 'dark' ? '☀️' : '🌙';
     });
 })();
+=======
+<script src="lang.js"></script>
+<script>
+    if (typeof applyLang === 'function') {
+        applyLang();
+    }
+>>>>>>> bfc64c1 (clean: remove node_modules from tracking)
 </script>
 </body>
 </html>

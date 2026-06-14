@@ -32,313 +32,202 @@
         .bg-blob-2 { width: 300px; height: 300px; background: #ec4899; bottom: -80px; left: -80px; }
 
         .container {
-            max-width: 600px;
             width: 100%;
+            max-width: 550px;
             background: var(--white);
-            border-radius: 36px;
-            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1);
-            overflow: hidden;
+            border-radius: 32px;
+            padding: 32px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.03);
+            border: 1px solid var(--border);
             position: relative;
             z-index: 10;
         }
-        .page-content { padding: 28px 24px 36px; }
 
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 28px;
-        }
+        .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
         .btn-back {
-            background: none;
-            border: none;
-            font-size: 16px;
-            font-weight: 500;
-            color: var(--purple);
-            cursor: pointer;
-            padding: 8px 12px;
-            border-radius: 30px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            background: none; border: none; font-size: 14px; font-weight: 600; color: var(--purple);
+            cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 6px 12px; border-radius: 12px;
             transition: background 0.2s;
         }
         .btn-back:hover { background: var(--purple-light); }
-        h2 {
-            font-size: 22px;
-            font-weight: 600;
-            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        .btn-save {
-            background: var(--purple);
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 30px;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.2s;
-        }
-        .btn-save:hover { background: var(--purple-dark); transform: translateY(-1px); }
+        .page-title { font-size: 20px; font-weight: 800; color: var(--text); }
 
-        .section-label {
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            letter-spacing: 1px;
-            margin: 20px 0 12px;
-        }
+        .form-section { margin-bottom: 24px; }
+        .section-title { font-size: 14px; font-weight: 700; color: var(--text-muted); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        .form-group { margin-bottom: 18px; }
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-        }
-        .input-wrapper { position: relative; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+        .form-group label { font-size: 13px; font-weight: 600; color: #475569; padding-left: 4px; }
+        .input-wrapper { position: relative; display: flex; align-items: center; }
+        .input-wrapper i { position: absolute; left: 14px; color: #94a3b8; font-size: 20px; }
         .input-wrapper input {
-            width: 100%;
-            border: 1px solid var(--border);
-            border-radius: 28px;
-            padding: 12px 45px 12px 18px;
-            font-size: 15px;
-            outline: none;
-            background: #f8fafc;
-            color: var(--text);
-            transition: border-color 0.2s, background 0.2s;
+            width: 100%; padding: 12px 14px 12px 44px; border-radius: 14px; border: 1px solid #e2e8f0;
+            font-size: 14px; color: var(--text); outline: none; background: #f8fafc; transition: all 0.2s;
         }
-        .input-wrapper input:focus { border-color: var(--purple); background: white; }
-        .input-wrapper input[readonly] { cursor: default; color: var(--text-muted); }
-        .input-wrapper i {
-            position: absolute;
-            right: 18px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 20px;
-            pointer-events: none;
+        .input-wrapper input:focus { border-color: var(--purple); background: white; box-shadow: 0 0 0 4px rgba(139,92,246,0.1); }
+
+        .btn-save {
+            width: 100%; background: linear-gradient(135deg, var(--purple-dark), var(--purple)); color: white;
+            border: none; padding: 14px; border-radius: 14px; font-size: 14px; font-weight: 700; cursor: pointer;
+            box-shadow: 0 6px 20px rgba(139,92,246,0.25); transition: all 0.2s; display: flex; align-items: center;
+            justify-content: center; gap: 8px; margin-top: 8px;
         }
-        .input-wrapper .eye-btn {
-            position: absolute;
-            right: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-        }
-        .input-wrapper .eye-btn:hover { color: var(--purple); }
+        .btn-save:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(139,92,246,0.35); }
 
-        .masked-email {
-            font-weight: 600;
-            color: var(--text);
-            font-size: 15px;
-        }
-
-        hr { margin: 24px 0; border: none; border-top: 1px solid var(--border); }
-
-        .hint { font-size: 12px; color: #94a3b8; margin-top: 6px; padding-left: 8px; }
-
+        /* Toast Notification */
         .toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(80px);
-            background: #1e293b;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 40px;
-            font-size: 14px;
-            font-weight: 500;
-            z-index: 9999;
-            transition: transform 0.3s ease;
-            white-space: nowrap;
+            position: fixed; bottom: -60px; left: 50%; transform: translateX(-50%); background: #0f172a; color: white;
+            padding: 12px 24px; border-radius: 30px; font-size: 13px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 1000;
         }
-        .toast.show { transform: translateX(-50%) translateY(0); }
-
-        @media (min-width: 768px) {
-            .page-content { padding: 40px 48px; }
-        }
+        .toast.show { bottom: 30px; }
+        .toast.error { background: #ef4444; }
     </style>
 </head>
 <body>
+
 <div class="bg-blob bg-blob-1"></div>
 <div class="bg-blob bg-blob-2"></div>
 
 <div class="container">
-    <div class="page-content">
-        <div class="header">
-            <button class="btn-back" id="backBtn">
-                <i class="material-icons-round" style="font-size:18px;">arrow_back</i> Back
-            </button>
-            <h2>Privacy</h2>
-            <button class="btn-save" id="saveBtn">Save</button>
+    <div class="header">
+        <button class="btn-back" id="backBtn">
+            <i class="material-icons-round">arrow_back</i>
+            <span data-i18n="privacy.btn_back">Kembali</span>
+        </button>
+        <h1 class="page-title" data-i18n="privacy.title">Privasi & Keamanan</h1>
+        <div style="width: 80px;"></div> </div>
+
+    <form id="privacyForm">
+        <div class="form-section">
+            <div class="section-title" data-i18n="privacy.section_verification">Verifikasi Identitas</div>
+            <div class="form-group">
+                <label data-i18n="privacy.label_current_password">Kata Sandi Saat Ini</label>
+                <div class="input-wrapper">
+                    <i class="material-icons-round">lock</i>
+                    <input type="password" id="currentPassword" data-i18n-placeholder="privacy.placeholder_current_password" placeholder="Wajib diisi jika mengubah sandi">
+                </div>
+            </div>
         </div>
 
-        <!-- Email Section -->
-        <div class="section-label">Akun Email</div>
-        <div class="form-group">
-            <label>Email Saat Ini</label>
-            <div class="input-wrapper">
-                <input type="text" id="currentEmailDisplay" readonly>
-                <i class="material-icons-round">email</i>
+        <div class="form-section">
+            <div class="section-title" data-i18n="privacy.section_change_password">Ubah Kata Sandi</div>
+            <div class="form-group">
+                <label data-i18n="privacy.label_new_password">Kata Sandi Baru</label>
+                <div class="input-wrapper">
+                    <i class="material-icons-round">lock_open</i>
+                    <input type="password" id="newPassword" data-i18n-placeholder="privacy.placeholder_new_password" placeholder="Masukkan kata sandi baru">
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            <label>Ganti Email (Opsional)</label>
-            <div class="input-wrapper">
-                <input type="email" id="newEmail" placeholder="Email baru (kosongkan jika tidak ingin ganti)">
-                <i class="material-icons-round">edit</i>
+            <div class="form-group">
+                <label data-i18n="privacy.label_confirm_password">Konfirmasi Kata Sandi Baru</label>
+                <div class="input-wrapper">
+                    <i class="material-icons-round">gpp_good</i>
+                    <input type="password" id="confirmPassword" data-i18n-placeholder="privacy.placeholder_confirm_password" placeholder="Ulangi kata sandi baru">
+                </div>
             </div>
-            <div class="hint">Email baru harus valid dan belum terdaftar.</div>
         </div>
 
-        <hr>
-
-        <!-- Password Section -->
-        <div class="section-label">Keamanan Password</div>
-        <div class="form-group">
-            <label>Password Saat Ini</label>
-            <div class="input-wrapper">
-                <input type="password" id="currentPassword" placeholder="Masukkan password saat ini">
-                <button class="eye-btn" onclick="togglePwd('currentPassword', this)">
-                    <i class="material-icons-round">visibility_off</i>
-                </button>
+        <div class="form-section">
+            <div class="section-title" data-i18n="privacy.section_account_info">Informasi Kontak</div>
+            <div class="form-group">
+                <label data-i18n="privacy.label_new_email">Ubah Alamat Email</label>
+                <div class="input-wrapper">
+                    <i class="material-icons-round">mail_outline</i>
+                    <input type="email" id="newEmail" data-i18n-placeholder="privacy.placeholder_new_email" placeholder="Masukkan email baru jika ingin mengubah">
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            <label>Password Baru (Opsional)</label>
-            <div class="input-wrapper">
-                <input type="password" id="newPassword" placeholder="Password baru">
-                <button class="eye-btn" onclick="togglePwd('newPassword', this)">
-                    <i class="material-icons-round">visibility_off</i>
-                </button>
+            <div class="form-group">
+                <label data-i18n="privacy.label_new_phone">Nomor Telepon</label>
+                <div class="input-wrapper">
+                    <i class="material-icons-round">phone</i>
+                    <input type="tel" id="newPhone" data-i18n-placeholder="privacy.placeholder_new_phone" placeholder="Contoh: 08123456789">
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            <label>Konfirmasi Password Baru</label>
-            <div class="input-wrapper">
-                <input type="password" id="confirmPassword" placeholder="Ulangi password baru">
-                <button class="eye-btn" onclick="togglePwd('confirmPassword', this)">
-                    <i class="material-icons-round">visibility_off</i>
-                </button>
-            </div>
-            <div class="hint">Password minimal 8 karakter, huruf kecil & angka.</div>
         </div>
 
-        <hr>
-
-        <!-- Phone Section -->
-        <div class="section-label">Nomor Telepon</div>
-        <div class="form-group">
-            <label>Nomor Telepon Saat Ini</label>
-            <div class="input-wrapper">
-                <input type="text" id="currentPhone" readonly placeholder="+62 (belum diatur)">
-                <i class="material-icons-round">phone</i>
-            </div>
-        </div>
-        <div class="form-group">
-            <label>Ganti Nomor (Opsional)</label>
-            <div class="input-wrapper">
-                <input type="tel" id="newPhone" placeholder="+62 8xx xxxx xxxx">
-                <i class="material-icons-round">edit</i>
-            </div>
-        </div>
-    </div>
+        <button type="submit" class="btn-save" id="saveBtn">
+            <i class="material-icons-round">save</i>
+            <span data-i18n="privacy.btn_save">Simpan Perubahan</span>
+        </button>
+    </form>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
     const API_URL = 'http://localhost:3000/api';
-    const userData = JSON.parse(localStorage.getItem('remindu_user') || '{}');
-    const userEmail = userData.email;
-    if (!userEmail) { alert('Sesi tidak ditemukan.'); window.location.href = 'welcome.html'; }
+    const userObj = JSON.parse(localStorage.getItem('remindu_user') || '{}');
+    const userEmail = userObj.email;
 
-    function maskEmail(email) {
-        const [local, domain] = email.split('@');
-        if (local.length <= 2) return email;
-        return local[0] + '*'.repeat(Math.min(local.length - 2, 6)) + local[local.length - 1] + '@' + domain;
+    if (!userEmail) {
+        window.location.href = 'welcome.html';
     }
 
-    function maskPhone(phone) {
-        if (!phone) return '';
-        return phone.slice(0, 4) + ' *** ' + phone.slice(-3);
+    function showToast(message, isError = false) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = 'toast show' + (isError ? ' error' : '');
+        setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    // Load profile data
-    async function loadProfile() {
-        try {
-            const res = await fetch(`${API_URL}/profile`, {
-                headers: { 'X-User-Email': userEmail }
-            });
-            if (!res.ok) throw new Error();
-            const data = await res.json();
-            document.getElementById('currentEmailDisplay').value = maskEmail(userEmail);
-            document.getElementById('currentPhone').value = data.nomor_telepon ? maskPhone(data.nomor_telepon) : '';
-        } catch {
-            document.getElementById('currentEmailDisplay').value = maskEmail(userEmail);
-        }
-    }
-    loadProfile();
-
-    function togglePwd(id, btn) {
-        const input = document.getElementById(id);
-        const icon = btn.querySelector('i');
-        if (input.type === 'password') {
-            input.type = 'text';
-            icon.textContent = 'visibility';
-        } else {
-            input.type = 'password';
-            icon.textContent = 'visibility_off';
-        }
+    // Load data telepon jika sebelumnya sudah tersimpan di profil lokal browser
+    const savedPhone = localStorage.getItem('user_phone');
+    if (savedPhone) {
+        document.getElementById('newPhone').value = savedPhone;
     }
 
-    function showToast(msg, isError = false) {
-        const t = document.getElementById('toast');
-        t.textContent = msg;
-        t.style.background = isError ? '#e53e3e' : '#1e293b';
-        t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 3000);
-    }
+    document.getElementById('privacyForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-    document.getElementById('saveBtn').addEventListener('click', async () => {
-        const currentPassword = document.getElementById('currentPassword').value;
-        const newPassword = document.getElementById('newPassword').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
+        const currentPassword = document.getElementById('currentPassword').value.trim();
+        const newPassword = document.getElementById('newPassword').value.trim();
+        const confirmPassword = document.getElementById('confirmPassword').value.trim();
         const newEmail = document.getElementById('newEmail').value.trim();
         const newPhone = document.getElementById('newPhone').value.trim();
 
-        // Validate password change
-        if (newPassword || confirmPassword) {
-            if (!currentPassword) { showToast('Masukkan password saat ini', true); return; }
-            if (newPassword !== confirmPassword) { showToast('Konfirmasi password tidak cocok', true); return; }
-            if (newPassword.length < 8 || !/[a-z]/.test(newPassword) || !/[0-9]/.test(newPassword)) {
-                showToast('Password minimal 8 karakter, huruf kecil & angka', true); return;
+        // Validasi Logika Kata Sandi
+        if (newPassword || confirmPassword || newEmail) {
+            if (!currentPassword) {
+                const errVerif = window.t ? window.t('privacy.err_current_password_required') : 'Kata sandi saat ini wajib diisi untuk melakukan perubahan sensitif!';
+                showToast(errVerif, true);
+                return;
+            }
+        }
+
+        if (newPassword) {
+            if (newPassword.length < 6) {
+                const errMinLen = window.t ? window.t('privacy.err_password_min_length') : 'Kata sandi baru minimal harus 6 karakter!';
+                showToast(errMinLen, true);
+                return;
+            }
+            if (newPassword !== confirmPassword) {
+                const errMatch = window.t ? window.t('privacy.err_passwords_dont_match') : 'Konfirmasi kata sandi baru tidak cocok!';
+                showToast(errMatch, true);
+                return;
             }
         }
 
         const payload = {};
-        if (newPassword) { payload.currentPassword = currentPassword; payload.newPassword = newPassword; }
+        if (newPassword) { 
+            payload.currentPassword = currentPassword; 
+            payload.newPassword = newPassword; 
+        }
         if (newEmail) payload.newEmail = newEmail;
         if (newPhone) payload.phone = newPhone;
 
-        if (Object.keys(payload).length === 0) { showToast('Tidak ada perubahan yang disimpan'); return; }
+        if (Object.keys(payload).length === 0) {
+            const infoNoChange = window.t ? window.t('privacy.info_no_changes') : 'Tidak ada perubahan yang dimasukkan';
+            showToast(infoNoChange);
+            return;
+        }
 
         try {
             const res = await fetch(`${API_URL}/privacy`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json', 'X-User-Email': userEmail },
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'X-User-Email': userEmail 
+                },
                 body: JSON.stringify(payload)
             });
             const data = await res.json();
@@ -349,17 +238,28 @@
                 updatedUser.email = newEmail;
                 localStorage.setItem('remindu_user', JSON.stringify(updatedUser));
             }
+            if (newPhone) {
+                localStorage.setItem('user_phone', newPhone);
+            }
 
-            showToast('✅ Perubahan berhasil disimpan!');
+            const successMsg = window.t ? window.t('privacy.success_save') : '✅ Perubahan berhasil disimpan!';
+            showToast(successMsg);
             setTimeout(() => window.location.href = 'profil.html', 1500);
         } catch (err) {
-            showToast(err.message || 'Terjadi kesalahan', true);
+            showToast(err.message || (window.t ? window.t('privacy.err_general') : 'Terjadi kesalahan'), true);
         }
     });
 
     document.getElementById('backBtn').addEventListener('click', () => {
         window.location.href = 'profil.html';
     });
+</script>
+
+<script src="lang.js"></script>
+<script>
+    if (typeof applyLang === 'function') {
+        applyLang();
+    }
 </script>
 </body>
 </html>

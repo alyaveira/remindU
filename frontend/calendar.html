@@ -161,6 +161,7 @@
     </style>
 </head>
 <body>
+    
 <div class="bg-blob bg-blob-1"></div>
 <div class="bg-blob bg-blob-2"></div>
 <div class="layout">
@@ -178,17 +179,17 @@
             </div>
         </div>
         <nav class="sidebar-nav">
-            <div class="nav-label">Menu Utama</div>
-            <div class="nav-item" data-nav="home"><i class="material-icons-round">home</i><span class="nav-item-label">Beranda</span></div>
-            <div class="nav-item active" data-nav="calendar"><i class="material-icons-round">calendar_month</i><span class="nav-item-label">Kalender</span></div>
-            <div class="nav-item" data-nav="notification"><i class="material-icons-round">notifications</i><span class="nav-item-label">Notifikasi</span><span class="nav-badge" id="notifBadge">0</span></div>
-            <div class="nav-label" style="margin-top:8px;">Lainnya</div>
-            <div class="nav-item" data-nav="ai"><i class="material-icons-round">auto_awesome</i><span class="nav-item-label">AI Motivasi</span></div>
-            <div class="nav-item" data-nav="statistic"><i class="material-icons-round">bar_chart</i><span class="nav-item-label">Statistik</span></div>
-            <div class="nav-item" data-nav="settings"><i class="material-icons-round">settings</i><span class="nav-item-label">Pengaturan</span></div>
+            <div class="nav-label" data-i18n="nav.label_main">Menu Utama</div>
+            <div class="nav-item" data-nav="home"><i class="material-icons-round">home</i><span class="nav-item-label" data-i18n="nav.home">Beranda</span></div>
+            <div class="nav-item active" data-nav="calendar"><i class="material-icons-round">calendar_month</i><span class="nav-item-label" data-i18n="nav.calendar">Kalender</span></div>
+            <div class="nav-item" data-nav="notification"><i class="material-icons-round">notifications</i><span class="nav-item-label" data-i18n="nav.notification">Notifikasi</span><span class="nav-badge" id="notifBadge">0</span></div>
+            <div class="nav-label" style="margin-top:8px;" data-i18n="nav.label_other">Lainnya</div>
+            <div class="nav-item" data-nav="ai"><i class="material-icons-round">auto_awesome</i><span class="nav-item-label" data-i18n="nav.ai">AI Motivasi</span></div>
+            <div class="nav-item" data-nav="statistic"><i class="material-icons-round">bar_chart</i><span class="nav-item-label" data-i18n="nav.statistic">Statistik</span></div>
+            <div class="nav-item" data-nav="settings"><i class="material-icons-round">settings</i><span class="nav-item-label" data-i18n="nav.settings">Pengaturan</span></div>
         </nav>
         <div class="sidebar-footer">
-            <div class="nav-item" id="sidebarLogout" style="color:#e53e3e;"><i class="material-icons-round">logout</i><span class="nav-item-label">Keluar</span></div>
+            <div class="nav-item" id="sidebarLogout" style="color:#e53e3e;"><i class="material-icons-round">logout</i><span class="nav-item-label" data-i18n="nav.logout">Keluar</span></div>
         </div>
     </aside>
     <main class="main" id="mainContent">
@@ -202,8 +203,8 @@
                 <div class="topbar-avatar relative" id="topbarAvatar">
                     <span id="topbarAvatarChar">A</span>
                     <div class="dropdown" id="dropdown">
-                        <div class="dd-item" id="ddProfile"><i class="material-icons-round">person</i> Profil</div>
-                        <div class="dd-item danger" id="ddLogout"><i class="material-icons-round">logout</i> Keluar</div>
+                        <div class="dd-item" id="ddProfile"><i class="material-icons-round">person</i> <span data-i18n="dropdown.profile">Profil</span></div>
+                        <div class="dd-item danger" id="ddLogout"><i class="material-icons-round">logout</i> <span data-i18n="dropdown.logout">Keluar</span></div>
                     </div>
                 </div>
             </div>
@@ -215,20 +216,37 @@
                     <div class="month-year" id="monthYear"></div>
                     <button id="nextMonth"><i class="material-icons-round">chevron_right</i></button>
                 </div>
-                <div class="weekdays"><div class="weekday">M</div><div class="weekday">T</div><div class="weekday">W</div><div class="weekday">T</div><div class="weekday">F</div><div class="weekday">S</div><div class="weekday">S</div></div>
+                <div class="weekdays">
+                    <div class="weekday" data-i18n="calendar.day_sunday_short">M</div>
+                    <div class="weekday" data-i18n="calendar.day_monday_short">T</div>
+                    <div class="weekday" data-i18n="calendar.day_tuesday_short">W</div>
+                    <div class="weekday" data-i18n="calendar.day_wednesday_short">T</div>
+                    <div class="weekday" data-i18n="calendar.day_thursday_short">F</div>
+                    <div class="weekday" data-i18n="calendar.day_friday_short">S</div>
+                    <div class="weekday" data-i18n="calendar.day_saturday_short">S</div>
+                </div>
                 <div class="days" id="calendarDays"></div>
             </div>
             <div class="events-section">
-                <div class="events-title"><i class="material-icons-round">event_note</i> Kegiatan pada tanggal <span id="selectedDateLabel" style="color:#8b5cf6; font-weight:600;">-</span></div>
-                <div id="eventList" class="event-list"><div class="no-event"><i class="material-icons-round">event_busy</i> Pilih tanggal untuk melihat kegiatan</div></div>
+                <div class="events-title">
+                    <i class="material-icons-round">event_note</i> 
+                    <span data-i18n="calendar.event_title">Kegiatan pada tanggal</span> 
+                    <span id="selectedDateLabel" style="color:#8b5cf6; font-weight:600;">-</span>
+                </div>
+                <div id="eventList" class="event-list">
+                    <div class="no-event">
+                        <i class="material-icons-round">event_busy</i>
+                        <br><span data-i18n="calendar.select_date_hint">Pilih tanggal untuk melihat kegiatan</span>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
     <nav class="bottom-nav">
-        <div class="bnav-item" data-nav="home"><i class="material-icons-round">home</i><span>Home</span></div>
-        <div class="bnav-item active" data-nav="calendar"><i class="material-icons-round">calendar_month</i><span>Kalender</span></div>
-        <div class="bnav-item" data-nav="notification"><i class="material-icons-round">notifications</i><span>Notif</span></div>
-        <div class="bnav-item" data-nav="settings"><i class="material-icons-round">settings</i><span>Setting</span></div>
+        <div class="bnav-item" data-nav="home"><i class="material-icons-round">home</i><span data-i18n="bottomnav.home">Home</span></div>
+        <div class="bnav-item active" data-nav="calendar"><i class="material-icons-round">calendar_month</i><span data-i18n="bottomnav.calendar">Kalender</span></div>
+        <div class="bnav-item" data-nav="notification"><i class="material-icons-round">notifications</i><span data-i18n="bottomnav.notification">Notif</span></div>
+        <div class="bnav-item" data-nav="settings"><i class="material-icons-round">settings</i><span data-i18n="bottomnav.settings">Setting</span></div>
     </nav>
 </div>
 <script>
@@ -260,9 +278,16 @@
     }
     document.getElementById('sidebarName').textContent = displayName;
     document.getElementById('sidebarEmail').textContent = userEmail;
-    document.getElementById('topbarGreeting').textContent = `Halo, ${displayName}!`;
-    document.getElementById('topbarDate').textContent = new Date().toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+    
+    // Sapaan Topbar diatur menggunakan fungsi translasi dari lang.js jika tersedia
+    const greetingText = window.t ? window.t('topbar.greeting') : 'Halo';
+    document.getElementById('topbarGreeting').textContent = `${greetingText}, ${displayName}!`;
+    
+    // Sinkronisasi format penanggalan terjemahan browser
+    const currentLangCode = localStorage.getItem('remindu_lang') === 'en' ? 'en-US' : 'id-ID';
+    document.getElementById('topbarDate').textContent = new Date().toLocaleDateString(currentLangCode, { weekday:'long', day:'numeric', month:'long', year:'numeric' });
     updateAvatar();
+    
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
     const sidebarToggle = document.getElementById('sidebarToggle');
@@ -298,6 +323,7 @@
     document.querySelectorAll('.nav-item[data-nav]').forEach(el => el.addEventListener('click', () => handleNav(el.dataset.nav)));
     document.querySelectorAll('.bnav-item[data-nav]').forEach(el => el.addEventListener('click', () => handleNav(el.dataset.nav)));
     document.getElementById('topbarNotif').addEventListener('click', () => handleNav('notification'));
+    
     let currentDate = new Date();
     let tasks = [];
     let selectedDate = null;
@@ -349,7 +375,10 @@
         const total = offset + daysInMonth;
         const remaining = 42 - total;
         for(let i=1; i<=remaining; i++) container.appendChild(createDayElement(i, true));
-        document.getElementById('monthYear').textContent = currentDate.toLocaleDateString('id-ID', { month:'long', year:'numeric' });
+        
+        // Render Nama Bulan & Tahun Sesuai Pilihan Bahasa
+        document.getElementById('monthYear').textContent = currentDate.toLocaleDateString(currentLangCode, { month:'long', year:'numeric' });
+        
         if (!selectedDate) {
             const t = new Date();
             if(t.getMonth()===month && t.getFullYear()===year) selectDate(t);
@@ -365,16 +394,20 @@
             const days = document.querySelectorAll('.days .day:not(.other-month)');
             for(let d of days) if(parseInt(d.textContent) === selectedDate.getDate()) { d.style.background = '#e0e7ff'; d.classList.add('selected-day'); selectedDayElem = d; break; }
         }
-        document.getElementById('selectedDateLabel').innerHTML = `${selectedDate.getDate()} ${selectedDate.toLocaleDateString('id-ID', { month:'long', year:'numeric' })}`;
+        document.getElementById('selectedDateLabel').innerHTML = `${selectedDate.getDate()} ${selectedDate.toLocaleDateString(currentLangCode, { month:'long', year:'numeric' })}`;
         renderEventsForDate(selectedDate);
     }
     function renderEventsForDate(date) {
         const events = getTasksByDate(date);
         const container = document.getElementById('eventList');
-        if(events.length===0) { container.innerHTML = `<div class="no-event"><i class="material-icons-round">event_busy</i><br>Tidak ada kegiatan pada tanggal ini</div>`; return; }
+        if(events.length===0) { 
+            const noEventText = window.t ? window.t('calendar.no_event') : 'Tidak ada kegiatan pada tanggal ini';
+            container.innerHTML = `<div class="no-event"><i class="material-icons-round">event_busy</i><br>${noEventText}</div>`; 
+            return; 
+        }
         container.innerHTML = '';
         events.forEach(task => {
-            const timeStr = task.due_date ? new Date(task.due_date).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}) : 'Sepanjang hari';
+            const timeStr = task.due_date ? new Date(task.due_date).toLocaleTimeString(currentLangCode, {hour:'2-digit',minute:'2-digit'}) : (window.t ? window.t('calendar.all_day') : 'Sepanjang hari');
             const div = document.createElement('div');
             div.className = 'event-card';
             div.innerHTML = `<div class="event-title">${escapeHtml(task.judul)}</div><div class="event-time"><i class="material-icons-round" style="font-size:14px">schedule</i> ${timeStr}</div>${task.notes ? `<div class="event-time"><i class="material-icons-round" style="font-size:14px">sticky_note_2</i> ${escapeHtml(task.notes.substring(0,60))}</div>` : ''}`;
@@ -390,6 +423,7 @@
 })();
 </script>
 
+<<<<<<< HEAD
 <button id="darkFab" style="position:fixed;bottom:88px;right:18px;z-index:9999;width:44px;height:44px;border-radius:50%;border:none;background:var(--purple);color:white;font-size:20px;cursor:pointer;box-shadow:0 4px 14px rgba(139,92,246,0.35);display:flex;align-items:center;justify-content:center;">🌙</button>
 <script>
 (function(){
@@ -402,6 +436,13 @@
         fab.textContent = next === 'dark' ? '☀️' : '🌙';
     });
 })();
+=======
+<script src="lang.js"></script>
+<script>
+    if (typeof applyLang === 'function') {
+        applyLang();
+    }
+>>>>>>> bfc64c1 (clean: remove node_modules from tracking)
 </script>
 </body>
 </html>

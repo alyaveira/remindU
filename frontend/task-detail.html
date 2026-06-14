@@ -31,61 +31,54 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
         body { background: var(--bg); min-height: 100vh; overflow-x: hidden; position: relative; }
+        
         .bg-blob { position: fixed; border-radius: 50%; filter: blur(60px); opacity: 0.38; pointer-events: none; z-index: 0; }
         .bg-blob-1 { width: 400px; height: 400px; background: var(--purple); top: -100px; right: -100px; }
         .bg-blob-2 { width: 300px; height: 300px; background: #ec4899; bottom: -80px; left: -80px; }
-        .layout { display: flex; min-height: 100vh; position: relative; z-index: 5; }
 
-        /* SIDEBAR (sama seperti home) */
-        .sidebar {
-            width: var(--sidebar-w); background: var(--white);
-            border-right: 1px solid var(--border);
-            display: flex; flex-direction: column;
-            position: fixed; top: 0; left: 0; bottom: 0; z-index: 200;
-            transition: width 0.3s cubic-bezier(0.4,0,0.2,1), transform 0.3s;
-            overflow: hidden; box-shadow: 2px 0 20px rgba(0,0,0,0.04);
-        }
-        .sidebar.collapsed { width: var(--sidebar-collapsed-w); }
-        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 199; backdrop-filter: blur(2px); }
-        .sidebar-overlay.show { display: block; }
-        .sidebar-header {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 16px; height: var(--header-h);
-            border-bottom: 1px solid var(--border); flex-shrink: 0;
-        }
-        .brand-wrap { display: flex; align-items: center; gap: 10px; overflow: hidden; }
-        .brand-logo { width: 36px; height: 36px; border-radius: 12px; background: linear-gradient(135deg, #1e3a8a, #8b5cf6); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 18px; font-weight: 900; color: white; }
-        .brand-name { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(135deg, #1e3a8a, #3b82f6, #8b5cf6, #ec4899); -webkit-background-clip: text; background-clip: text; color: transparent; white-space: nowrap; overflow: hidden; transition: opacity 0.2s, width 0.3s; }
-        .sidebar.collapsed .brand-name { opacity: 0; width: 0; }
-        .toggle-btn { width: 32px; height: 32px; border-radius: 10px; border: none; background: var(--bg); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: background 0.2s, color 0.2s; flex-shrink: 0; }
-        .toggle-btn:hover { background: var(--purple-light); color: var(--purple); }
-        .toggle-btn i { font-size: 20px; transition: transform 0.3s; }
-        .sidebar.collapsed .toggle-btn i { transform: rotate(180deg); }
-        .sidebar-user { padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
-        .sidebar-user:hover { background: var(--bg); }
-        .sidebar-avatar { width: 40px; height: 40px; border-radius: 14px; background: linear-gradient(135deg, var(--purple), #ec4899); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; color: white; flex-shrink: 0; background-size: cover; background-position: center; }
-        .sidebar-user-info { overflow: hidden; transition: opacity 0.2s; }
-        .sidebar.collapsed .sidebar-user-info { opacity: 0; width: 0; }
-        .sidebar-user-name { font-weight: 600; font-size: 14px; color: var(--text); white-space: nowrap; }
-        .sidebar-user-email { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
-        .sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; overflow-x: hidden; }
-        .sidebar-nav::-webkit-scrollbar { width: 4px; }
-        .sidebar-nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-        .nav-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; padding: 8px 10px 4px; white-space: nowrap; overflow: hidden; transition: opacity 0.2s; }
-        .sidebar.collapsed .nav-label { opacity: 0; }
-        .nav-item { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 14px; cursor: pointer; transition: all 0.2s; color: var(--text-muted); margin-bottom: 2px; white-space: nowrap; overflow: hidden; }
-        .nav-item:hover { background: var(--bg); color: var(--purple); }
-        .nav-item.active { background: var(--purple-light); color: var(--purple); font-weight: 600; }
-        .nav-item i { font-size: 22px; flex-shrink: 0; }
-        .nav-item-label { font-size: 14px; transition: opacity 0.2s; }
-        .sidebar.collapsed .nav-item-label { opacity: 0; width: 0; }
-        .nav-badge { margin-left: auto; background: var(--purple); color: white; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; flex-shrink: 0; transition: opacity 0.2s; }
-        .sidebar.collapsed .nav-badge { opacity: 0; }
-        .sidebar-footer { padding: 12px 10px 16px; border-top: 1px solid var(--border); flex-shrink: 0; }
+        .layout { display: flex; min-height: 100vh; position: relative; z-index: 10; }
+        .main-content { flex: 1; display: flex; flex-direction: column; padding: 24px; min-height: 100vh; overflow-y: auto; }
+        
+        .container { max-width: 700px; width: 100%; margin: 0 auto; background: var(--white); border-radius: 32px; padding: 32px; box-shadow: 0 20px 40px rgba(0,0,0,0.02); border: 1px solid var(--border); }
+        
+        .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
+        .page-title { font-size: 22px; font-weight: 800; color: var(--text); }
+        
+        .detail-card { display: flex; flex-direction: column; gap: 24px; }
+        .task-title-large { font-size: 24px; font-weight: 800; color: var(--text); line-height: 1.3; }
+        
+        .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 8px; }
+        .meta-item { display: flex; align-items: center; gap: 12px; padding: 14px 18px; background: #f8fafc; border-radius: 16px; border: 1px solid var(--border); }
+        .meta-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        
+        .meta-icon.info { background: var(--purple-light); color: var(--purple); }
+        .meta-icon.calendar { background: #eff6ff; color: var(--blue); }
+        .meta-icon.alarm { background: #fff7ed; color: var(--orange); }
+        .meta-icon.status { background: #e6f4ea; color: var(--green); }
+        
+        .meta-info { display: flex; flex-direction: column; gap: 2px; }
+        .meta-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .meta-value { font-size: 14px; font-weight: 600; color: var(--text); }
+        
+        .notes-section { background: #f8fafc; border-radius: 20px; padding: 20px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
+        .notes-heading { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .notes-content { font-size: 14px; color: #334155; line-height: 1.6; white-space: pre-wrap; }
+        
+        .progress-section { display: flex; flex-direction: column; gap: 8px; margin: 8px 0; }
+        .progress-label { font-size: 13px; font-weight: 700; color: var(--text-muted); }
+        .progress-bar-bg { width: 100%; height: 10px; background: #e2e8f0; border-radius: 10px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--purple), var(--purple-dark)); border-radius: 10px; transition: width 0.5s ease; }
+        .progress-desc { font-size: 12px; color: var(--text-muted); margin-top: 4px; font-weight: 500; }
 
-        .main { flex: 1; margin-left: var(--sidebar-w); transition: margin-left 0.3s cubic-bezier(0.4,0,0.2,1); min-height: 100vh; display: flex; flex-direction: column; }
-        .main.expanded { margin-left: var(--sidebar-collapsed-w); }
+        .action-buttons { display: flex; gap: 12px; margin-top: 16px; justify-content: flex-end; }
+        .btn-action { display: flex; align-items: center; gap: 6px; padding: 12px 20px; border-radius: 14px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; transition: all 0.2s; }
+        
+        .btn-back { background: #f1f5f9; color: #475569; }
+        .btn-back:hover { background: #e2e8f0; }
+        .btn-edit { background: var(--purple); color: white; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2); }
+        .btn-edit:hover { background: var(--purple-dark); transform: translateY(-1px); }
 
+<<<<<<< HEAD
         .topbar { height: var(--header-h); background: var(--white); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 8px rgba(0,0,0,0.04); }
         .topbar-left { display: flex; align-items: center; gap: 12px; }
         .topbar-mobile-toggle { display: none; width: 36px; height: 36px; border-radius: 10px; border: none; background: var(--bg); cursor: pointer; align-items: center; justify-content: center; color: var(--text); transition: background 0.2s; }
@@ -305,247 +298,224 @@
         [data-theme="dark"] .status-badge { background:#1a3a2a !important; color:#86efac !important; }
         [data-theme="dark"] .status-badge.pending { background:#3a2a1a !important; color:#fcd34d !important; }
         [data-theme="dark"] .progress-bar-bg { background:#13131e !important; }
+=======
+        .loading-state { text-align: center; padding: 40px 0; color: var(--text-muted); font-size: 14px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+        .loading-spinner { animation: spin 1s linear infinite; color: var(--purple); font-size: 32px; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+>>>>>>> bfc64c1 (clean: remove node_modules from tracking)
     </style>
 </head>
 <body>
+
 <div class="bg-blob bg-blob-1"></div>
 <div class="bg-blob bg-blob-2"></div>
+
 <div class="layout">
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <div class="brand-wrap"><div class="brand-logo">R</div><div class="brand-name">RemindU</div></div>
-            <button class="toggle-btn" id="sidebarToggle"><i class="material-icons-round">chevron_left</i></button>
-        </div>
-        <div class="sidebar-user" id="sidebarUser">
-            <div class="sidebar-avatar" id="sidebarAvatar">A</div>
-            <div class="sidebar-user-info"><div class="sidebar-user-name" id="sidebarName">User</div><div class="sidebar-user-email" id="sidebarEmail">user@email.com</div></div>
-        </div>
-        <nav class="sidebar-nav">
-            <div class="nav-label">Menu Utama</div>
-            <div class="nav-item" data-nav="home"><i class="material-icons-round">home</i><span class="nav-item-label">Beranda</span></div>
-            <div class="nav-item" data-nav="calendar"><i class="material-icons-round">calendar_month</i><span class="nav-item-label">Kalender</span></div>
-            <div class="nav-item" data-nav="notification"><i class="material-icons-round">notifications</i><span class="nav-item-label">Notifikasi</span><span class="nav-badge" id="notifBadge">0</span></div>
-            <div class="nav-label" style="margin-top:8px;">Lainnya</div>
-            <div class="nav-item" data-nav="ai"><i class="material-icons-round">auto_awesome</i><span class="nav-item-label">AI Motivasi</span></div>
-            <div class="nav-item" data-nav="statistic"><i class="material-icons-round">bar_chart</i><span class="nav-item-label">Statistik</span></div>
-            <div class="nav-item" data-nav="settings"><i class="material-icons-round">settings</i><span class="nav-item-label">Pengaturan</span></div>
-        </nav>
-        <div class="sidebar-footer"><div class="nav-item" id="sidebarLogout" style="color:#e53e3e;"><i class="material-icons-round">logout</i><span class="nav-item-label">Keluar</span></div></div>
-    </aside>
-
-    <main class="main" id="mainContent">
-        <header class="topbar">
-            <div class="topbar-left">
-                <button class="topbar-mobile-toggle" id="mobileMenuBtn"><i class="material-icons-round">menu</i></button>
-                <div><div class="topbar-greeting" id="topbarGreeting">Detail Task</div><div class="topbar-date" id="topbarDate"></div></div>
-            </div>
-            <div class="topbar-right">
-                <button class="topbar-icon-btn" id="topbarNotif"><i class="material-icons-round">notifications_none</i><span class="notif-dot" id="notifDot" style="display:none;"></span></button>
-                <div class="topbar-avatar relative" id="topbarAvatar"><span id="topbarAvatarChar">A</span><div class="dropdown" id="dropdown"><div class="dd-item" id="ddProfile"><i class="material-icons-round">person</i> Profil</div><div class="dd-item danger" id="ddLogout"><i class="material-icons-round">logout</i> Keluar</div></div></div>
-            </div>
-        </header>
-
-        <div class="page-content">
-            <div id="taskDetailContainer">
-                <div class="loading-state"><i class="material-icons-round" style="font-size:48px">hourglass_top</i><br>Memuat detail task...</div>
+    <main class="main-content">
+        <div class="container" id="detailContainer">
+            <div class="loading-state">
+                <i class="material-icons-round loading-spinner">sync</i>
+                <span data-i18n="task_detail.loading">Memuat detail pengingat...</span>
             </div>
         </div>
     </main>
-
-    <nav class="bottom-nav">
-        <div class="bnav-item" data-nav="home"><i class="material-icons-round">home</i><span>Home</span></div>
-        <div class="bnav-item" data-nav="calendar"><i class="material-icons-round">calendar_month</i><span>Kalender</span></div>
-        <div class="bnav-item" data-nav="notification"><i class="material-icons-round">notifications</i><span>Notif</span></div>
-        <div class="bnav-item" data-nav="settings"><i class="material-icons-round">settings</i><span>Setting</span></div>
-    </nav>
 </div>
 
 <script>
+(() => {
     const API_URL = 'http://localhost:3000/api';
     const userData = JSON.parse(localStorage.getItem('remindu_user') || '{}');
     const userEmail = userData.email;
-    if (!userEmail) { alert('Sesi login tidak ditemukan.'); window.location.href = 'welcome.html'; }
 
-    // Ambil ID task dari URL parameter
+    if (!userEmail) {
+        window.location.href = 'welcome.html';
+        return;
+    }
+
+    // Mendapatkan parameter ID Task dari URL (?id=...)
     const urlParams = new URLSearchParams(window.location.search);
     const taskId = urlParams.get('id');
 
     if (!taskId) {
-        document.getElementById('taskDetailContainer').innerHTML = '<div class="error-state"><i class="material-icons-round" style="font-size:48px">error</i><br>Task ID tidak ditemukan.<br><button class="btn-back" style="margin-top:16px;" onclick="window.location.href=\'home.html\'">Kembali ke Home</button></div>';
-    } else {
-        loadTaskDetail(taskId);
+        alert(window.t ? window.t('task_detail.err_no_id') : 'ID tugas tidak valid!');
+        window.location.href = 'home.html';
+        return;
     }
 
-    // ===== FUNGSI AVATAR & SIDEBAR SAMA SEPERTI HOME =====
-    function updateAvatar() {
-        const saved = localStorage.getItem('user_avatar');
-        const sidebarAvatar = document.getElementById('sidebarAvatar');
-        const topbarSpan = document.getElementById('topbarAvatarChar');
-        const topbarDiv = document.getElementById('topbarAvatar');
-        if (!saved) {
-            const def = userEmail.charAt(0).toUpperCase();
-            sidebarAvatar.textContent = def;
-            topbarSpan.textContent = def;
-            sidebarAvatar.style.backgroundImage = '';
-            topbarDiv.style.backgroundImage = '';
-        } else if (saved.startsWith('data:image')) {
-            sidebarAvatar.textContent = '';
-            sidebarAvatar.style.backgroundImage = `url(${saved})`;
-            sidebarAvatar.style.backgroundSize = 'cover';
-            topbarSpan.textContent = '';
-            topbarDiv.style.backgroundImage = `url(${saved})`;
-            topbarDiv.style.backgroundSize = 'cover';
-        } else {
-            sidebarAvatar.textContent = saved;
-            topbarSpan.textContent = saved;
-            sidebarAvatar.style.backgroundImage = '';
-            topbarDiv.style.backgroundImage = '';
-        }
-    }
-    const firstName = userEmail.split('@')[0];
-    const displayName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
-    document.getElementById('sidebarName').textContent = displayName;
-    document.getElementById('sidebarEmail').textContent = userEmail;
-    document.getElementById('topbarGreeting').textContent = `Detail Task`;
-    document.getElementById('topbarDate').textContent = new Date().toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-    updateAvatar();
-
-    // Sidebar toggle
-    const sidebar = document.getElementById('sidebar');
-    const mainContent = document.getElementById('mainContent');
-    const sidebarToggle = document.getElementById('sidebarToggle');
-    let sidebarCollapsed = localStorage.getItem('sidebar_collapsed') === 'true';
-    if (sidebarCollapsed) { sidebar.classList.add('collapsed'); mainContent.classList.add('expanded'); }
-    sidebarToggle.addEventListener('click', () => {
-        sidebarCollapsed = !sidebarCollapsed;
-        localStorage.setItem('sidebar_collapsed', sidebarCollapsed);
-        sidebar.classList.toggle('collapsed', sidebarCollapsed);
-        mainContent.classList.toggle('expanded', sidebarCollapsed);
-    });
-    const overlay = document.getElementById('sidebarOverlay');
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    function checkMobile() { mobileMenuBtn.style.display = window.innerWidth <= 900 ? 'flex' : 'none'; }
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    mobileMenuBtn.addEventListener('click', () => { sidebar.classList.toggle('mobile-open'); overlay.classList.toggle('show'); });
-    overlay.addEventListener('click', () => { sidebar.classList.remove('mobile-open'); overlay.classList.remove('show'); });
-
-    // Dropdown
-    const avatarBtn = document.getElementById('topbarAvatar');
-    const dropdown = document.getElementById('dropdown');
-    avatarBtn.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('show'); });
-    document.addEventListener('click', () => dropdown.classList.remove('show'));
-    document.getElementById('ddProfile').addEventListener('click', () => window.location.href = 'profil.html');
-    document.getElementById('ddLogout').addEventListener('click', () => { localStorage.removeItem('remindu_user'); window.location.href = 'welcome.html'; });
-    document.getElementById('sidebarLogout').addEventListener('click', () => { localStorage.removeItem('remindu_user'); window.location.href = 'welcome.html'; });
-    document.getElementById('sidebarUser').addEventListener('click', () => window.location.href = 'profil.html');
-
-    // Navigasi
-    function handleNav(nav) {
-        if (nav === 'home') window.location.href = 'home.html';
-        else if (nav === 'calendar') window.location.href = 'calendar.html';
-        else if (nav === 'notification') window.location.href = 'notification.html';
-        else if (nav === 'settings') window.location.href = 'settings.html';
-        else if (nav === 'ai') window.location.href = 'ai-motivation.html';
-        else if (nav === 'statistic') window.location.href = 'statistic.html';
-    }
-    document.querySelectorAll('.nav-item[data-nav]').forEach(el => el.addEventListener('click', () => handleNav(el.dataset.nav)));
-    document.querySelectorAll('.bnav-item[data-nav]').forEach(el => el.addEventListener('click', () => handleNav(el.dataset.nav)));
-    document.getElementById('topbarNotif').addEventListener('click', () => handleNav('notification'));
-
-    // ===== LOAD TASK DETAIL =====
-    async function loadTaskDetail(id) {
+    async function loadTaskDetail() {
         try {
-            const response = await fetch(`${API_URL}/tasks`, { headers: { 'X-User-Email': userEmail } });
-            if (!response.ok) throw new Error('Gagal mengambil data task');
-            const tasks = await response.json();
-            const task = tasks.find(t => t.id_task == id);
-            if (!task) throw new Error('Task tidak ditemukan');
-            renderTaskDetail(task);
+            const res = await fetch(`${API_URL}/tasks/${taskId}`, {
+                headers: { 'X-User-Email': userEmail }
+            });
+            if (!res.ok) throw new Error();
+            const task = await res.json();
+            renderDetail(task);
         } catch (err) {
-            document.getElementById('taskDetailContainer').innerHTML = `<div class="error-state"><i class="material-icons-round" style="font-size:48px">error</i><br>${err.message}<br><button class="btn-back" style="margin-top:16px;" onclick="window.location.href='home.html'">Kembali ke Home</button></div>`;
+            document.getElementById('detailContainer').innerHTML = `
+                <div style="text-align:center; padding:40px 0; color:var(--text-muted);">
+                    <i class="material-icons-round" style="font-size:48px; color:#cbd5e1; margin-bottom:12px;">error_outline</i>
+                    <p style="font-weight:600;" data-i18n="task_detail.err_load">Gagal memuat rincian data pengingat.</p>
+                    <button class="btn-action btn-back" style="margin:16px auto 0;" onclick="window.location.href='home.html'">
+                        <i class="material-icons-round">arrow_back</i> <span data-i18n="task_detail.btn_back">Kembali</span>
+                    </button>
+                </div>
+            `;
+            if (window.applyLang) window.applyLang();
         }
     }
 
-    function getCatLabel(cat) {
-        const labels = { study:'Study', personal:'Personal', health:'Health', work:'Work' };
-        return labels[cat] || cat;
-    }
-    function getCatColor(cat) {
-        const colors = { study:'#3b82f6', personal:'#f97316', health:'#10b981', work:'#f59e0b' };
-        return colors[cat] || '#8b5cf6';
-    }
-    function formatDate(dateStr) {
-        if (!dateStr) return 'Tidak ditentukan';
-        const d = new Date(dateStr);
-        return d.toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' });
-    }
+    function renderDetail(task) {
+        const container = document.getElementById('detailContainer');
+        
+        // Formatter Waktu Lokal Sesuai Preferensi Bahasa
+        const currentLang = localStorage.getItem('remindu_lang') || 'id';
+        const dateOptions = { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+        
+        const dueDateStr = task.due_date ? new Date(task.due_date).toLocaleString(currentLang, dateOptions) : '-';
+        const remindAtStr = task.remind_at ? new Date(task.remind_at).toLocaleString(currentLang, dateOptions) : (window.t ? window.t('task_detail.no_alarm') : 'Tidak diatur');
 
-    function renderTaskDetail(task) {
-        const container = document.getElementById('taskDetailContainer');
-        const isDone = task.selesai;
-        const statusClass = isDone ? 'status-badge' : 'status-badge pending';
-        const statusText = isDone ? '✅ Selesai' : '⏳ Tertunda';
-        const catColor = getCatColor(task.kategori);
-        // Hitung progress estimasi berdasarkan deadline (jika ada)
-        let progressPercent = 0;
-        if (task.due_date && !isDone) {
-            const now = Date.now();
-            const due = new Date(task.due_date).getTime();
-            const created = task.dibuat_pada ? new Date(task.dibuat_pada).getTime() : now - 7*86400000;
-            const total = due - created;
-            const elapsed = now - created;
-            if (total > 0) progressPercent = Math.min(100, Math.max(0, Math.round((elapsed / total) * 100)));
-        } else if (isDone) progressPercent = 100;
+        // Internasionalisasi Teks Status & Kategori Secara Dinamis
+        let statusText = task.selesai ? 'Selesai' : 'Belum Selesai';
+        if (window.t) {
+            statusText = task.selesai ? window.t('task_detail.status_done') : window.t('task_detail.status_pending');
+        }
+
+        let categoryText = task.kategori || 'Lainnya';
+        if (window.t) {
+            if (task.kategori === 'Kuliah') categoryText = window.t('task_detail.cat_school');
+            else if (task.kategori === 'Kerja') categoryText = window.t('task_detail.cat_work');
+            else if (task.kategori === 'Lainnya') categoryText = window.t('task_detail.cat_other');
+        }
+
+        // Penghitungan Logika Progress Persentase Waktu Menuju Deadline
+        let progressHtml = '';
+        if (task.due_date && !task.selesai) {
+            const createdAt = task.created_at ? new Date(task.created_at).getTime() : new Date().getTime() - 86400000;
+            const dueDate = new Date(task.due_date).getTime();
+            const now = new Date().getTime();
+
+            const totalDuration = dueDate - createdAt;
+            const elapsed = now - createdAt;
+            
+            let progressPercent = 0;
+            if (totalDuration > 0) {
+                progressPercent = Math.min(100, Math.max(0, Math.round((elapsed / totalDuration) * 100)));
+            }
+
+            const labelProgress = window.t ? window.t('task_detail.progress_label') : 'Progress waktu menuju deadline';
+            const descProgress = window.t ? window.t('task_detail.progress_desc', { percent: progressPercent }) : `${progressPercent}% waktu telah berlalu`;
+
+            progressHtml = `
+                <div class="progress-section">
+                    <div class="progress-label">${labelProgress}</div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" style="width: ${progressPercent}%"></div>
+                    </div>
+                    <div class="progress-desc">${descProgress}</div>
+                </div>
+            `;
+        }
+
+        // Teks Deskripsi Catatan Kosong Bawaan
+        const emptyNotesText = window.t ? window.t('task_detail.no_notes') : 'Tidak ada catatan tambahan untuk tugas ini.';
+        const notesContent = task.notes ? escapeHtml(task.notes) : `<span style="color:var(--text-muted); font-style:italic;">${emptyNotesText}</span>`;
 
         container.innerHTML = `
+            <div class="header">
+                <h1 class="page-title" data-i18n="task_detail.title">Detail Pengingat</h1>
+                <button class="btn-action btn-back" id="headerBackBtn">
+                    <i class="material-icons-round">arrow_back</i>
+                    <span data-i18n="task_detail.btn_back">Kembali</span>
+                </button>
+            </div>
+
             <div class="detail-card">
-                <div class="detail-header">
-                    <h1>${escapeHtml(task.judul)}</h1>
-                    <span class="task-cat" style="background:${catColor}20; color:${catColor};">${getCatLabel(task.kategori)}</span>
+                <h2 class="task-title-large">${escapeHtml(task.judul)}</h2>
+                
+                <div class="meta-grid">
+                    <div class="meta-item">
+                        <div class="meta-icon info"><i class="material-icons-round">category</i></div>
+                        <div class="meta-info">
+                            <span class="meta-label" data-i18n="task_detail.label_kategori">Kategori</span>
+                            <span class="meta-value">${categoryText}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="meta-item">
+                        <div class="meta-icon calendar"><i class="material-icons-round">calendar_today</i></div>
+                        <div class="meta-info">
+                            <span class="meta-label" data-i18n="task_detail.label_deadline">Batas Waktu</span>
+                            <span class="meta-value">${dueDateStr}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="meta-item">
+                        <div class="meta-icon alarm"><i class="material-icons-round">alarm</i></div>
+                        <div class="meta-info">
+                            <span class="meta-label" data-i18n="task_detail.label_remind">Waktu Alarm</span>
+                            <span class="meta-value">${remindAtStr}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="meta-item">
+                        <div class="meta-icon status" style="${task.selesai ? 'background:#e6f4ea; color:var(--green);' : 'background:#fef3c7; color:var(--amber);'}">
+                            <i class="material-icons-round">${task.selesai ? 'check_circle' : 'hourglass_empty'}</i>
+                        </div>
+                        <div class="meta-info">
+                            <span class="meta-label" data-i18n="task_detail.label_status">Status</span>
+                            <span class="meta-value">${statusText}</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="detail-body">
-                    <div class="info-row">
-                        <div class="info-label">Catatan</div>
-                        <div class="info-value">${task.notes ? escapeHtml(task.notes) : '<span style="color:var(--text-muted);">Tidak ada catatan</span>'}</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">Deadline</div>
-                        <div class="info-value">${formatDate(task.due_date)}</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">Status</div>
-                        <div class="info-value"><span class="${statusClass}">${statusText}</span></div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">Dibuat</div>
-                        <div class="info-value">${formatDate(task.dibuat_pada)}</div>
-                    </div>
-                    ${task.due_date ? `
-                    <div class="progress-section">
-                        <div class="progress-label">Progress waktu menuju deadline</div>
-                        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${progressPercent}%"></div></div>
-                        <div style="font-size:12px; color:var(--text-muted); margin-top:8px;">${progressPercent}% waktu telah berlalu</div>
-                    </div>
-                    ` : ''}
-                    <div class="action-buttons">
-                        <button class="btn-back" id="backBtn"><i class="material-icons-round">arrow_back</i> Kembali</button>
-                        <button class="btn-edit" id="editBtn"><i class="material-icons-round">edit</i> Edit Task</button>
-                    </div>
+                
+                <div class="notes-section">
+                    <span class="notes-heading" data-i18n="task_detail.label_catatan">Catatan Deskripsi</span>
+                    <p class="notes-content">${notesContent}</p>
+                </div>
+                
+                ${progressHtml}
+                
+                <div class="action-buttons">
+                    <button class="btn-action btn-back" id="backBtn">
+                        <i class="material-icons-round">arrow_back</i> 
+                        <span data-i18n="task_detail.btn_back">Kembali</span>
+                    </button>
+                    <button class="btn-action btn-edit" id="editBtn">
+                        <i class="material-icons-round">edit</i> 
+                        <span data-i18n="task_detail.btn_edit">Edit Task</span>
+                    </button>
                 </div>
             </div>
         `;
+
+        // Daftarkan ulang Event Listener setelah elemen di-render ke DOM
+        document.getElementById('headerBackBtn').addEventListener('click', () => window.location.href = 'home.html');
         document.getElementById('backBtn').addEventListener('click', () => window.location.href = 'home.html');
+        
         document.getElementById('editBtn').addEventListener('click', () => {
-            alert(`Fitur edit task untuk ID ${task.id_task} akan segera hadir.`);
-            // Bisa redirect ke halaman edit jika dibuat nanti
+            const comingSoonText = window.t ? window.t('task_detail.edit_coming_soon') : `Fitur edit task untuk ID ${task.id_task} akan segera hadir.`;
+            alert(comingSoonText);
         });
+
+        // Jalankan interpreter bahasa eksternal untuk menerjemahkan elemen data-i18n statis
+        if (typeof applyLang === 'function') {
+            applyLang();
+        }
     }
 
     function escapeHtml(str) {
         if (!str) return '';
-        return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;');
+        return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
+    }
+
+    loadTaskDetail();
+})();
+</script>
+
+<script src="lang.js"></script>
+<script>
+    if (typeof applyLang === 'function') {
+        applyLang();
     }
 </script>
 

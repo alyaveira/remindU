@@ -57,12 +57,10 @@
             cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
             position: relative; overflow: hidden;
         }
-        .user-card::before { content: ''; position: absolute; top: -40px; right: -30px; width: 130px; height: 130px; border-radius: 50%; background: rgba(255,255,255,0.09); }
-        .user-card:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(139,92,246,0.4); }
         .user-card-avatar { width: 56px; height: 56px; border-radius: 18px; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 700; flex-shrink: 0; background-size: cover; background-position: center; }
-        .user-card-info { flex: 1; }
-        .user-card-name { font-size: 18px; font-weight: 700; margin-bottom: 3px; }
-        .user-card-email { font-size: 12px; opacity: 0.85; }
+        .user-card-info { flex: 1; min-width: 0; }
+        .user-card-name { font-size: 18px; font-weight: 700; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-card-email { font-size: 12px; opacity: 0.85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .user-card-badge { font-size: 11px; background: rgba(255,255,255,0.2); border-radius: 20px; padding: 3px 10px; margin-top: 6px; display: inline-block; }
         .user-card-arrow { font-size: 20px; opacity: 0.7; }
 
@@ -132,10 +130,9 @@
     <div class="page-content">
         <div class="header">
             <button class="btn-back" id="backBtn"><i class="material-icons-round">arrow_back</i></button>
-            <h2>Profil</h2>
+            <h2 data-i18n="profile.title">Profil</h2>
         </div>
 
-        <!-- User Card -->
         <div class="user-card" id="userCardBtn">
             <div class="user-card-avatar" id="profileAvatar">A</div>
             <div class="user-card-info">
@@ -146,14 +143,14 @@
             <i class="material-icons-round user-card-arrow">chevron_right</i>
         </div>
 
-        <div class="section-divider">Akun</div>
+        <div class="section-divider" data-i18n="profile.section_account">Akun</div>
         <div class="menu-list">
             <div class="menu-item" id="yourAccount">
                 <div class="menu-left">
                     <i class="material-icons-round menu-icon">manage_accounts</i>
                     <div class="menu-text">
-                        <span class="menu-title">Your account</span>
-                        <span class="menu-sub">Edit nama & avatar</span>
+                        <span class="menu-title" data-i18n="profile.menu_account_title">Your account</span>
+                        <span class="menu-sub" data-i18n="profile.menu_account_sub">Edit nama & avatar</span>
                     </div>
                 </div>
                 <i class="material-icons-round arrow-icon">chevron_right</i>
@@ -162,8 +159,8 @@
                 <div class="menu-left">
                     <i class="material-icons-round menu-icon">lock</i>
                     <div class="menu-text">
-                        <span class="menu-title">Privacy</span>
-                        <span class="menu-sub">Email, password, telepon</span>
+                        <span class="menu-title" data-i18n="profile.menu_privacy_title">Privacy</span>
+                        <span class="menu-sub" data-i18n="profile.menu_privacy_sub">Email, password, telepon</span>
                     </div>
                 </div>
                 <i class="material-icons-round arrow-icon">chevron_right</i>
@@ -172,22 +169,22 @@
                 <div class="menu-left">
                     <i class="material-icons-round menu-icon">backup</i>
                     <div class="menu-text">
-                        <span class="menu-title">Data backup</span>
-                        <span class="menu-sub">Export & import data task</span>
+                        <span class="menu-title" data-i18n="profile.menu_backup_title">Data backup</span>
+                        <span class="menu-sub" data-i18n="profile.menu_backup_sub">Export & import data task</span>
                     </div>
                 </div>
                 <i class="material-icons-round arrow-icon">chevron_right</i>
             </div>
         </div>
 
-        <div class="section-divider">Lainnya</div>
+        <div class="section-divider" data-i18n="profile.section_other">Lainnya</div>
         <div class="menu-list">
             <div class="menu-item" id="statistic">
                 <div class="menu-left">
                     <i class="material-icons-round menu-icon">bar_chart</i>
                     <div class="menu-text">
-                        <span class="menu-title">Statistik</span>
-                        <span class="menu-sub">Progres & produktivitas</span>
+                        <span class="menu-title" data-i18n="profile.menu_stat_title">Statistik</span>
+                        <span class="menu-sub" data-i18n="profile.menu_stat_sub">Progres & produktivitas</span>
                     </div>
                 </div>
                 <i class="material-icons-round arrow-icon">chevron_right</i>
@@ -196,7 +193,7 @@
                 <div class="menu-left">
                     <i class="material-icons-round menu-icon">language</i>
                     <div class="menu-text">
-                        <span class="menu-title">Language</span>
+                        <span class="menu-title" data-i18n="profile.menu_lang_title">Language</span>
                         <span class="menu-sub" id="langSub">Indonesia</span>
                     </div>
                 </div>
@@ -206,8 +203,8 @@
                 <div class="menu-left">
                     <i class="material-icons-round menu-icon">info</i>
                     <div class="menu-text">
-                        <span class="menu-title">About</span>
-                        <span class="menu-sub">Versi & info aplikasi</span>
+                        <span class="menu-title" data-i18n="profile.menu_about_title">About</span>
+                        <span class="menu-sub" data-i18n="profile.menu_about_sub">Versi & info aplikasi</span>
                     </div>
                 </div>
                 <i class="material-icons-round arrow-icon">chevron_right</i>
@@ -216,45 +213,47 @@
 
         <div class="logout-wrapper">
             <button class="logout-btn" id="logoutBtn">
-                <i class="material-icons-round">logout</i> Logout
+                <i class="material-icons-round">logout</i> <span data-i18n="profile.btn_logout">Logout</span>
             </button>
         </div>
     </div>
 </div>
 
-<!-- About Modal -->
 <div class="modal-overlay" id="aboutModal">
     <div class="modal">
         <div class="modal-icon">🔔</div>
         <h3>RemindU</h3>
-        <p>Aplikasi manajemen tugas & pengingat cerdas dengan dukungan AI.</p>
-        <p style="margin-top:8px;"><strong>Versi:</strong> 1.0.0</p>
-        <p><strong>Build:</strong> 2026</p>
-        <p style="margin-top:8px;font-size:12px;">Dibuat dengan ❤️ untuk produktivitas yang lebih baik.</p>
-        <button class="modal-close" id="aboutClose">Tutup</button>
+        <p data-i18n="profile.about_desc">Aplikasi manajemen tugas & pengingat cerdas dengan dukungan AI.</p>
+        <p style="margin-top:8px;"><strong data-i18n="profile.about_version">Versi:</strong> 1.0.0</p>
+        <p><strong data-i18n="profile.about_build">Build:</strong> 2026</p>
+        <p style="margin-top:8px;font-size:12px;" data-i18n="profile.about_footer">Dibuat dengan ❤️ untuk produktivitas yang lebih baik.</p>
+        <button class="modal-close" id="aboutClose" data-i18n="profile.modal_close">Tutup</button>
     </div>
 </div>
 
-<!-- Language Modal -->
 <div class="modal-overlay" id="langModal">
     <div class="modal">
         <div class="modal-icon">🌐</div>
-        <h3>Pilih Bahasa</h3>
+        <h3 data-i18n="profile.lang_modal_title">Pilih Bahasa</h3>
         <div class="lang-list">
-            <div class="lang-option active" data-lang="id">🇮🇩 Indonesia <span>✓</span></div>
+            <div class="lang-option" data-lang="id">🇲🇩 Indonesia</div>
             <div class="lang-option" data-lang="en">🇬🇧 English</div>
             <div class="lang-option" data-lang="zh">🇨🇳 Mandarin</div>
             <div class="lang-option" data-lang="ja">🇯🇵 Japan</div>
             <div class="lang-option" data-lang="nl">🇳🇱 Dutch</div>
         </div>
-        <button class="modal-close" id="langClose">Simpan</button>
+        <button class="modal-close" id="langClose" data-i18n="profile.modal_save">Simpan</button>
     </div>
 </div>
 
 <script>
     const API_URL = 'http://localhost:3000/api';
     const userData = JSON.parse(localStorage.getItem('remindu_user') || '{}');
-    if (!userData.email) { alert('Sesi login tidak ditemukan.'); window.location.href = 'welcome.html'; }
+    if (!userData.email) { 
+        const sessionErr = window.t ? window.t('profile.err_session') : 'Sesi login tidak ditemukan.';
+        alert(sessionErr); 
+        window.location.href = 'welcome.html'; 
+    }
     const userEmail = userData.email;
 
     // Avatar
@@ -287,28 +286,55 @@
             const res2 = await fetch(`${API_URL}/tasks`, { headers: { 'X-User-Email': userEmail } });
             const tasks = await res2.json();
             const active = tasks.filter(t => !t.selesai).length;
-            document.getElementById('profileTaskBadge').textContent = `${active} task aktif`;
+            
+            // Konfigurasi lencana text secara multi-bahasa
+            if (window.t) {
+                document.getElementById('profileTaskBadge').textContent = window.t('profile.active_tasks_count', { count: active }) || `${active} task aktif`;
+            } else {
+                document.getElementById('profileTaskBadge').textContent = `${active} task aktif`;
+            }
         } catch {}
     }
     loadProfile();
 
-    // Language
+    // Language configuration mapping
     const langNames = { id: 'Indonesia', en: 'English', zh: 'Mandarin', ja: 'Japan', nl: 'Dutch' };
     let currentLang = localStorage.getItem('remindu_lang') || 'id';
     document.getElementById('langSub').textContent = langNames[currentLang] || 'Indonesia';
+    
+    // Inisialisasi status active tanda centang ✓ awal pada modal list
     document.querySelectorAll('.lang-option').forEach(opt => {
-        if (opt.dataset.lang === currentLang) opt.classList.add('active');
-        opt.addEventListener('click', () => {
-            document.querySelectorAll('.lang-option').forEach(o => { o.classList.remove('active'); o.querySelector('span') && o.querySelector('span').remove(); });
+        if (opt.dataset.lang === currentLang) {
             opt.classList.add('active');
-            const sp = document.createElement('span'); sp.textContent = '✓'; opt.appendChild(sp);
+            const sp = document.createElement('span'); 
+            sp.textContent = '✓'; 
+            opt.appendChild(sp);
+        }
+        
+        opt.addEventListener('click', () => {
+            document.querySelectorAll('.lang-option').forEach(o => { 
+                o.classList.remove('active'); 
+                const existingSpan = o.querySelector('span');
+                if (existingSpan) existingSpan.remove(); 
+            });
+            opt.classList.add('active');
+            const sp = document.createElement('span'); 
+            sp.textContent = '✓'; 
+            opt.appendChild(sp);
             currentLang = opt.dataset.lang;
         });
     });
+
     document.getElementById('langClose').addEventListener('click', () => {
         localStorage.setItem('remindu_lang', currentLang);
         document.getElementById('langSub').textContent = langNames[currentLang];
         document.getElementById('langModal').classList.remove('show');
+        
+        // Picu pembaruan real-time interpreter teks bahasa tanpa memuat ulang page
+        if (typeof applyLang === 'function') {
+            applyLang();
+            loadProfile(); // perbarui baris teks "X task aktif"
+        }
     });
 
     // Navigation
@@ -328,13 +354,15 @@
     });
 
     document.getElementById('logoutBtn').addEventListener('click', () => {
-        if (confirm('Yakin ingin keluar?')) {
+        const confirmMsg = window.t ? window.t('profile.confirm_logout') : 'Yakin ingin keluar?';
+        if (confirm(confirmMsg)) {
             localStorage.removeItem('remindu_user');
             window.location.href = 'welcome.html';
         }
     });
 </script>
 
+<<<<<<< HEAD
 <button id="darkFab" style="position:fixed;bottom:88px;right:18px;z-index:9999;width:44px;height:44px;border-radius:50%;border:none;background:var(--purple);color:white;font-size:20px;cursor:pointer;box-shadow:0 4px 14px rgba(139,92,246,0.35);display:flex;align-items:center;justify-content:center;">🌙</button>
 <script>
 (function(){
@@ -347,6 +375,13 @@
         fab.textContent = next === 'dark' ? '☀️' : '🌙';
     });
 })();
+=======
+<script src="lang.js"></script>
+<script>
+    if (typeof applyLang === 'function') {
+        applyLang();
+    }
+>>>>>>> bfc64c1 (clean: remove node_modules from tracking)
 </script>
 </body>
 </html>
