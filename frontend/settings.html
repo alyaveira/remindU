@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+<script>
+(function(){
+    var t = localStorage.getItem('remindu_theme') || 'light';
+    document.documentElement.setAttribute('data-theme', t);
+})();
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>RemindU - Settings</title>
@@ -19,13 +25,60 @@
             --sidebar-collapsed-w: 72px;
             --header-h: 64px;
         }
+        [data-theme="dark"] {
+            --purple: #a78bfa;
+            --purple-dark: #8b5cf6;
+            --purple-light: #2d1f5e;
+            --bg: #0f0f13;
+            --white: #1a1a24;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #2a2a3a;
+        }
+        [data-theme="dark"] body { background: var(--bg); color: var(--text); }
+        [data-theme="dark"] .sidebar,
+        [data-theme="dark"] .topbar,
+        [data-theme="dark"] .settings-section,
+        [data-theme="dark"] .modal-box,
+        [data-theme="dark"] .dropdown { background: var(--white) !important; border-color: var(--border) !important; }
+        [data-theme="dark"] .settings-item { border-color: var(--border) !important; }
+        [data-theme="dark"] .settings-item:hover { background: rgba(167,139,250,0.06); }
+        [data-theme="dark"] .settings-item-title { color: var(--text) !important; }
+        [data-theme="dark"] .settings-item-sub,
+        [data-theme="dark"] .settings-section-title,
+        [data-theme="dark"] .nav-label { color: var(--text-muted) !important; }
+        [data-theme="dark"] .nav-item { color: var(--text-muted) !important; }
+        [data-theme="dark"] .nav-item:hover { background: rgba(167,139,250,0.08) !important; color: var(--purple) !important; }
+        [data-theme="dark"] .nav-item.active { background: var(--purple-light) !important; color: var(--purple) !important; }
+        [data-theme="dark"] .sidebar-user-name { color: var(--text) !important; }
+        [data-theme="dark"] .sidebar-user-email,
+        [data-theme="dark"] .topbar-date { color: var(--text-muted) !important; }
+        [data-theme="dark"] .topbar-greeting { color: var(--text) !important; }
+        [data-theme="dark"] .toggle-btn,
+        [data-theme="dark"] .topbar-icon-btn,
+        [data-theme="dark"] .topbar-mobile-toggle { background: #13131e !important; color: var(--text-muted) !important; }
+        [data-theme="dark"] .modal-option { border-color: var(--border) !important; color: var(--text) !important; }
+        [data-theme="dark"] .modal-option:hover,
+        [data-theme="dark"] .modal-option.selected { background: var(--purple-light) !important; border-color: var(--purple) !important; color: var(--purple) !important; }
+        [data-theme="dark"] .modal-title { color: var(--text) !important; }
+        [data-theme="dark"] .btn-modal-cancel { background: #13131e !important; border-color: var(--border) !important; color: var(--text) !important; }
+        [data-theme="dark"] .dd-item { color: var(--text) !important; }
+        [data-theme="dark"] .dd-item:hover { background: #13131e !important; }
+        [data-theme="dark"] .dd-item.danger { color: #f87171 !important; }
+        [data-theme="dark"] .bottom-nav { background: var(--white) !important; border-color: var(--border) !important; }
+        [data-theme="dark"] .bnav-item { color: var(--text-muted) !important; }
+        [data-theme="dark"] .bnav-item.active { background: var(--purple-light) !important; color: var(--purple) !important; }
+        [data-theme="dark"] .bg-blob-1,
+        [data-theme="dark"] .bg-blob-2 { opacity: 0.07 !important; }
+        [data-theme="dark"] .sidebar-header,
+        [data-theme="dark"] .sidebar-user,
+        [data-theme="dark"] .sidebar-footer { border-color: var(--border) !important; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
         body { background: var(--bg); min-height: 100vh; overflow-x: hidden; position: relative; }
         .bg-blob { position: fixed; border-radius: 50%; filter: blur(60px); opacity: 0.38; pointer-events: none; z-index: 0; }
         .bg-blob-1 { width: 400px; height: 400px; background: var(--purple); top: -100px; right: -100px; }
         .bg-blob-2 { width: 300px; height: 300px; background: #ec4899; bottom: -80px; left: -80px; }
         .layout { display: flex; min-height: 100vh; position: relative; z-index: 5; }
-        /* SIDEBAR */
         .sidebar { width: var(--sidebar-w); background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 200; transition: width 0.3s cubic-bezier(0.4,0,0.2,1), transform 0.3s; overflow: hidden; box-shadow: 2px 0 20px rgba(0,0,0,0.04); }
         .sidebar.collapsed { width: var(--sidebar-collapsed-w); }
         .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 199; backdrop-filter: blur(2px); }
@@ -60,10 +113,8 @@
         .nav-badge { margin-left: auto; background: var(--purple); color: white; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; flex-shrink: 0; transition: opacity 0.2s; }
         .sidebar.collapsed .nav-badge { opacity: 0; }
         .sidebar-footer { padding: 12px 10px 16px; border-top: 1px solid var(--border); flex-shrink: 0; }
-        /* MAIN */
         .main { flex: 1; margin-left: var(--sidebar-w); transition: margin-left 0.3s cubic-bezier(0.4,0,0.2,1); min-height: 100vh; display: flex; flex-direction: column; }
         .main.expanded { margin-left: var(--sidebar-collapsed-w); }
-        /* TOPBAR */
         .topbar { height: var(--header-h); background: var(--white); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 8px rgba(0,0,0,0.04); }
         .topbar-left { display: flex; align-items: center; gap: 12px; }
         .topbar-mobile-toggle { display: none; width: 36px; height: 36px; border-radius: 10px; border: none; background: var(--bg); cursor: pointer; align-items: center; justify-content: center; color: var(--text); transition: background 0.2s; }
@@ -85,9 +136,7 @@
         .dd-item:hover { background: var(--bg); }
         .dd-item.danger { color: #e53e3e; border-top: 1px solid var(--border); }
         .dd-item i { font-size: 18px; }
-        /* PAGE */
         .page-content { flex: 1; padding: 28px; max-width: 800px; width: 100%; margin: 0 auto; }
-        /* BANNER */
         .settings-banner { background: linear-gradient(135deg, var(--purple) 0%, #6d28d9 60%, #4f46e5 100%); border-radius: 24px; padding: 24px 28px; color: white; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; overflow: hidden; position: relative; box-shadow: 0 8px 24px rgba(139,92,246,0.3); animation: fadeUp 0.5s ease both; }
         @keyframes fadeUp { from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);} }
         .settings-banner::before { content:''; position:absolute; top:-60px; right:-40px; width:200px; height:200px; border-radius:50%; background:rgba(255,255,255,0.08); }
@@ -95,7 +144,6 @@
         .settings-banner p { font-size: 13px; opacity: 0.85; }
         .settings-banner-icon { font-size: 52px; animation: floatIcon 3s infinite ease-in-out; position: relative; z-index: 1; }
         @keyframes floatIcon { 0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);} }
-        /* SECTIONS */
         .settings-section { background: var(--white); border-radius: 24px; padding: 20px; border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.03); margin-bottom: 16px; animation: fadeUp 0.5s 0.1s ease both; }
         .settings-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; margin-bottom: 12px; }
         .settings-item { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--border); cursor: pointer; transition: all 0.2s; border-radius: 0; }
@@ -110,19 +158,16 @@
         .settings-item-icon.orange { background: #fef3c7; color: #f97316; }
         .settings-item-icon.pink { background: #fce7f3; color: #ec4899; }
         .settings-item-icon i { font-size: 20px; }
-        .settings-item-text { }
         .settings-item-title { font-size: 14px; font-weight: 600; color: var(--text); }
         .settings-item-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
         .settings-item-right { display: flex; align-items: center; gap: 8px; color: var(--text-muted); }
         .settings-item-right i { font-size: 20px; }
-        /* SWITCH */
         .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #cbd5e1; transition: 0.3s; border-radius: 24px; }
         .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background: white; transition: 0.3s; border-radius: 50%; }
         input:checked + .slider { background: var(--purple); }
         input:checked + .slider:before { transform: translateX(20px); }
-        /* BOTTOM NAV */
         .bottom-nav { display: none; background: var(--white); border-top: 1px solid var(--border); position: fixed; bottom: 0; left: 0; right: 0; z-index: 200; padding: 8px 12px 16px; justify-content: space-around; box-shadow: 0 -4px 16px rgba(0,0,0,0.06); }
         .bnav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; color: #94a3b8; cursor: pointer; padding: 6px 12px; border-radius: 16px; transition: all 0.2s; flex: 1; }
         .bnav-item i { font-size: 22px; }
@@ -137,7 +182,6 @@
             .topbar { padding: 0 16px; }
         }
         .relative { position: relative; }
-        /* MODAL */
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 400; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
         .modal-overlay.show { display: flex; }
         .modal-box { background: white; border-radius: 24px; padding: 28px; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.2); animation: dropFade 0.2s ease; }
@@ -216,8 +260,6 @@
                 </div>
                 <div class="settings-banner-icon">⚙️</div>
             </div>
-
-            <!-- KOSTUMASI -->
             <div class="settings-section">
                 <div class="settings-section-title">Kostumasi</div>
                 <div class="settings-item" id="widgetSetting">
@@ -271,8 +313,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- DATE & TIME -->
             <div class="settings-section">
                 <div class="settings-section-title">Tanggal & Waktu</div>
                 <div class="settings-item" id="dateFmtSetting">
@@ -306,8 +346,6 @@
                     <div class="settings-item-right"><i class="material-icons-round">chevron_right</i></div>
                 </div>
             </div>
-
-            <!-- AI -->
             <div class="settings-section">
                 <div class="settings-section-title">AI & Motivasi</div>
                 <div class="settings-item" id="aiSetting">
@@ -339,7 +377,7 @@
         <div class="modal-options">
             <div class="modal-option" data-val="light"><i class="material-icons-round">light_mode</i> Light</div>
             <div class="modal-option" data-val="dark"><i class="material-icons-round">dark_mode</i> Dark</div>
-            <div class="modal-option selected" data-val="system"><i class="material-icons-round">devices</i> Ikuti Sistem</div>
+            <div class="modal-option" data-val="system"><i class="material-icons-round">devices</i> Ikuti Sistem</div>
         </div>
         <div class="modal-footer">
             <button class="btn-modal-cancel" id="themeCancel">Batal</button>
@@ -347,7 +385,6 @@
         </div>
     </div>
 </div>
-<!-- MODAL DATE FORMAT -->
 <div class="modal-overlay" id="dateFmtModal">
     <div class="modal-box">
         <div class="modal-title">Format Tanggal</div>
@@ -363,7 +400,6 @@
         </div>
     </div>
 </div>
-<!-- MODAL TIME FORMAT -->
 <div class="modal-overlay" id="timeFmtModal">
     <div class="modal-box">
         <div class="modal-title">Format Waktu</div>
@@ -378,7 +414,6 @@
         </div>
     </div>
 </div>
-<!-- MODAL FIRST DAY -->
 <div class="modal-overlay" id="firstDayModal">
     <div class="modal-box">
         <div class="modal-title">Hari Pertama Minggu</div>
@@ -413,7 +448,6 @@
     document.getElementById('sidebarAvatar').textContent = avatarChar;
     document.getElementById('topbarAvatarChar').textContent = avatarChar;
 
-    // SIDEBAR
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
     const sidebarToggle = document.getElementById('sidebarToggle');
@@ -453,7 +487,6 @@
     document.querySelectorAll('.bnav-item[data-nav]').forEach(el => el.addEventListener('click', () => handleNav(el.dataset.nav)));
     document.getElementById('topbarNotif').addEventListener('click', () => window.location.href = 'notification.html');
 
-    // MODAL HELPER
     function openModal(id) { document.getElementById(id).classList.add('show'); }
     function closeModal(id) { document.getElementById(id).classList.remove('show'); }
     function setupModal(modalId, itemId, labelId, cancelId, saveId, settingKey) {
@@ -477,8 +510,17 @@
         document.getElementById(saveId).addEventListener('click', () => {
             const selected = modal.querySelector('.modal-option.selected');
             if (selected) {
-                label.textContent = selected.dataset.val;
-                localStorage.setItem(settingKey, selected.dataset.val);
+                const val = selected.dataset.val;
+                label.textContent = val;
+                localStorage.setItem(settingKey, val);
+                if (settingKey === 'remindu_theme') {
+                    const applied = val === 'system'
+                        ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+                        : val;
+                    document.documentElement.setAttribute('data-theme', applied);
+                    const fab = document.getElementById('darkFab');
+                    if (fab) fab.textContent = applied === 'dark' ? '☀️' : '🌙';
+                }
             }
             closeModal(modalId);
         });
@@ -492,7 +534,40 @@
 
     document.getElementById('widgetSetting').addEventListener('click', () => alert('Fitur widget akan segera hadir.'));
     document.getElementById('aiSetting').addEventListener('click', () => window.location.href = 'ai-motivation.html');
-    document.getElementById('syncSetting');
+})();
+</script>
+
+<button id="darkFab" title="Toggle Dark Mode" style="
+    position:fixed; bottom:88px; right:18px; z-index:9999;
+    width:44px; height:44px; border-radius:50%; border:none;
+    background:var(--purple); color:white; font-size:20px;
+    cursor:pointer; box-shadow:0 4px 14px rgba(139,92,246,0.35);
+    display:flex; align-items:center; justify-content:center;
+    transition:transform 0.2s;">🌙</button>
+
+<script>
+(function(){
+    var fab = document.getElementById('darkFab');
+    var current = document.documentElement.getAttribute('data-theme') || 'light';
+    fab.textContent = current === 'dark' ? '☀️' : '🌙';
+    fab.addEventListener('click', function() {
+        var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        var next = isDark ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('remindu_theme', next);
+        fab.textContent = next === 'dark' ? '☀️' : '🌙';
+        var lbl = document.getElementById('themeLabel');
+        if (lbl) lbl.textContent = next.charAt(0).toUpperCase() + next.slice(1);
+        document.querySelectorAll('#themeModal .modal-option').forEach(function(o) {
+            o.classList.toggle('selected', o.dataset.val === next);
+        });
+    });
+    var saved = localStorage.getItem('remindu_theme');
+    if (saved === 'system') {
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+        fab.textContent = prefersDark ? '☀️' : '🌙';
+    }
 })();
 </script>
 </body>

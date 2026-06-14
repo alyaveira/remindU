@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>RemindU - Login</title>
-    <!-- Google Identity Services (One Tap + Sign-In Button) -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         :root {
             --purple:#8b5cf6; --purple-dark:#7c3aed; --purple-light:#ede9fe;
@@ -20,8 +18,6 @@
         @keyframes fadeSlide { from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);} }
         h2 { font-size:28px; margin-bottom:6px; color:var(--text); font-weight:700; }
         .subtitle { color:var(--text-muted); margin-bottom:24px; font-size:15px; }
-
-        /* Inputs */
         .form-group { position:relative; margin-bottom:14px; }
         .form-group input {
             width:100%; padding:14px 20px 14px 48px; background:#f3f4f9;
@@ -33,67 +29,34 @@
         .form-group .eye-toggle:hover { color:var(--purple); }
         .error-msg { color:#e53e3e; font-size:12px; padding:0 4px; margin-top:4px; display:none; }
         .error-msg.show { display:block; }
-
-        /* Remember & Forgot */
         .flex-between { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; font-size:14px; }
         .remember-row { display:flex; align-items:center; gap:8px; }
         .remember-row input[type=checkbox] { width:16px; height:16px; accent-color:var(--purple); cursor:pointer; }
         .remember-row label { color:var(--text-muted); cursor:pointer; user-select:none; }
         a { color:var(--purple); text-decoration:none; transition:opacity 0.2s; }
         a:hover { opacity:0.8; text-decoration:underline; }
-
-        /* Login Button */
         .btn-primary { background:var(--purple); color:white; border:none; border-radius:60px; padding:14px; width:100%; font-weight:700; font-size:15px; cursor:pointer; transition:all 0.2s ease; display:flex; align-items:center; justify-content:center; gap:8px; }
         .btn-primary:hover { background:var(--purple-dark); transform:translateY(-2px); box-shadow:0 8px 20px rgba(139,92,246,0.3); }
         .btn-primary:disabled { opacity:0.6; transform:none; cursor:not-allowed; }
-
-        /* Divider */
         .divider { display:flex; align-items:center; gap:12px; margin:20px 0; color:var(--text-muted); font-size:13px; }
         .divider::before,.divider::after { content:''; flex:1; height:1px; background:var(--border); }
-
-        /* Google Button */
-        .btn-google {
-            width:100%; padding:12px 20px; border:1.5px solid var(--border); border-radius:60px;
-            background:white; color:#1a1a1a; font-size:15px; font-weight:600; cursor:pointer;
-            display:flex; align-items:center; justify-content:center; gap:12px;
-            transition:all 0.2s ease; position:relative;
-        }
+        .btn-google { width:100%; padding:12px 20px; border:1.5px solid var(--border); border-radius:60px; background:white; color:#1a1a1a; font-size:15px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:12px; transition:all 0.2s ease; }
         .btn-google:hover { background:#f8f9fa; border-color:#dadce0; box-shadow:0 2px 8px rgba(0,0,0,0.08); transform:translateY(-1px); }
-        .btn-google:active { transform:translateY(0); }
         .btn-google img { width:20px; height:20px; }
-        .btn-google span { font-family:'Segoe UI',Arial,sans-serif; }
-
-        /* OR with Google One Tap container */
-        #g_id_onload { display:none; }
-
         .signup-link { text-align:center; margin-top:20px; font-size:14px; color:var(--text-muted); }
-
-        /* Toast */
         .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(80px); background:#1e293b; color:white; padding:12px 24px; border-radius:40px; font-size:14px; font-weight:500; z-index:9999; transition:transform 0.3s ease; white-space:nowrap; }
         .toast.show { transform:translateX(-50%) translateY(0); }
         .toast.success { background:#10b981; }
         .toast.error { background:#e53e3e; }
-
-        /* Loading spinner */
         .spinner { width:18px; height:18px; border:2.5px solid rgba(255,255,255,0.4); border-top-color:white; border-radius:50%; animation:spin 0.7s linear infinite; }
         @keyframes spin { to { transform:rotate(360deg); } }
-
         .back-link { display:inline-block; margin-bottom:20px; color:var(--purple); font-weight:500; font-size:14px; }
-
         @media (min-width:768px) { .card { max-width:550px; padding:48px 40px; } }
     </style>
 </head>
 <body>
 <div class="bg-blob bg-blob-1"></div>
 <div class="bg-blob bg-blob-2"></div>
-
-<!-- Google One Tap (muncul otomatis jika user belum login) -->
-<div id="g_id_onload"
-     data-client_id="YOUR_GOOGLE_CLIENT_ID"
-     data-callback="handleGoogleOneTap"
-     data-auto_prompt="true"
-     data-cancel_on_tap_outside="false">
-</div>
 
 <div class="card">
     <a href="welcome.html" class="back-link">← Kembali</a>
@@ -102,15 +65,15 @@
 
     <form id="loginForm" novalidate>
         <div class="form-group">
-            <span class="material-icons-round field-icon" style="font-family:'Material Icons Round'">email</span>
-            <input type="text" id="loginEmail" placeholder="Email atau Username" autocomplete="username">
+            <span class="material-icons-round field-icon">email</span>
+            <input type="email" id="loginEmail" placeholder="Email" autocomplete="email">
             <div class="error-msg" id="loginEmailError"></div>
         </div>
         <div class="form-group">
-            <span class="material-icons-round field-icon" style="font-family:'Material Icons Round'">lock</span>
+            <span class="material-icons-round field-icon">lock</span>
             <input type="password" id="loginPassword" placeholder="Password" autocomplete="current-password">
             <button type="button" class="eye-toggle" id="eyeToggle" onclick="togglePwd()">
-                <span class="material-icons-round" style="font-family:'Material Icons Round';font-size:20px;">visibility_off</span>
+                <span class="material-icons-round" style="font-size:20px;">visibility_off</span>
             </button>
             <div class="error-msg" id="loginPassError"></div>
         </div>
@@ -130,9 +93,8 @@
 
     <div class="divider">atau</div>
 
-    <!-- Google Sign-In Button (custom, lebih responsive dari default) -->
-    <button class="btn-google" id="googleLoginBtn" onclick="loginWithGoogle()">
-        <img src="https://lh3.googleusercontent.com/COxitqgJr1sJnIDe8-jiKhxDx1FrYbtRHKJ9z_hELisAlapwE9LPeM-Bg68oTqKpQmq=" alt="Google" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTkuNiAxMC4yM2MwLS42Mi0uMDUtMS4yMi0uMTUtMS44SDEwdjMuNDJoNS4wOWMtLjIyIDEuMTctLjg5IDIuMTYtMS45IDIuODR2Mi4zNmgzLjA3YzEuOC0xLjY2IDIuODQtNC4xIDIuODQtNi44MnoiIGZpbGw9IiM0Mjg1RjQiLz48cGF0aCBkPSJNMTAgMjBjMi41NCAwIDQuNjctLjg0IDYuMjMtMi4yN2wtMy4wNy0yLjM2Yy0uODQuNTYtMS45MS45LTMuMTYuOS0yLjQzIDAtNC40OS0xLjY0LTUuMjMtMy44NEgyLjQ4djIuNDRDNC4wMyAxNy43OCA2LjggMjAgMTAgMjB6IiBmaWxsPSIjMzRBODUzIi8+PHBhdGggZD0iTTQuNzcgMTIuNDNBNi4wMiA2LjAyIDAgMCAxIDQuNDcgMTBjMC0uODQuMTUtMS42NS40My0yLjQzVjUuMTNIMi40OEE5Ljk3IDkuOTcgMCAwIDAgMCAxMGMwIDEuNjEuMzggMy4xNCAxLjA1IDQuNWwyLjcyLTIuMDd6IiBmaWxsPSIjRkJCQzA1Ii8+PHBhdGggZD0iTTEwIDMuOTZjMS4zNyAwIDIuNi40NyAzLjU3IDEuNGwyLjY3LTIuNjdDMTQuNjUuOTcgMTIuNTIgMCAxMCAwIDYuOCAwIDQuMDMgMi4yMiAyLjQ4IDUuMTNsMyAyLjMxQzcuNTEgNS42IDkuNTcgMy45NiAxMCAzLjk2eiIgZmlsbD0iI0VBNDMzNSIvPjwvc3ZnPg=='">
+    <button class="btn-google" id="googleLoginBtn">
+        <img src="https://www.google.com/favicon.ico" alt="Google Icon">
         <span>Lanjutkan dengan Google</span>
     </button>
 
@@ -142,141 +104,131 @@
 </div>
 
 <div class="toast" id="toast"></div>
-
-<!-- Material Icons (lightweight) -->
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 
-<script>
-const API_URL = 'http://localhost:3000/api';
-const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID'; // Ganti dengan Client ID kamu
+<script type="module">
+    import { supabase } from './supabase-config.js';
 
-// ===== INIT =====
-// Update Google One Tap client_id
-document.getElementById('g_id_onload').dataset.clientId = GOOGLE_CLIENT_ID;
+    const form = document.getElementById('loginForm');
+    const emailInput = document.getElementById('loginEmail');
+    const passwordInput = document.getElementById('loginPassword');
+    const emailError = document.getElementById('loginEmailError');
+    const passError = document.getElementById('loginPassError');
+    const rememberCheck = document.getElementById('rememberMe');
+    const loginBtn = document.getElementById('loginBtn');
+    const toast = document.getElementById('toast');
 
-// Load saved email
-if (localStorage.getItem('remindu_remember') === 'true') {
-    const saved = localStorage.getItem('remindu_saved_email');
-    if (saved) { document.getElementById('loginEmail').value = saved; document.getElementById('rememberMe').checked = true; }
-}
-
-// Cek error dari redirect Google
-const urlParams = new URLSearchParams(window.location.search);
-if (urlParams.get('error') === 'google_failed') {
-    showToast('Login Google gagal. Coba lagi.', 'error');
-}
-
-// ===== HELPER =====
-function showToast(msg, type = '') {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.className = 'toast show ' + type;
-    setTimeout(() => t.classList.remove('show'), 4000);
-}
-
-function togglePwd() {
-    const inp = document.getElementById('loginPassword');
-    const btn = document.querySelector('#eyeToggle span');
-    if (inp.type === 'password') { inp.type = 'text'; btn.textContent = 'visibility'; }
-    else { inp.type = 'password'; btn.textContent = 'visibility_off'; }
-}
-
-function setLoginLoading(loading) {
-    const btn = document.getElementById('loginBtn');
-    btn.disabled = loading;
-    btn.innerHTML = loading
-        ? '<div class="spinner"></div>'
-        : '<span id="loginBtnText">Masuk</span>';
-}
-
-// ===== LOGIN LOKAL =====
-document.getElementById('loginForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email    = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value.trim();
-    const emailErr = document.getElementById('loginEmailError');
-    const passErr  = document.getElementById('loginPassError');
-
-    emailErr.className = 'error-msg'; passErr.className = 'error-msg';
-    let valid = true;
-    if (!email) { emailErr.textContent = 'Email wajib diisi'; emailErr.className = 'error-msg show'; valid = false; }
-    if (!password) { passErr.textContent = 'Password wajib diisi'; passErr.className = 'error-msg show'; valid = false; }
-    if (!valid) return;
-
-    if (document.getElementById('rememberMe').checked) {
-        localStorage.setItem('remindu_remember', 'true');
-        localStorage.setItem('remindu_saved_email', email);
-    } else {
-        localStorage.removeItem('remindu_remember');
-        localStorage.removeItem('remindu_saved_email');
+    function showToast(msg, type = '') {
+        toast.textContent = msg;
+        toast.className = 'toast show ' + type;
+        setTimeout(() => toast.classList.remove('show'), 4000);
     }
 
-    setLoginLoading(true);
-    try {
-        const res  = await fetch(`${API_URL}/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
+    function setLoginLoading(loading) {
+        loginBtn.disabled = loading;
+        loginBtn.innerHTML = loading ? '<div class="spinner"></div>' : '<span id="loginBtnText">Masuk</span>';
+    }
+
+    window.togglePwd = function() {
+        const inp = document.getElementById('loginPassword');
+        const btn = document.querySelector('#eyeToggle span');
+        if (inp.type === 'password') {
+            inp.type = 'text';
+            btn.textContent = 'visibility';
+        } else {
+            inp.type = 'password';
+            btn.textContent = 'visibility_off';
+        }
+    }
+
+    // Load saved email
+    if (localStorage.getItem('remindu_remember') === 'true') {
+        const saved = localStorage.getItem('remindu_saved_email');
+        if (saved) {
+            emailInput.value = saved;
+            rememberCheck.checked = true;
+        }
+    }
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        emailError.classList.remove('show');
+        passError.classList.remove('show');
+        
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+        
+        let valid = true;
+        if (!email) {
+            emailError.textContent = 'Email wajib diisi';
+            emailError.classList.add('show');
+            valid = false;
+        }
+        if (!password) {
+            passError.textContent = 'Password wajib diisi';
+            passError.classList.add('show');
+            valid = false;
+        }
+        if (!valid) return;
+
+        if (rememberCheck.checked) {
+            localStorage.setItem('remindu_remember', 'true');
+            localStorage.setItem('remindu_saved_email', email);
+        } else {
+            localStorage.removeItem('remindu_remember');
+            localStorage.removeItem('remindu_saved_email');
+        }
+
+        setLoginLoading(true);
+        
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email: email,
+            password: password
         });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Login gagal');
-
-        localStorage.setItem('remindu_user', JSON.stringify({
-            email: data.email || email,
-            firstName: data.nama_depan || email.split('@')[0],
-            provider: 'local'
-        }));
-        showToast('✅ Login berhasil! Mengalihkan...', 'success');
-        setTimeout(() => window.location.href = 'home.html', 800);
-    } catch (err) {
-        showToast(err.message, 'error');
-    } finally {
+        
+        if (error) {
+            let message = 'Login gagal';
+            if (error.message === 'Invalid login credentials') message = 'Email atau password salah';
+            
+            // JIKA EMAIL BELUM DIVERIFIKASI (MENGGUNAKAN TOAST SUCCESS SEPERTI PETUNJUKMU AGAR MENCOLOK)
+            if (error.message === 'Email not confirmed') {
+                showToast('✅ Cek emailmu untuk verifikasi akun!', 'success');
+                message = 'Email belum diverifikasi. Cek email kamu!';
+            } else {
+                showToast(message, 'error');
+            }
+        } else {
+            localStorage.setItem('remindu_user', JSON.stringify({
+                email: data.user.email,
+                uid: data.user.id
+            }));
+            showToast('Login berhasil!', 'success');
+            setTimeout(() => window.location.href = 'home.html', 1500);
+        }
+        
         setLoginLoading(false);
-    }
-});
+    });
 
-// ===== GOOGLE LOGIN — REDIRECT FLOW =====
-// Mengarahkan ke backend untuk OAuth2 redirect flow
-function loginWithGoogle() {
-    if (GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID') {
-        showToast('⚠️ Google Client ID belum dikonfigurasi di server. Hubungi admin.', 'error');
-        return;
-    }
-    window.location.href = 'http://localhost:3000/auth/google';
-}
-
-// ===== GOOGLE ONE TAP CALLBACK =====
-// Dipanggil ketika user memilih akun di One Tap popup
-async function handleGoogleOneTap(response) {
-    if (!response?.credential) return;
-    setLoginLoading(true);
-    try {
-        const res  = await fetch(`${API_URL}/auth/google-token`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ credential: response.credential })
+    // Google Login
+    document.getElementById('googleLoginBtn').addEventListener('click', async () => {
+        setLoginLoading(true);
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: window.location.origin + '/home.html'
+            }
         });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Google login gagal');
+        if (error) {
+            showToast('Login Google gagal: ' + error.message, 'error');
+            setLoginLoading(false);
+        }
+    });
 
-        localStorage.setItem('remindu_user', JSON.stringify({
-            email:     data.email,
-            firstName: data.nama_depan,
-            provider:  'google'
-        }));
-        showToast('✅ Login Google berhasil!', 'success');
-        setTimeout(() => window.location.href = 'home.html', 800);
-    } catch (err) {
-        showToast(err.message || 'Google login gagal', 'error');
-    } finally {
-        setLoginLoading(false);
-    }
-}
-
-document.getElementById('forgotPwdLink').addEventListener('click', (e) => {
-    e.preventDefault();
-    showToast('Fitur lupa password: masukkan email lama kamu → reset OTP akan dikirim via email.', '');
-});
+    document.getElementById('forgotPwdLink').addEventListener('click', (e) => {
+        e.preventDefault();
+        showToast('Hubungi admin untuk reset password.', '');
+    });
 </script>
 </body>
 </html>

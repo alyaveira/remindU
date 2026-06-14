@@ -54,7 +54,6 @@
         @media (min-width:768px) { .card { padding:48px 40px; } }
     </style>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 <div class="bg-blob bg-blob-1"></div>
@@ -112,7 +111,7 @@
 
     <div class="divider">atau daftar dengan</div>
 
-    <button class="btn-google" onclick="registerWithGoogle()">
+    <button class="btn-google" id="googleRegisterBtn">
         <svg width="20" height="20" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
         Lanjutkan dengan Google
     </button>
@@ -122,126 +121,113 @@
 
 <div class="toast" id="toast"></div>
 
-<script>
-const API_URL = 'http://localhost:3000/api';
-const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID'; // Ganti dengan Client ID kamu
+<script type="module">
+    import { supabase } from './supabase-config.js';
 
-function showToast(msg, type = '') {
-    const t = document.getElementById('toast');
-    t.textContent = msg; t.className = 'toast show ' + type;
-    setTimeout(() => t.classList.remove('show'), 4000);
-}
+    function showToast(msg, type = '') {
+        const t = document.getElementById('toast');
+        t.textContent = msg; 
+        t.className = 'toast show ' + type;
+        setTimeout(() => t.classList.remove('show'), 4000);
+    }
 
-function togglePwd(id, btn) {
-    const inp = document.getElementById(id);
-    inp.type = inp.type === 'password' ? 'text' : 'password';
-    btn.textContent = inp.type === 'password' ? 'visibility_off' : 'visibility';
-}
+    window.togglePwd = function(id, btn) {
+        const inp = document.getElementById(id);
+        inp.type = inp.type === 'password' ? 'text' : 'password';
+        btn.textContent = inp.type === 'password' ? 'visibility_off' : 'visibility';
+    }
 
-// Password strength indicator
-document.getElementById('signupPassword').addEventListener('input', function () {
-    const val = this.value;
-    const fill = document.getElementById('strengthFill');
-    const label = document.getElementById('strengthLabel');
-    let score = 0;
-    if (val.length >= 8) score++;
-    if (/[a-z]/.test(val)) score++;
-    if (/[0-9]/.test(val)) score++;
-    if (/[A-Z]/.test(val)) score++;
-    if (/[^a-zA-Z0-9]/.test(val)) score++;
-    const pct = score * 20;
-    const colors = ['', '#e53e3e', '#f97316', '#f59e0b', '#10b981', '#8b5cf6'];
-    const labels = ['', 'Sangat Lemah', 'Lemah', 'Cukup', 'Kuat', 'Sangat Kuat'];
-    fill.style.width = pct + '%';
-    fill.style.background = colors[score] || '';
-    label.textContent = score > 0 ? `Kekuatan: ${labels[score]}` : 'Password minimal 8 karakter, huruf kecil & angka';
-    label.style.color = colors[score] || '#94a3b8';
-});
+    // Password strength indicator
+    document.getElementById('signupPassword').addEventListener('input', function () {
+        const val = this.value;
+        const fill = document.getElementById('strengthFill');
+        const label = document.getElementById('strengthLabel');
+        let score = 0;
+        if (val.length >= 6) score++;
+        if (/[a-z]/.test(val)) score++;
+        if (/[0-9]/.test(val)) score++;
+        if (/[A-Z]/.test(val)) score++;
+        if (/[^a-zA-Z0-9]/.test(val)) score++;
+        const pct = score * 20;
+        const colors = ['', '#e53e3e', '#f97316', '#f59e0b', '#10b981', '#8b5cf6'];
+        const labels = ['', 'Sangat Lemah', 'Lemah', 'Cukup', 'Kuat', 'Sangat Kuat'];
+        fill.style.width = pct + '%';
+        fill.style.background = colors[score] || '';
+        label.textContent = score > 0 ? `Kekuatan: ${labels[score]}` : 'Password minimal 6 karakter, huruf kecil & angka';
+        label.style.color = colors[score] || '#94a3b8';
+    });
 
-// Form validation
-function validateForm() {
-    let valid = true;
-    const clearErr = id => { const el = document.getElementById(id); if (el) { el.textContent = ''; el.className = 'err'; } };
-    const showErr  = (id, msg) => { const el = document.getElementById(id); if (el) { el.textContent = msg; el.className = 'err show'; } valid = false; };
+    function validateForm() {
+        let valid = true;
+        const clearErr = id => { const el = document.getElementById(id); if (el) { el.textContent = ''; el.className = 'err'; } };
+        const showErr  = (id, msg) => { const el = document.getElementById(id); if (el) { el.textContent = msg; el.className = 'err show'; } valid = false; };
 
-    clearErr('firstNameErr'); clearErr('emailErr'); clearErr('passwordErr'); clearErr('confirmErr');
+        clearErr('firstNameErr'); clearErr('emailErr'); clearErr('passwordErr'); clearErr('confirmErr');
 
-    const first    = document.getElementById('firstName').value.trim();
-    const email    = document.getElementById('signupEmail').value.trim();
-    const password = document.getElementById('signupPassword').value;
-    const confirm  = document.getElementById('confirmPassword').value;
-    const terms    = document.getElementById('acceptTerms').checked;
+        const first    = document.getElementById('firstName').value.trim();
+        const email    = document.getElementById('signupEmail').value.trim();
+        const password = document.getElementById('signupPassword').value;
+        const confirm  = document.getElementById('confirmPassword').value;
+        const terms    = document.getElementById('acceptTerms').checked;
 
-    if (!first) showErr('firstNameErr', 'Nama depan wajib diisi');
-    if (!email || !email.includes('@')) showErr('emailErr', 'Email tidak valid');
-    if (!password || password.length < 8 || !/[a-z]/.test(password) || !/[0-9]/.test(password))
-        showErr('passwordErr', 'Password minimal 8 karakter, huruf kecil & angka');
-    if (password !== confirm) showErr('confirmErr', 'Konfirmasi password tidak cocok');
-    if (!terms) { showToast('⚠️ Harap menyetujui Syarat & Ketentuan', 'error'); valid = false; }
-    return valid;
-}
+        if (!first) showErr('firstNameErr', 'Nama depan wajib diisi');
+        if (!email || !email.includes('@')) showErr('emailErr', 'Email tidak valid');
+        if (!password || password.length < 6 || !/[a-z]/.test(password) || !/[0-9]/.test(password))
+            showErr('passwordErr', 'Password minimal 6 karakter, huruf kecil & angka');
+        if (password !== confirm) showErr('confirmErr', 'Konfirmasi password tidak cocok');
+        if (!terms) { showToast('⚠️ Harap menyetujui Syarat & Ketentuan', 'error'); valid = false; }
+        return valid;
+    }
 
-document.getElementById('signupForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    if (!validateForm()) return;
+    document.getElementById('signupForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!validateForm()) return;
 
-    const btn = document.getElementById('signupBtn');
-    btn.disabled = true;
-    btn.innerHTML = '<div class="spinner"></div>';
+        const btn = document.getElementById('signupBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<div class="spinner"></div>';
 
-    const firstName = document.getElementById('firstName').value.trim();
-    const lastName  = document.getElementById('lastName').value.trim();
-    const email     = document.getElementById('signupEmail').value.trim();
-    const password  = document.getElementById('signupPassword').value;
+        const firstName = document.getElementById('firstName').value.trim();
+        const lastName  = document.getElementById('lastName').value.trim();
+        const email     = document.getElementById('signupEmail').value.trim();
+        const password  = document.getElementById('signupPassword').value;
 
-    try {
-        const res  = await fetch(`${API_URL}/register`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ firstName, lastName, email, password, terms: true })
+        const { data, error } = await supabase.auth.signUp({
+            email: email,
+            password: password,
+            options: {
+                data: {
+                    nama_depan: firstName,
+                    nama_belakang: lastName
+                }
+            }
         });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Registrasi gagal');
+        
+        if (error) {
+            let message = 'Registrasi gagal';
+            if (error.message === 'User already registered') message = 'Email sudah terdaftar';
+            if (error.message === 'Password should be at least 6 characters') message = 'Password minimal 6 karakter';
+            showToast(message, 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<span id="signupBtnText">Buat Akun</span>';
+        } else {
+            showToast('✅ Akun berhasil dibuat! Cek email untuk verifikasi.', 'success');
+            setTimeout(() => window.location.href = 'login.html', 2000);
+        }
+    });
 
-        localStorage.setItem('pendingVerifyEmail', email);
-        showToast('✅ Akun dibuat! Cek email untuk kode OTP.', 'success');
-        // Tampilkan OTP di alert jika SMTP belum aktif
-        if (data.otp) alert(`Kode OTP kamu: ${data.otp}\n(Catatan: Di produksi, OTP dikirim via email otomatis)`);
-        setTimeout(() => window.location.href = 'verify.html', 1000);
-    } catch (err) {
-        showToast(err.message, 'error');
+    // Google Register
+    document.getElementById('googleRegisterBtn').addEventListener('click', async () => {
+        const btn = document.getElementById('googleRegisterBtn');
+        btn.disabled = true;
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: 'google'
+        });
+        if (error) {
+            showToast('Google register gagal: ' + error.message, 'error');
+        }
         btn.disabled = false;
-        btn.innerHTML = '<span id="signupBtnText">Buat Akun</span>';
-    }
-});
-
-// Google Register (sama flow dengan login)
-function registerWithGoogle() {
-    if (GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID') {
-        showToast('⚠️ Google Login belum dikonfigurasi. Hubungi admin.', 'error');
-        return;
-    }
-    window.location.href = 'http://localhost:3000/auth/google';
-}
-
-// Google One Tap callback (sama dengan login)
-window.handleGoogleOneTap = async function (response) {
-    if (!response?.credential) return;
-    try {
-        const res  = await fetch(`${API_URL}/auth/google-token`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ credential: response.credential })
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error);
-        localStorage.setItem('remindu_user', JSON.stringify({ email: data.email, firstName: data.nama_depan, provider: 'google' }));
-        showToast('✅ Daftar via Google berhasil!', 'success');
-        setTimeout(() => window.location.href = 'home.html', 800);
-    } catch (err) {
-        showToast(err.message || 'Google login gagal', 'error');
-    }
-};
+    });
 </script>
 </body>
 </html>

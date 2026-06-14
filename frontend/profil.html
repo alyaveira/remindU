@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>RemindU - Profil</title>
+    <script>
+    (function(){
+        var t = localStorage.getItem('remindu_theme') || 'light';
+        document.documentElement.setAttribute('data-theme', t);
+    })();
+    </script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <style>
         :root {
@@ -96,6 +102,26 @@
         .lang-option span { margin-left: auto; font-size: 16px; }
 
         @media (min-width: 768px) { .page-content { padding: 40px 48px; } }
+
+        /* ========== DARK MODE CSS ========== */
+        [data-theme="dark"] { --purple:#a78bfa; --purple-dark:#8b5cf6; --purple-light:#2d1f5e; --bg:#0f0f13; --white:#1a1a24; --text:#f1f5f9; --text-muted:#94a3b8; --border:#2a2a3a; }
+        [data-theme="dark"] body { background:var(--bg); }
+        [data-theme="dark"] .container { background:var(--white); box-shadow:0 20px 35px -12px rgba(0,0,0,0.3); }
+        [data-theme="dark"] .btn-back { color:var(--purple); }
+        [data-theme="dark"] .btn-back:hover { background:var(--purple-light); }
+        [data-theme="dark"] h2 { color:var(--text); }
+        [data-theme="dark"] .menu-item { background:#13131e; border-color:var(--border); }
+        [data-theme="dark"] .menu-item:hover { background:var(--purple-light); }
+        [data-theme="dark"] .menu-title { color:var(--text); }
+        [data-theme="dark"] .menu-sub { color:var(--text-muted); }
+        [data-theme="dark"] .section-divider { color:var(--text-muted); }
+        [data-theme="dark"] .modal { background:var(--white); }
+        [data-theme="dark"] .modal h3 { color:var(--text); }
+        [data-theme="dark"] .modal p { color:var(--text-muted); }
+        [data-theme="dark"] .lang-option { border-color:var(--border); color:var(--text); }
+        [data-theme="dark"] .lang-option:hover { border-color:var(--purple); background:var(--purple-light); }
+        [data-theme="dark"] .lang-option.active { border-color:var(--purple); background:var(--purple-light); color:var(--purple); }
+        [data-theme="dark"] .bg-blob-1,[data-theme="dark"] .bg-blob-2 { opacity:0.07; }
     </style>
 </head>
 <body>
@@ -307,6 +333,20 @@
             window.location.href = 'welcome.html';
         }
     });
+</script>
+
+<button id="darkFab" style="position:fixed;bottom:88px;right:18px;z-index:9999;width:44px;height:44px;border-radius:50%;border:none;background:var(--purple);color:white;font-size:20px;cursor:pointer;box-shadow:0 4px 14px rgba(139,92,246,0.35);display:flex;align-items:center;justify-content:center;">🌙</button>
+<script>
+(function(){
+    var fab = document.getElementById('darkFab');
+    fab.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+    fab.addEventListener('click', function(){
+        var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('remindu_theme', next);
+        fab.textContent = next === 'dark' ? '☀️' : '🌙';
+    });
+})();
 </script>
 </body>
 </html>

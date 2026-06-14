@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>RemindU - Notifikasi</title>
+    <script>
+    (function(){
+        var t = localStorage.getItem('remindu_theme') || 'light';
+        document.documentElement.setAttribute('data-theme', t);
+    })();
+    </script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <style>
         :root { --purple:#8b5cf6; --purple-dark:#7c3aed; --purple-light:#ede9fe; --blue:#3b82f6; --orange:#f97316; --green:#10b981; --bg:#f5f7fe; --white:#ffffff; --text:#0f172a; --text-muted:#64748b; --border:#edf2f7; --sidebar-w:260px; --sidebar-collapsed-w:72px; --header-h:64px; }
@@ -125,6 +131,34 @@
             .page-content { padding:16px; }
             .topbar { padding:0 16px; }
         }
+
+        /* ========== DARK MODE CSS ========== */
+        [data-theme="dark"] { --purple:#a78bfa; --purple-dark:#8b5cf6; --purple-light:#2d1f5e; --bg:#0f0f13; --white:#1a1a24; --text:#f1f5f9; --text-muted:#94a3b8; --border:#2a2a3a; }
+        [data-theme="dark"] body { background:var(--bg); color:var(--text); }
+        [data-theme="dark"] .sidebar,[data-theme="dark"] .topbar,[data-theme="dark"] .card,[data-theme="dark"] .modal-box,[data-theme="dark"] .dropdown,[data-theme="dark"] .bottom-nav,[data-theme="dark"] .notif-card,[data-theme="dark"] .empty-notif { background:var(--white) !important; border-color:var(--border) !important; }
+        [data-theme="dark"] .notif-card.unread { background:#2d1f3a !important; border-left-color:var(--purple) !important; }
+        [data-theme="dark"] .nav-item { color:var(--text-muted) !important; }
+        [data-theme="dark"] .nav-item:hover { background:rgba(167,139,250,0.08) !important; color:var(--purple) !important; }
+        [data-theme="dark"] .nav-item.active { background:var(--purple-light) !important; color:var(--purple) !important; }
+        [data-theme="dark"] h1,[data-theme="dark"] h2,[data-theme="dark"] h3,[data-theme="dark"] .topbar-greeting,[data-theme="dark"] .sidebar-user-name,[data-theme="dark"] .notif-card-title { color:var(--text) !important; }
+        [data-theme="dark"] .topbar-date,[data-theme="dark"] .sidebar-user-email,[data-theme="dark"] .nav-label,[data-theme="dark"] .text-muted,[data-theme="dark"] .notif-card-msg,[data-theme="dark"] .notif-card-time { color:var(--text-muted) !important; }
+        [data-theme="dark"] .toggle-btn,[data-theme="dark"] .topbar-icon-btn,[data-theme="dark"] .topbar-mobile-toggle,[data-theme="dark"] .filter-chip { background:#13131e !important; color:var(--text-muted) !important; border-color:var(--border) !important; }
+        [data-theme="dark"] .filter-chip.active { background:var(--purple) !important; color:white !important; border-color:var(--purple) !important; }
+        [data-theme="dark"] .filter-chip:hover:not(.active) { background:var(--purple-light) !important; color:var(--purple) !important; }
+        [data-theme="dark"] .notif-icon-wrap.deadline { background:#422f1a !important; }
+        [data-theme="dark"] .notif-icon-wrap.motivasi { background:var(--purple-light) !important; }
+        [data-theme="dark"] .notif-icon-wrap.achievement { background:#1a3a2a !important; }
+        [data-theme="dark"] .notif-icon-wrap.system { background:#1a2a4a !important; }
+        [data-theme="dark"] .notif-icon-wrap.reminder { background:#3a1a3a !important; }
+        [data-theme="dark"] .dd-item { color:var(--text) !important; }
+        [data-theme="dark"] .dd-item:hover { background:#13131e !important; }
+        [data-theme="dark"] .dd-item.danger { color:#f87171 !important; }
+        [data-theme="dark"] .bnav-item { color:var(--text-muted) !important; }
+        [data-theme="dark"] .bnav-item.active { background:var(--purple-light) !important; color:var(--purple) !important; }
+        [data-theme="dark"] .bg-blob-1,[data-theme="dark"] .bg-blob-2 { opacity:0.07 !important; }
+        [data-theme="dark"] .sidebar-header,[data-theme="dark"] .sidebar-user,[data-theme="dark"] .sidebar-footer { border-color:var(--border) !important; }
+        [data-theme="dark"] .sidebar-overlay { background:rgba(0,0,0,0.6) !important; }
+        [data-theme="dark"] .skeleton { background:linear-gradient(90deg,#1a1a2a 25%,#2a2a3a 50%,#1a1a2a 75%); background-size:200% 100%; }
     </style>
 </head>
 <body>
@@ -201,7 +235,7 @@
         <div class="bnav-item" data-nav="home"><i class="material-icons-round">home</i><span>Home</span></div>
         <div class="bnav-item" data-nav="calendar"><i class="material-icons-round">calendar_month</i><span>Kalender</span></div>
         <div class="bnav-item active" data-nav="notification"><i class="material-icons-round">notifications</i><span>Notif</span></div>
-        <div class="bnav-item" data-nav="settings"><i class="material-icons-round">Setting</i><span>Setting</span></div>
+        <div class="bnav-item" data-nav="settings"><i class="material-icons-round">settings</i><span>Setting</span></div>
     </nav>
 </div>
 <script>
@@ -393,6 +427,20 @@
     });
 
     loadNotifs();
+})();
+</script>
+
+<button id="darkFab" style="position:fixed;bottom:88px;right:18px;z-index:9999;width:44px;height:44px;border-radius:50%;border:none;background:var(--purple);color:white;font-size:20px;cursor:pointer;box-shadow:0 4px 14px rgba(139,92,246,0.35);display:flex;align-items:center;justify-content:center;">🌙</button>
+<script>
+(function(){
+    var fab = document.getElementById('darkFab');
+    fab.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+    fab.addEventListener('click', function(){
+        var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('remindu_theme', next);
+        fab.textContent = next === 'dark' ? '☀️' : '🌙';
+    });
 })();
 </script>
 </body>

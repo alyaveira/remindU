@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>RemindU - Detail Task</title>
+    <script>
+    (function(){
+        var t = localStorage.getItem('remindu_theme') || 'light';
+        document.documentElement.setAttribute('data-theme', t);
+    })();
+    </script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <style>
         :root {
@@ -274,6 +280,31 @@
             .topbar { padding: 0 16px; }
         }
         .relative { position: relative; }
+
+        /* ========== DARK MODE CSS ========== */
+        [data-theme="dark"] { --purple:#a78bfa; --purple-dark:#8b5cf6; --purple-light:#2d1f5e; --bg:#0f0f13; --white:#1a1a24; --text:#f1f5f9; --text-muted:#94a3b8; --border:#2a2a3a; }
+        [data-theme="dark"] body { background:var(--bg); color:var(--text); }
+        [data-theme="dark"] .sidebar,[data-theme="dark"] .topbar,[data-theme="dark"] .card,[data-theme="dark"] .modal-box,[data-theme="dark"] .dropdown,[data-theme="dark"] .bottom-nav,[data-theme="dark"] .detail-card { background:var(--white) !important; border-color:var(--border) !important; }
+        [data-theme="dark"] .nav-item { color:var(--text-muted) !important; }
+        [data-theme="dark"] .nav-item:hover { background:rgba(167,139,250,0.08) !important; color:var(--purple) !important; }
+        [data-theme="dark"] .nav-item.active { background:var(--purple-light) !important; color:var(--purple) !important; }
+        [data-theme="dark"] h1,[data-theme="dark"] h2,[data-theme="dark"] h3,[data-theme="dark"] .topbar-greeting,[data-theme="dark"] .sidebar-user-name { color:var(--text) !important; }
+        [data-theme="dark"] .topbar-date,[data-theme="dark"] .sidebar-user-email,[data-theme="dark"] .nav-label,[data-theme="dark"] .text-muted,[data-theme="dark"] .info-label,[data-theme="dark"] .progress-label { color:var(--text-muted) !important; }
+        [data-theme="dark"] .info-value { color:var(--text) !important; }
+        [data-theme="dark"] .toggle-btn,[data-theme="dark"] .topbar-icon-btn,[data-theme="dark"] .topbar-mobile-toggle { background:#13131e !important; color:var(--text-muted) !important; }
+        [data-theme="dark"] .dd-item { color:var(--text) !important; }
+        [data-theme="dark"] .dd-item:hover { background:#13131e !important; }
+        [data-theme="dark"] .dd-item.danger { color:#f87171 !important; }
+        [data-theme="dark"] .bnav-item { color:var(--text-muted) !important; }
+        [data-theme="dark"] .bnav-item.active { background:var(--purple-light) !important; color:var(--purple) !important; }
+        [data-theme="dark"] .bg-blob-1,[data-theme="dark"] .bg-blob-2 { opacity:0.07 !important; }
+        [data-theme="dark"] .sidebar-header,[data-theme="dark"] .sidebar-user,[data-theme="dark"] .sidebar-footer { border-color:var(--border) !important; }
+        [data-theme="dark"] .sidebar-overlay { background:rgba(0,0,0,0.6) !important; }
+        [data-theme="dark"] .btn-back { background:#13131e !important; border-color:var(--border) !important; color:var(--text) !important; }
+        [data-theme="dark"] .btn-back:hover { background:var(--purple-light) !important; color:var(--purple) !important; }
+        [data-theme="dark"] .status-badge { background:#1a3a2a !important; color:#86efac !important; }
+        [data-theme="dark"] .status-badge.pending { background:#3a2a1a !important; color:#fcd34d !important; }
+        [data-theme="dark"] .progress-bar-bg { background:#13131e !important; }
     </style>
 </head>
 <body>
@@ -516,6 +547,20 @@
         if (!str) return '';
         return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;');
     }
+</script>
+
+<button id="darkFab" style="position:fixed;bottom:88px;right:18px;z-index:9999;width:44px;height:44px;border-radius:50%;border:none;background:var(--purple);color:white;font-size:20px;cursor:pointer;box-shadow:0 4px 14px rgba(139,92,246,0.35);display:flex;align-items:center;justify-content:center;">🌙</button>
+<script>
+(function(){
+    var fab = document.getElementById('darkFab');
+    fab.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+    fab.addEventListener('click', function(){
+        var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('remindu_theme', next);
+        fab.textContent = next === 'dark' ? '☀️' : '🌙';
+    });
+})();
 </script>
 </body>
 </html>
