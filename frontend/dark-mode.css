@@ -1,0 +1,146 @@
+/* dark-mode.css — RemindU Global Dark Theme */
+/* Include ini di semua halaman: <link rel="stylesheet" href="dark-mode.css"> */
+
+[data-theme="dark"] {
+    --purple: #a78bfa;
+    --purple-dark: #8b5cf6;
+    --purple-light: #2d1f5e;
+    --bg: #0f0f13;
+    --white: #1a1a24;
+    --text: #f1f5f9;
+    --text-muted: #94a3b8;
+    --border: #2a2a3a;
+}
+
+[data-theme="dark"] body {
+    background: var(--bg);
+    color: var(--text);
+}
+
+/* Cards & surfaces */
+[data-theme="dark"] .card,
+[data-theme="dark"] .container,
+[data-theme="dark"] .sidebar,
+[data-theme="dark"] .topbar,
+[data-theme="dark"] .modal-box,
+[data-theme="dark"] .modal-content,
+[data-theme="dark"] .task-card,
+[data-theme="dark"] .stat-card,
+[data-theme="dark"] .progress-card,
+[data-theme="dark"] .settings-card,
+[data-theme="dark"] .info-card-white,
+[data-theme="dark"] .backup-item,
+[data-theme="dark"] .notif-item,
+[data-theme="dark"] .calendar-grid,
+[data-theme="dark"] .dropdown,
+[data-theme="dark"] .chart-card {
+    background: var(--white) !important;
+    border-color: var(--border) !important;
+    color: var(--text) !important;
+}
+
+/* Inputs */
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select,
+[data-theme="dark"] .input-wrapper input {
+    background: #13131e !important;
+    border-color: var(--border) !important;
+    color: var(--text) !important;
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+    color: #475569 !important;
+}
+
+[data-theme="dark"] input:focus,
+[data-theme="dark"] textarea:focus {
+    background: #1a1a28 !important;
+    border-color: var(--purple) !important;
+}
+
+/* Buttons & Nav */
+[data-theme="dark"] .toggle-btn,
+[data-theme="dark"] .topbar-icon-btn,
+[data-theme="dark"] .btn-back,
+[data-theme="dark"] .topbar-mobile-toggle {
+    background: #13131e !important;
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .nav-item:hover,
+[data-theme="dark"] .dd-item:hover {
+    background: #13131e !important;
+}
+
+[data-theme="dark"] .nav-item.active {
+    background: var(--purple-light) !important;
+    color: var(--purple) !important;
+}
+
+/* Background inputs */
+[data-theme="dark"] .form-group input,
+[data-theme="dark"] .backup-item {
+    background: #13131e !important;
+}
+
+/* Blob visibility in dark mode */
+[data-theme="dark"] .bg-blob-1 { opacity: 0.12 !important; }
+[data-theme="dark"] .bg-blob-2 { opacity: 0.10 !important; }
+
+/* Calendar specific */
+[data-theme="dark"] .calendar-day:hover { background: #13131e !important; }
+[data-theme="dark"] .calendar-day.other-month { color: #334155 !important; }
+
+/* Toast */
+[data-theme="dark"] .toast { background: #f1f5f9 !important; color: #0f172a !important; }
+
+/* Section labels */
+[data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] h3,
+[data-theme="dark"] h4, [data-theme="dark"] h5 {
+    color: var(--text) !important;
+}
+
+/* Sidebar overlay in dark */
+[data-theme="dark"] .sidebar-overlay { background: rgba(0,0,0,0.6) !important; }
+
+/* Progress bar track */
+[data-theme="dark"] .progress-track { background: #1e1e2e !important; }
+
+/* Notification badges */
+[data-theme="dark"] .nav-badge { background: var(--purple) !important; }
+
+/* Avatar fallback */
+[data-theme="dark"] .topbar-avatar span,
+[data-theme="dark"] .sidebar-avatar span { color: white !important; }
+
+/* Table / list items */
+[data-theme="dark"] .settings-item { border-color: var(--border) !important; }
+[data-theme="dark"] .settings-item:hover { background: #13131e !important; }
+
+/* Google btn */
+[data-theme="dark"] .btn-google {
+    background: #1a1a24 !important;
+    border-color: var(--border) !important;
+    color: var(--text) !important;
+}
+[data-theme="dark"] .btn-google:hover { background: #13131e !important; }
+
+/* Danger zone */
+[data-theme="dark"] .btn-danger { background: #2d0f0f !important; border-color: #7f1d1d !important; }
+
+/* Info card */
+[data-theme="dark"] .info-card {
+    background: linear-gradient(135deg, #1a1030, #2d1030) !important;
+    border-color: rgba(167,139,250,0.2) !important;
+}
+
+/* Chart background */
+[data-theme="dark"] canvas { filter: brightness(0.9); }
+
+/* Checkbox & radio */
+[data-theme="dark"] input[type=checkbox],
+[data-theme="dark"] input[type=radio] {
+    accent-color: var(--purple) !important;
+}

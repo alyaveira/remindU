@@ -8,92 +8,132 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
         body { background: linear-gradient(145deg, #f5f7fe 0%, #eef2fa 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .card { max-width: 500px; width: 100%; background: white; border-radius: 36px; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1); padding: 40px 28px; text-align: center; }
-        h2 { font-size: 28px; margin-bottom: 8px; }
-        p { margin-bottom: 16px; color: #4a5568; }
-        input { width: 100%; padding: 14px 20px; background: #f3f4f9; border: 1px solid transparent; border-radius: 60px; margin-bottom: 16px; font-size: 15px; text-align: center; letter-spacing: 4px; }
-        button { background: #8b5cf6; color: white; border: none; border-radius: 60px; padding: 14px; width: 100%; font-weight: 600; cursor: pointer; margin-top: 8px; }
-        .timer { font-family: monospace; background: #f1f1f1; display: inline-block; padding: 4px 12px; border-radius: 30px; margin: 8px 0; }
-        .flex-between { display: flex; justify-content: space-between; align-items: center; margin: 12px 0; }
-        a { color: #8b5cf6; text-decoration: none; }
-        .success-msg { color: green; margin-top: 16px; display: none; }
+        h2 { font-size: 28px; margin-bottom: 8px; color: #0f172a; font-weight: 800; }
+        p { margin-bottom: 24px; color: #64748b; font-size: 15px; line-height: 1.5; }
+        input { width: 100%; padding: 14px 20px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 60px; margin-bottom: 16px; font-size: 15px; font-weight: 600; text-align: center; letter-spacing: 2px; outline: none; transition: all 0.2s; }
+        input:focus { border-color: #8b5cf6; background: white; box-shadow: 0 0 0 4px rgba(139,92,246,0.1); }
+        button { width: 100%; padding: 14px; background: linear-gradient(135deg, #7c3aed, #8b5cf6); color: white; border: none; border-radius: 60px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 20px rgba(139,92,246,0.2); transition: all 0.2s; }
+        button:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(139,92,246,0.3); }
+        button:disabled { background: #cbd5e1; box-shadow: none; cursor: not-allowed; transform: none; }
+        .error { color: #ef4444; font-size: 13px; margin-top: -8px; margin-bottom: 16px; font-weight: 600; min-height: 20px; }
+        .resend { margin-top: 20px; font-size: 14px; color: #64748b; font-weight: 500; }
+        .resend a { color: #8b5cf6; text-decoration: none; font-weight: 700; cursor: pointer; transition: color 0.2s; }
+        .resend a:hover { color: #7c3aed; }
+        .resend span { font-weight: 700; color: #475569; }
     </style>
 </head>
 <body>
+
 <div class="card">
-    <h2>Verification</h2>
-    <p>Enter Verification Code</p>
-    <p style="font-size: 14px;">We sent 5 digit code to your email</p>
-    <p>This code will expire in <span id="timerDisplay" class="timer">01:00</span></p>
-    <input type="text" id="otpInput" placeholder="OTP Code" maxlength="6">
-    <div class="error-msg" id="otpError" style="color:red; margin-top: -8px;"></div>
-    <div class="flex-between">
-        <span>Waiting for the code</span>
-        <a href="#" id="resendCodeLink">Resend Code</a>
+    <h2 data-i18n="verify.title">Verifikasi Akun</h2>
+    <p data-i18n="verify.subtitle">Masukkan 6 digit kode OTP yang telah dikirimkan ke alamat email terdaftar Anda untuk mengaktifkan akun.</p>
+    
+    <form id="verifyForm">
+        <input type="text" id="otpInput" maxlength="6" data-i18n-placeholder="verify.placeholder_otp" placeholder="Masukkan kode OTP" autocomplete="one-time-code" required>
+        <div id="otpError" class="error"></div>
+        <button type="submit" id="verifyBtn" data-i18n="verify.btn_submit">Verifikasi Sekarang</button>
+    </form>
+
+    <div class="resend">
+        <span data-i18n="verify.txt_no_code">Belum menerima kode?</span> 
+        <a id="resendCodeLink" data-i18n="verify.btn_resend">Kirim Ulang</a>
+        <span id="timerContainer" style="display: none;">(<span id="countdown">60</span>s)</span>
     </div>
-    <button id="verifyBtn">Verify</button>
-    <div id="successMsg" class="success-msg">✓ Success! your account has been successfully created</div>
 </div>
+
 <script>
+(() => {
     const API_URL = 'http://localhost:3000/api';
-    let timerInterval;
-    let resendTimer = null;
+    const pendingEmail = localStorage.getItem('remindu_pending_email');
 
-    function startTimer(seconds = 60) {
-        if (timerInterval) clearInterval(timerInterval);
-        const timerElement = document.getElementById('timerDisplay');
-        let remaining = seconds;
-        function update() {
-            const mins = Math.floor(remaining / 60);
-            const secs = remaining % 60;
-            timerElement.innerText = `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
-            if (remaining <= 0) {
-                clearInterval(timerInterval);
-                timerElement.innerText = "Expired";
-                document.getElementById('verifyBtn').disabled = true;
-                document.getElementById('otpError').innerText = 'Code expired, please resend.';
-            } else {
-                document.getElementById('verifyBtn').disabled = false;
-            }
-        }
-        update();
-        timerInterval = setInterval(() => { if (remaining <= 0) clearInterval(timerInterval); else { remaining--; update(); } }, 1000);
-    }
-
-    startTimer(60);
-
-    const pendingEmail = localStorage.getItem('pendingVerifyEmail');
     if (!pendingEmail) {
-        alert('Sesi registrasi hilang, silakan daftar ulang.');
         window.location.href = 'register.html';
+        return;
     }
 
-    document.getElementById('verifyBtn').addEventListener('click', async () => {
+    let timerInterval;
+    function startTimer(duration) {
+        clearInterval(timerInterval);
+        const display = document.getElementById('countdown');
+        const container = document.getElementById('timerContainer');
+        const link = document.getElementById('resendCodeLink');
+        
+        let timer = duration;
+        container.style.display = 'inline';
+        link.style.pointerEvents = 'none';
+        link.style.opacity = '0.5';
+
+        timerInterval = setInterval(() => {
+            display.textContent = timer;
+            if (--timer < 0) {
+                clearInterval(timerInterval);
+                container.style.display = 'none';
+                link.style.pointerEvents = 'auto';
+                link.style.opacity = '1';
+            }
+        }, 1000);
+    }
+
+    // Hanya izinkan input berupa angka pada kolom OTP
+    document.getElementById('otpInput').addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/[^0-9]/g, '');
+    });
+
+    // --- FORM VERIFIKASI SUBMIT ---
+    document.getElementById('verifyForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
         const otp = document.getElementById('otpInput').value.trim();
-        if (!otp) { document.getElementById('otpError').innerText = 'Masukkan kode OTP'; return; }
+        const errorEl = document.getElementById('otpError');
+        const btn = document.getElementById('verifyBtn');
+
+        if (otp.length !== 6) {
+            errorEl.innerText = window.t ? window.t('verify.err_invalid_length') : 'Kode OTP harus berjumlah 6 digit lengkap!';
+            return;
+        }
+
+        errorEl.innerText = '';
+        btn.disabled = true;
+
         try {
-            const res = await fetch(`${API_URL}/verify`, {
+            const res = await fetch(`${API_URL}/verify-otp`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: pendingEmail, otp })
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error);
-            document.getElementById('successMsg').style.display = 'block';
-            localStorage.removeItem('pendingVerifyEmail');
-            setTimeout(() => {
-                window.location.href = 'login.html';
-            }, 2000);
+
+            // Bersihkan email transit pendaftaran
+            localStorage.removeItem('remindu_pending_email');
+            
+            // Simpan status session login user baru ke lokal aplikasi
+            localStorage.setItem('remindu_user', JSON.stringify({
+                email: data.email,
+                firstName: data.nama_depan || '',
+                provider: 'local'
+            }));
+
+            // Alert / Notifikasi Sukses Terjemahan
+            alert(window.t ? window.t('verify.success_msg') : '🎉 Akun Anda berhasil diverifikasi dan diaktifkan!');
+            window.location.href = 'home.html';
         } catch (err) {
-            document.getElementById('otpError').innerText = err.message;
+            errorEl.innerText = err.message || (window.t ? window.t('verify.err_failed') : 'Verifikasi gagal, periksa kode Anda kembali.');
+            btn.disabled = false;
         }
     });
 
+    // --- TIMING RESEND OTP LINK ---
     let resendCooldown = false;
     document.getElementById('resendCodeLink').addEventListener('click', async (e) => {
         e.preventDefault();
-        if (resendCooldown) { document.getElementById('otpError').innerText = 'Tunggu sebelum kirim ulang'; return; }
+        const errorEl = document.getElementById('otpError');
+        
+        if (resendCooldown) { 
+            errorEl.innerText = window.t ? window.t('verify.err_cooldown') : 'Harap tunggu sebelum meminta kode ulang!'; 
+            return; 
+        }
+        
         resendCooldown = true;
-        document.getElementById('resendCodeLink').style.opacity = '0.5';
         try {
             const res = await fetch(`${API_URL}/resend-otp`, {
                 method: 'POST',
@@ -102,19 +142,32 @@
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error);
-            document.getElementById('otpError').innerText = '';
-            alert(`OTP baru: ${data.otp}\n(Di produksi, OTP dikirim via email)`);
+
+            errorEl.innerText = '';
+            
+            // Informasi simulasi box alert pop up
+            const alertPrefix = window.t ? window.t('verify.alert_new_otp') : 'Kode OTP Baru Anda adalah:';
+            const alertSuffix = window.t ? window.t('verify.alert_production_note') : '(Pada mode produksi, kode dikirim via kotak masuk email)';
+            alert(`${alertPrefix} ${data.otp}\n${alertSuffix}`);
+            
             startTimer(60);
             document.getElementById('verifyBtn').disabled = false;
         } catch (err) {
-            document.getElementById('otpError').innerText = err.message;
+            errorEl.innerText = err.message;
         } finally {
             setTimeout(() => {
                 resendCooldown = false;
-                document.getElementById('resendCodeLink').style.opacity = '1';
-            }, 30000);
+            }, 15000); // Batasi spam klik request API
         }
     });
+})();
+</script>
+
+<script src="lang.js"></script>
+<script>
+    if (typeof applyLang === 'function') {
+        applyLang();
+    }
 </script>
 </body>
 </html>

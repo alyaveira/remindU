@@ -24,7 +24,7 @@
             font-family: 'Segoe UI', system-ui, -apple-system, 'Inter', sans-serif;
         }
 
-        /* --- BG DECORATION (blob + warna latar dari welcomebaru) --- */
+        /* --- BG DECORATION --- */
         body {
             background: var(--bg);
             min-height: 100vh;
@@ -37,7 +37,6 @@
             overflow-y: auto;
         }
 
-        /* Elemen blur / blobs - persis dari welcomebaru */
         .bg-blob {
             position: fixed;
             border-radius: 50%;
@@ -46,6 +45,7 @@
             pointer-events: none;
             z-index: 0;
         }
+
         .bg-blob-1 {
             width: 400px;
             height: 400px;
@@ -53,6 +53,7 @@
             top: -100px;
             right: -100px;
         }
+
         .bg-blob-2 {
             width: 300px;
             height: 300px;
@@ -61,124 +62,100 @@
             left: -80px;
         }
 
-        /* --- CARD STYLE (konten asli dari welcome.html) --- */
+        /* --- CARD STYLE --- */
         .card {
-            max-width: 580px;
+            max-width: 460px;
             width: 100%;
-            background: var(--white);
-            border-radius: 36px;
-            box-shadow: 0 28px 48px -16px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(139, 92, 246, 0.05);
-            padding: 48px 32px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 40px;
+            box-shadow: 0 24px 50px -12px rgba(139, 92, 246, 0.12);
+            padding: 48px 36px;
             text-align: center;
-            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.6);
             z-index: 10;
-            backdrop-filter: blur(0px);
-            transition: transform 0.2s ease, box-shadow 0.2s;
+            position: relative;
         }
 
-        .card:hover {
-            box-shadow: 0 32px 56px -20px rgba(139, 92, 246, 0.2);
-        }
-
-        /* Heading & teks original welcome.html */
+        /* FIX WARNING: Menambahkan background-clip standar */
         h1 {
-            font-size: 52px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #1e3a8a, #3b82f6, #8b5cf6, #ec4899);
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--text);
+            letter-spacing: -1.5px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, var(--text), var(--purple-dark));
             -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            letter-spacing: -1px;
-            margin-bottom: 20px;
+            background-clip: text; 
+            -webkit-text-fill-color: transparent;
         }
 
         .desc-text {
-            font-size: 1.1rem;
-            line-height: 1.5;
             color: var(--text-muted);
-            margin-bottom: 36px;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            margin-bottom: 40px;
             font-weight: 500;
             max-width: 90%;
             margin-left: auto;
             margin-right: auto;
         }
 
-        /* Tombol utama (Get Started) */
+        /* --- BUTTONS --- */
         .btn-get-started {
-            background: var(--purple);
-            color: white;
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--purple-dark), var(--purple));
+            color: var(--white);
             border: none;
             border-radius: 60px;
-            padding: 15px 24px;
-            font-size: 1rem;
+            font-size: 16px;
             font-weight: 700;
-            width: 100%;
             cursor: pointer;
+            box-shadow: 0 10px 28px rgba(139, 92, 246, 0.25);
             transition: all 0.25s ease;
-            box-shadow: 0 8px 20px -8px rgba(139, 92, 246, 0.45);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            letter-spacing: 0.3px;
+            margin-bottom: 20px;
         }
 
         .btn-get-started:hover {
-            background: var(--purple-dark);
-            transform: translateY(-3px);
-            box-shadow: 0 16px 28px -12px rgba(139, 92, 246, 0.55);
+            transform: translateY(-2px);
+            box-shadow: 0 14px 32px rgba(139, 92, 246, 0.35);
         }
 
         .btn-get-started:active {
-            transform: translateY(1px);
+            transform: translateY(0);
         }
 
-        /* Link Sign Up */
-        .link {
-            margin-top: 24px;
-            font-size: 0.95rem;
+        /* --- ACCENT LINK --- */
+        .login-link {
+            font-size: 14px;
             color: var(--text-muted);
-            font-weight: 500;
+            font-weight: 600;
         }
 
-        .link a {
-            color: var(--purple);
+        .login-link a {
+            color: var(--purple-dark);
             text-decoration: none;
             font-weight: 700;
-            transition: all 0.2s;
-            border-bottom: 1px solid transparent;
+            transition: color 0.2s;
+            margin-left: 4px;
         }
 
-        .link a:hover {
-            color: var(--purple-dark);
-            border-bottom-color: var(--purple-light);
-            text-decoration: none;
+        .login-link a:hover {
+            color: var(--purple);
+            text-decoration: underline;
         }
 
-        /* Opsi tambahan: sedikit sentuhan modern tanpa mengubah makna asli */
-        @media (max-width: 550px) {
-            .card {
-                padding: 36px 24px;
-            }
-            h1 {
-                font-size: 42px;
-            }
-            .desc-text {
-                font-size: 1rem;
-                max-width: 100%;
-            }
+        @media (max-width: 480px) {
+            .card { padding: 36px 24px; }
+            h1 { font-size: 42px; }
+            .desc-text { font-size: 1rem; max-width: 100%; }
         }
 
-        /* Tambahan animasi subtle untuk halaman */
         @keyframes fadeSlide {
-            0% {
-                opacity: 0;
-                transform: translateY(14px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            0% { opacity: 0; transform: translateY(14px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
 
         .card {
@@ -188,23 +165,28 @@
 </head>
 <body>
 
-    <!-- Background Blobs persis dari welcomebaru (diganti ke welcome.html) -->
     <div class="bg-blob bg-blob-1"></div>
     <div class="bg-blob bg-blob-2"></div>
 
-    <!-- Card dengan KONTEN ASLI WELCOME.HTML (teks, tombol, tautan) -->
     <div class="card">
         <h1>RemindU</h1>
-        <p class="desc-text">Start minimizing missed deadlines and foster a more balanced workflow today.</p>
+        <p class="desc-text" data-i18n="welcome.subtitle">Start minimizing missed deadlines and foster a more balanced workflow today.</p>
         
-        <button class="btn-get-started" onclick="window.location.href='login.html'">
-             Get Started
-        </button>
+        <!-- FIX ERROR: Menghilangkan tanda backslash pada onclick -->
+        <button class="btn-get-started" onclick="window.location.href='login.html'" data-i18n="welcome.btn_get_started">Get Started</button>
         
-        <div class="link">
-            Don't have an account? <a href="register.html">Sign Up</a>
+        <div class="login-link">
+            <span data-i18n="welcome.txt_have_account">Already have an account?</span>
+            <a href="login.html" data-i18n="welcome.btn_login">Sign In</a>
         </div>
     </div>
 
+    <!-- ENGINE INTERPRETER SCRIPT LANG.JS -->
+    <script src="lang.js"></script>
+    <script>
+        if (typeof applyLang === 'function') {
+            applyLang();
+        }
+    </script>
 </body>
 </html>

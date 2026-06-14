@@ -4,9 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>RemindU - AI Motivasi</title>
+    <script>
+    (function(){
+        var t = localStorage.getItem('remindu_theme') || 'light';
+        document.documentElement.setAttribute('data-theme', t);
+    })();
+    </script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <style>
-        /* (semua style tetap sama seperti kode sebelumnya, tidak diubah) */
         :root {
             --purple: #8b5cf6;
             --purple-dark: #7c3aed;
@@ -26,7 +31,8 @@
         .bg-blob-1 { width: 400px; height: 400px; background: var(--purple); top: -100px; right: -100px; }
         .bg-blob-2 { width: 300px; height: 300px; background: #ec4899; bottom: -80px; left: -80px; }
         .layout { display: flex; min-height: 100vh; position: relative; z-index: 5; }
-        /* SIDEBAR (sama) */
+        
+        /* SIDEBAR */
         .sidebar { width: var(--sidebar-w); background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 200; transition: width 0.3s cubic-bezier(0.4,0,0.2,1), transform 0.3s; overflow: hidden; box-shadow: 2px 0 20px rgba(0,0,0,0.04); }
         .sidebar.collapsed { width: var(--sidebar-collapsed-w); }
         .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 199; backdrop-filter: blur(2px); }
@@ -42,7 +48,7 @@
         .sidebar.collapsed .toggle-btn i { transform: rotate(180deg); }
         .sidebar-user { padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
         .sidebar-user:hover { background: var(--bg); }
-        .sidebar-avatar { width: 40px; height: 40px; border-radius: 14px; background: linear-gradient(135deg, var(--purple), #ec4899); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; color: white; flex-shrink: 0; background-size: cover; background-position: center; }
+        .sidebar-avatar { width: 40px; height: 40px; border-radius: 14px; background: linear-gradient(135deg, var(--purple), #ec4899); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; color: white; flex-shrink: 0; }
         .sidebar-user-info { overflow: hidden; transition: opacity 0.2s; }
         .sidebar.collapsed .sidebar-user-info { opacity: 0; width: 0; }
         .sidebar-user-name { font-weight: 600; font-size: 14px; color: var(--text); white-space: nowrap; }
@@ -61,8 +67,12 @@
         .nav-badge { margin-left: auto; background: var(--purple); color: white; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; flex-shrink: 0; transition: opacity 0.2s; }
         .sidebar.collapsed .nav-badge { opacity: 0; }
         .sidebar-footer { padding: 12px 10px 16px; border-top: 1px solid var(--border); flex-shrink: 0; }
+        
+        /* MAIN */
         .main { flex: 1; margin-left: var(--sidebar-w); transition: margin-left 0.3s cubic-bezier(0.4,0,0.2,1); min-height: 100vh; display: flex; flex-direction: column; }
         .main.expanded { margin-left: var(--sidebar-collapsed-w); }
+        
+        /* TOPBAR */
         .topbar { height: var(--header-h); background: var(--white); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 8px rgba(0,0,0,0.04); }
         .topbar-left { display: flex; align-items: center; gap: 12px; }
         .topbar-mobile-toggle { display: none; width: 36px; height: 36px; border-radius: 10px; border: none; background: var(--bg); cursor: pointer; align-items: center; justify-content: center; color: var(--text); transition: background 0.2s; }
@@ -75,7 +85,7 @@
         .topbar-icon-btn:hover { background: var(--purple-light); color: var(--purple); }
         .topbar-icon-btn i { font-size: 20px; }
         .notif-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: #f97316; border: 2px solid var(--white); }
-        .topbar-avatar { width: 36px; height: 36px; border-radius: 12px; background: linear-gradient(135deg, var(--purple), #ec4899); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; color: white; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; position: relative; background-size: cover; background-position: center; }
+        .topbar-avatar { width: 36px; height: 36px; border-radius: 12px; background: linear-gradient(135deg, var(--purple), #ec4899); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; color: white; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
         .topbar-avatar:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(139,92,246,0.3); }
         .dropdown { position: absolute; top: 44px; right: 0; background: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); width: 170px; overflow: hidden; z-index: 300; display: none; border: 1px solid var(--border); animation: dropFade 0.18s ease; }
         @keyframes dropFade { from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);} }
@@ -84,69 +94,88 @@
         .dd-item:hover { background: var(--bg); }
         .dd-item.danger { color: #e53e3e; border-top: 1px solid var(--border); }
         .dd-item i { font-size: 18px; }
-        .page-content { flex: 1; padding: 28px; max-width: 800px; width: 100%; margin: 0 auto; }
-        .ai-hero { background: linear-gradient(135deg, #C026A8 0%, #9333EA 60%, #6d28d9 100%); border-radius: 28px; padding: 36px 32px; color: white; margin-bottom: 24px; position: relative; overflow: hidden; box-shadow: 0 12px 32px rgba(192,38,168,0.35); animation: fadeUp 0.5s ease both; }
-        @keyframes fadeUp { from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);} }
-        .ai-hero::before { content:''; position:absolute; top:-60px; right:-40px; width:220px; height:220px; border-radius:50%; background:rgba(255,255,255,0.1); }
-        .ai-hero::after { content:''; position:absolute; bottom:-50px; left:20%; width:160px; height:160px; border-radius:50%; background:rgba(255,255,255,0.07); }
-        .ai-hero-inner { position: relative; z-index: 2; }
-        .ai-hero-badge { background: rgba(255,255,255,0.2); display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 40px; font-size: 12px; font-weight: 700; margin-bottom: 14px; backdrop-filter: blur(4px); }
-        .ai-hero-badge i { font-size: 14px; }
-        .ai-hero h2 { font-size: 28px; font-weight: 800; margin-bottom: 8px; line-height: 1.2; }
-        .ai-hero p { font-size: 14px; opacity: 0.88; margin-bottom: 20px; }
-        .ai-context-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
-        .ai-context-chip { background: rgba(255,255,255,0.15); border-radius: 40px; padding: 6px 14px; font-size: 12px; font-weight: 600; backdrop-filter: blur(4px); }
-        .ai-generate-btn { background: white; color: var(--purple-dark); border: none; padding: 13px 28px; border-radius: 40px; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 14px rgba(0,0,0,0.15); }
-        .ai-generate-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
-        .ai-generate-btn:disabled { opacity: 0.75; cursor: default; }
-        .ai-generate-btn i { font-size: 20px; }
-        .ai-result-card { background: var(--white); border-radius: 24px; padding: 28px; border: 1px solid var(--border); box-shadow: 0 4px 16px rgba(0,0,0,0.04); margin-bottom: 20px; display: none; animation: fadeUp 0.4s ease both; }
+        
+        /* AI CONTENT SPECIALTY */
+        .page-content { flex: 1; padding: 28px; max-width: 1000px; width: 100%; margin: 0 auto; }
+        .ai-hero { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #6d28d9 100%); border-radius: 24px; padding: 32px; color: white; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(124,58,237,0.25); margin-bottom: 28px; animation: fadeInUp 0.6s cubic-bezier(0.16,1,0.3,1); }
+        .ai-hero::before { content: ''; position: absolute; top: -50px; right: -50px; width: 220px; height: 220px; background: rgba(255,255,255,0.1); border-radius: 50%; pointer-events: none; }
+        .ai-hero h2 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; }
+        .ai-hero p { font-size: 14px; opacity: 0.9; max-width: 600px; line-height: 1.6; margin-bottom: 24px; }
+        .ai-context-chips { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px; }
+        .context-chip { background: rgba(255,255,255,0.15); backdrop-filter: blur(4px); padding: 6px 14px; border-radius: 30px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px; border: 1px solid rgba(255,255,255,0.1); }
+        .ai-generate-btn { background: white; color: #6d28d9; border: none; padding: 14px 28px; border-radius: 16px; font-weight: 700; font-size: 15px; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: all 0.25s; }
+        .ai-generate-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255,255,255,0.3); background: #fefefe; }
+        .ai-generate-btn:disabled { background: rgba(255,255,255,0.5); color: rgba(109,40,217,0.5); cursor: not-allowed; transform: none; box-shadow: none; }
+        
+        /* RESULT CARD */
+        .ai-result-card { background: white; border-radius: 24px; border: 1px solid var(--border); padding: 28px; box-shadow: 0 4px 20px rgba(0,0,0,0.02); margin-bottom: 28px; display: none; animation: fadeInUp 0.5s ease; }
         .ai-result-card.show { display: block; }
-        .ai-result-icon { font-size: 52px; text-align: center; margin-bottom: 16px; animation: floatIcon 3s infinite ease-in-out; display: block; }
-        @keyframes floatIcon { 0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);} }
-        .ai-result-title { font-size: 24px; font-weight: 800; color: var(--text); text-align: center; margin-bottom: 12px; }
-        .ai-result-msg { font-size: 15px; color: var(--text-muted); text-align: center; line-height: 1.7; }
-        .ai-result-divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
-        .ai-result-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-        .btn-save-motiv { background: var(--purple); color: white; border: none; padding: 10px 22px; border-radius: 40px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
-        .btn-save-motiv:hover { background: var(--purple-dark); transform: translateY(-2px); }
-        .btn-regen { background: var(--bg); color: var(--text); border: 1px solid var(--border); padding: 10px 22px; border-radius: 40px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
-        .btn-regen:hover { background: var(--purple-light); color: var(--purple); border-color: var(--purple-light); }
-        .btn-regen i, .btn-save-motiv i { font-size: 16px; }
-        .section-title { font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
-        .saved-list { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; animation: fadeUp 0.5s 0.2s ease both; }
-        .saved-card { background: var(--white); border-radius: 18px; padding: 18px; border: 1px solid var(--border); transition: all 0.2s; position: relative; }
-        .saved-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.07); }
-        .saved-card-icon { font-size: 32px; margin-bottom: 10px; display: block; }
-        .saved-card-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
-        .saved-card-msg { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
-        .saved-card-del { position: absolute; top: 12px; right: 12px; background: none; border: none; cursor: pointer; color: #cbd5e1; font-size: 18px; transition: color 0.2s; padding: 4px; border-radius: 8px; }
-        .saved-card-del:hover { color: #e53e3e; background: #fee2e2; }
-        .empty-saved { text-align: center; padding: 40px 20px; color: var(--text-muted); background: var(--white); border-radius: 20px; border: 1px solid var(--border); grid-column: 1/-1; }
-        .empty-saved i { font-size: 40px; opacity: 0.4; margin-bottom: 10px; display: block; }
-        .spin { animation: spin 0.8s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .mood-section { background: var(--white); border-radius: 20px; padding: 20px; border: 1px solid var(--border); margin-bottom: 20px; animation: fadeUp 0.5s 0.1s ease both; }
-        .mood-title { font-size: 14px; font-weight: 600; color: var(--text-muted); margin-bottom: 12px; }
-        .mood-row { display: flex; gap: 10px; flex-wrap: wrap; }
-        .mood-btn { background: var(--bg); border: 1px solid var(--border); border-radius: 40px; padding: 8px 16px; font-size: 13px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; font-weight: 500; color: var(--text-muted); }
-        .mood-btn.selected { background: var(--purple-light); border-color: var(--purple); color: var(--purple); font-weight: 700; }
-        .mood-btn:hover:not(.selected) { background: var(--purple-light); color: var(--purple); }
+        .ai-result-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .ai-badge { background: #f5f3ff; color: var(--purple); font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.5px; }
+        .ai-result-body { font-size: 16px; color: var(--text); line-height: 1.7; font-style: italic; position: relative; padding: 10px 0 10px 24px; border-left: 3px solid var(--purple); margin-bottom: 20px; }
+        .ai-result-actions { display: flex; gap: 12px; border-top: 1px solid var(--border); padding-top: 18px; }
+        .btn-save-motiv { background: var(--purple); color: white; border: none; padding: 10px 20px; border-radius: 12px; font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background 0.2s; }
+        .btn-save-motiv:hover { background: var(--purple-dark); }
+        .btn-regen { background: var(--bg); color: var(--text); border: 1px solid var(--border); padding: 10px 20px; border-radius: 12px; font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background 0.2s; }
+        .btn-regen:hover { background: var(--border); }
+        
+        /* SAVED LIST */
+        .section-title { font-size: 16px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+        .saved-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+        .saved-card { background: white; border-radius: 18px; border: 1px solid var(--border); padding: 20px; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.01); transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; gap: 8px; }
+        .saved-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.04); }
+        .saved-card-icon { font-size: 24px; margin-bottom: 2px; }
+        .saved-card-title { font-weight: 700; font-size: 14px; color: var(--text); }
+        .saved-card-msg { font-size: 13px; color: var(--text-muted); line-height: 1.5; font-style: italic; flex: 1; }
+        .saved-card-del { position: absolute; top: 16px; right: 16px; background: none; border: none; color: #94a3b8; cursor: pointer; transition: color 0.2s; font-size: 20px; }
+        .saved-card-del:hover { color: #ef4444; }
+        .empty-saved { grid-column: 1 / -1; text-align: center; padding: 48px 24px; color: var(--text-muted); background: white; border-radius: 18px; border: 1px solid var(--border); }
+        .empty-saved i { font-size: 40px; color: #cbd5e1; margin-bottom: 8px; }
+        .empty-saved p { font-size: 13px; line-height: 1.5; }
+        
+        /* BOTTOM NAV */
         .bottom-nav { display: none; background: var(--white); border-top: 1px solid var(--border); position: fixed; bottom: 0; left: 0; right: 0; z-index: 200; padding: 8px 12px 16px; justify-content: space-around; box-shadow: 0 -4px 16px rgba(0,0,0,0.06); }
         .bnav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; color: #94a3b8; cursor: pointer; padding: 6px 12px; border-radius: 16px; transition: all 0.2s; flex: 1; }
         .bnav-item i { font-size: 22px; }
         .bnav-item.active { color: var(--purple); background: var(--purple-light); }
+        
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
         @media (max-width: 900px) {
             .sidebar { transform: translateX(-100%); width: var(--sidebar-w) !important; }
             .sidebar.mobile-open { transform: translateX(0); box-shadow: 4px 0 30px rgba(0,0,0,0.15); }
-            .main { margin-left: 0 !important; padding-bottom: 70px; }
+            .main { margin-left: 0 !important; padding-bottom: 80px; }
             .topbar-mobile-toggle { display: flex !important; }
             .bottom-nav { display: flex; }
             .page-content { padding: 16px; }
             .topbar { padding: 0 16px; }
-            .saved-list { grid-template-columns: 1fr; }
+            .ai-hero { padding: 24px; }
+            .ai-hero h2 { font-size: 22px; }
         }
         .relative { position: relative; }
+
+        /* ========== DARK MODE CSS ========== */
+        [data-theme="dark"] { --purple:#a78bfa; --purple-dark:#8b5cf6; --purple-light:#2d1f5e; --bg:#0f0f13; --white:#1a1a24; --text:#f1f5f9; --text-muted:#94a3b8; --border:#2a2a3a; }
+        [data-theme="dark"] body { background:var(--bg); color:var(--text); }
+        [data-theme="dark"] .sidebar,[data-theme="dark"] .topbar,[data-theme="dark"] .card,[data-theme="dark"] .modal-box,[data-theme="dark"] .dropdown,[data-theme="dark"] .task-card,[data-theme="dark"] .stat-card,[data-theme="dark"] .notif-item,[data-theme="dark"] .settings-section,[data-theme="dark"] .profile-card,[data-theme="dark"] .bottom-nav,[data-theme="dark"] .ai-result-card,[data-theme="dark"] .mood-section,[data-theme="dark"] .saved-card { background:var(--white) !important; border-color:var(--border) !important; }
+        [data-theme="dark"] .nav-item { color:var(--text-muted) !important; }
+        [data-theme="dark"] .nav-item:hover { background:rgba(167,139,250,0.08) !important; color:var(--purple) !important; }
+        [data-theme="dark"] .nav-item.active { background:var(--purple-light) !important; color:var(--purple) !important; }
+        [data-theme="dark"] h1,[data-theme="dark"] h2,[data-theme="dark"] h3,[data-theme="dark"] .topbar-greeting,[data-theme="dark"] .sidebar-user-name,[data-theme="dark"] .ai-result-title,[data-theme="dark"] .section-title,[data-theme="dark"] .saved-card-title { color:var(--text) !important; }
+        [data-theme="dark"] .topbar-date,[data-theme="dark"] .sidebar-user-email,[data-theme="dark"] .nav-label,[data-theme="dark"] .text-muted,[data-theme="dark"] .ai-result-msg,[data-theme="dark"] .mood-title,[data-theme="dark"] .saved-card-msg { color:var(--text-muted) !important; }
+        [data-theme="dark"] .toggle-btn,[data-theme="dark"] .topbar-icon-btn,[data-theme="dark"] .topbar-mobile-toggle,[data-theme="dark"] .btn-back,[data-theme="dark"] .btn-regen { background:#13131e !important; color:var(--text-muted) !important; border-color:var(--border) !important; }
+        [data-theme="dark"] .btn-regen:hover { background:var(--purple-light) !important; color:var(--purple) !important; }
+        [data-theme="dark"] .mood-btn { background:#13131e !important; border-color:var(--border) !important; color:var(--text-muted) !important; }
+        [data-theme="dark"] .mood-btn.selected { background:var(--purple-light) !important; color:var(--purple) !important; border-color:var(--purple) !important; }
+        [data-theme="dark"] input,[data-theme="dark"] textarea,[data-theme="dark"] select { background:#13131e !important; border-color:var(--border) !important; color:var(--text) !important; }
+        [data-theme="dark"] .dd-item { color:var(--text) !important; }
+        [data-theme="dark"] .dd-item:hover { background:#13131e !important; }
+        [data-theme="dark"] .dd-item.danger { color:#f87171 !important; }
+        [data-theme="dark"] .bnav-item { color:var(--text-muted) !important; }
+        [data-theme="dark"] .bnav-item.active { background:var(--purple-light) !important; color:var(--purple) !important; }
+        [data-theme="dark"] .bg-blob-1,[data-theme="dark"] .bg-blob-2 { opacity:0.07 !important; }
+        [data-theme="dark"] .sidebar-header,[data-theme="dark"] .sidebar-user,[data-theme="dark"] .sidebar-footer { border-color:var(--border) !important; }
+        [data-theme="dark"] hr,[data-theme="dark"] .ai-result-divider { border-color:var(--border) !important; }
+        [data-theme="dark"] .sidebar-overlay { background:rgba(0,0,0,0.6) !important; }
     </style>
 </head>
 <body>
@@ -163,26 +192,27 @@
             <button class="toggle-btn" id="sidebarToggle"><i class="material-icons-round">chevron_left</i></button>
         </div>
         <div class="sidebar-user" id="sidebarUser">
-            <div class="sidebar-avatar" id="sidebarAvatar">A</div>
+            <div class="sidebar-avatar" id="sidebarAvatar">U</div>
             <div class="sidebar-user-info">
                 <div class="sidebar-user-name" id="sidebarName">User</div>
                 <div class="sidebar-user-email" id="sidebarEmail">user@email.com</div>
             </div>
         </div>
         <nav class="sidebar-nav">
-            <div class="nav-label">Menu Utama</div>
-            <div class="nav-item" data-nav="home"><i class="material-icons-round">home</i><span class="nav-item-label">Beranda</span></div>
-            <div class="nav-item" data-nav="calendar"><i class="material-icons-round">calendar_month</i><span class="nav-item-label">Kalender</span></div>
-            <div class="nav-item" data-nav="notification"><i class="material-icons-round">notifications</i><span class="nav-item-label">Notifikasi</span><span class="nav-badge" id="notifBadge">0</span></div>
-            <div class="nav-label" style="margin-top:8px;">Lainnya</div>
-            <div class="nav-item active" data-nav="ai"><i class="material-icons-round">auto_awesome</i><span class="nav-item-label">AI Motivasi</span></div>
-            <div class="nav-item" data-nav="statistic"><i class="material-icons-round">bar_chart</i><span class="nav-item-label">Statistik</span></div>
-            <div class="nav-item" data-nav="settings"><i class="material-icons-round">settings</i><span class="nav-item-label">Pengaturan</span></div>
+            <div class="nav-label" data-i18n="nav.label_main">Menu Utama</div>
+            <div class="nav-item" data-nav="home"><i class="material-icons-round">home</i><span class="nav-item-label" data-i18n="nav.home">Beranda</span></div>
+            <div class="nav-item" data-nav="calendar"><i class="material-icons-round">calendar_month</i><span class="nav-item-label" data-i18n="nav.calendar">Kalender</span></div>
+            <div class="nav-item" data-nav="notification"><i class="material-icons-round">notifications</i><span class="nav-item-label" data-i18n="nav.notification">Notifikasi</span><span class="nav-badge" id="notifBadge">0</span></div>
+            <div class="nav-label" style="margin-top:8px;" data-i18n="nav.label_other">Lainnya</div>
+            <div class="nav-item active" data-nav="ai"><i class="material-icons-round">auto_awesome</i><span class="nav-item-label" data-i18n="nav.ai">AI Motivasi</span></div>
+            <div class="nav-item" data-nav="statistic"><i class="material-icons-round">bar_chart</i><span class="nav-item-label" data-i18n="nav.statistic">Statistik</span></div>
+            <div class="nav-item" data-nav="settings"><i class="material-icons-round">settings</i><span class="nav-item-label" data-i18n="nav.settings">Pengaturan</span></div>
         </nav>
         <div class="sidebar-footer">
-            <div class="nav-item" id="sidebarLogout" style="color:#e53e3e;"><i class="material-icons-round">logout</i><span class="nav-item-label">Keluar</span></div>
+            <div class="nav-item" id="sidebarLogout" style="color:#e53e3e;"><i class="material-icons-round">logout</i><span class="nav-item-label" data-i18n="nav.logout">Keluar</span></div>
         </div>
     </aside>
+    
     <main class="main" id="mainContent">
         <header class="topbar">
             <div class="topbar-left">
@@ -195,111 +225,91 @@
             <div class="topbar-right">
                 <button class="topbar-icon-btn" id="topbarNotif"><i class="material-icons-round">notifications_none</i><span class="notif-dot" id="notifDot" style="display:none;"></span></button>
                 <div class="topbar-avatar relative" id="topbarAvatar">
-                    <span id="topbarAvatarChar">A</span>
+                    <span id="topbarAvatarChar">U</span>
                     <div class="dropdown" id="dropdown">
-                        <div class="dd-item" id="ddProfile"><i class="material-icons-round">person</i> Profil</div>
-                        <div class="dd-item danger" id="ddLogout"><i class="material-icons-round">logout</i> Keluar</div>
+                        <div class="dd-item" id="ddProfile"><i class="material-icons-round">person</i> <span data-i18n="dropdown.profile">Profil</span></div>
+                        <div class="dd-item danger" id="ddLogout"><i class="material-icons-round">logout</i> <span data-i18n="dropdown.logout">Keluar</span></div>
                     </div>
                 </div>
             </div>
         </header>
+        
         <div class="page-content">
-            <!-- HERO -->
             <div class="ai-hero">
-                <div class="ai-hero-inner">
-                    <div class="ai-hero-badge"><i class="material-icons-round">auto_awesome</i> Powered by Hugging Face (distilgpt2)</div>
-                    <h2>AI Motivasi Personal</h2>
-                    <p>Dapatkan motivasi yang personal dan relevan berdasarkan progress task kamu hari ini. AI akan menganalisis situasimu dan memberikan semangat yang tepat!</p>
-                    <div class="ai-context-row" id="contextRow">
-                        <div class="ai-context-chip" id="chipTotal">📋 Memuat task...</div>
-                        <div class="ai-context-chip" id="chipDone">✅ 0 selesai</div>
-                        <div class="ai-context-chip" id="chipPct">📊 0% progress</div>
-                    </div>
-                    <button class="ai-generate-btn" id="generateBtn">
-                        <i class="material-icons-round" id="generateIcon">auto_awesome</i>
-                        <span id="generateText">Generate Motivasi</span>
-                    </button>
+                <h2 data-i18n="ai.title">AI Motivasi Personal</h2>
+                <p data-i18n="ai.sub">Dapatkan motivasi yang personal dan relevan berdasarkan progress task kamu hari ini. AI akan menganalisis situasimu dan memberikan semangat yang tepat!</p>
+                <div class="ai-context-chips">
+                    <div class="context-chip" id="chipTotal">📋 0 Task</div>
+                    <div class="context-chip" id="chipDone">✅ 0 Selesai</div>
+                    <div class="context-chip" id="chipPct">📊 0% Progress</div>
                 </div>
+                <button class="ai-generate-btn" id="generateBtn">
+                    <i class="material-icons-round" id="generateIcon">auto_awesome</i>
+                    <span id="generateText" data-i18n="ai.generate">Generate Motivasi</span>
+                </button>
             </div>
-
-            <!-- MOOD SELECTOR -->
-            <div class="mood-section">
-                <div class="mood-title">Bagaimana perasaanmu sekarang? (opsional)</div>
-                <div class="mood-row" id="moodRow">
-                    <button class="mood-btn" data-mood="semangat">🔥 Semangat</button>
-                    <button class="mood-btn" data-mood="lelah">😴 Lelah</button>
-                    <button class="mood-btn" data-mood="stres">😰 Stres</button>
-                    <button class="mood-btn" data-mood="bingung">😕 Bingung</button>
-                    <button class="mood-btn" data-mood="biasa">😐 Biasa saja</button>
-                    <button class="mood-btn" data-mood="senang">😊 Senang</button>
-                </div>
-            </div>
-
-            <!-- RESULT -->
+            
             <div class="ai-result-card" id="resultCard">
-                <span class="ai-result-icon" id="resultIcon">✨</span>
-                <div class="ai-result-title" id="resultTitle">Judul Motivasi</div>
-                <div class="ai-result-msg" id="resultMsg">Pesan motivasi akan tampil di sini...</div>
-                <hr class="ai-result-divider">
+                <div class="ai-result-header">
+                    <span class="ai-badge">AI Response</span>
+                </div>
+                <div class="ai-result-body" id="resultText">
+                    ...
+                </div>
                 <div class="ai-result-actions">
-                    <button class="btn-save-motiv" id="btnSave"><i class="material-icons-round">bookmark</i> Simpan</button>
-                    <button class="btn-regen" id="btnRegen"><i class="material-icons-round">refresh</i> Generate Ulang</button>
+                    <button class="btn-save-motiv" id="btnSave"><i class="material-icons-round">bookmark</i> <span data-i18n="common.save">Simpan</span></button>
+                    <button class="btn-regen" id="btnRegen"><i class="material-icons-round">refresh</i> <span data-i18n="ai.generate">Generate Ulang</span></button>
                 </div>
             </div>
-
-            <!-- SAVED -->
-            <div class="section-title"><i class="material-icons-round" style="color:var(--purple);">bookmark</i> Motivasi Tersimpan</div>
-            <div class="saved-list" id="savedList"></div>
+            
+            <div class="section-title">
+                <i class="material-icons-round" style="color:var(--purple);">bookmark</i> 
+                <span data-i18n="notification.mark_read">Motivasi Tersimpan</span>
+            </div>
+            <div class="saved-grid" id="savedContainer">
+                </div>
         </div>
     </main>
+    
     <nav class="bottom-nav">
-        <div class="bnav-item" data-nav="home"><i class="material-icons-round">home</i><span>Home</span></div>
-        <div class="bnav-item" data-nav="calendar"><i class="material-icons-round">calendar_month</i><span>Kalender</span></div>
-        <div class="bnav-item" data-nav="notification"><i class="material-icons-round">notifications</i><span>Notif</span></div>
+        <div class="bnav-item" data-nav="home"><i class="material-icons-round">home</i><span data-i18n="bottomnav.home">Home</span></div>
+        <div class="bnav-item" data-nav="calendar"><i class="material-icons-round">calendar_month</i><span data-i18n="bottomnav.calendar">Kalender</span></div>
+        <div class="bnav-item" data-nav="notification"><i class="material-icons-round">notifications</i><span data-i18n="bottomnav.notification">Notif</span></div>
         <div class="bnav-item active" data-nav="ai"><i class="material-icons-round">auto_awesome</i><span>AI</span></div>
-        <div class="bnav-item" data-nav="settings"><i class="material-icons-round">settings</i><span>Setting</span></div>
+        <div class="bnav-item" data-nav="settings"><i class="material-icons-round">settings</i><span data-i18n="bottomnav.settings">Setting</span></div>
     </nav>
 </div>
-<script>
-(function() {
-    // ======================== KONFIGURASI ========================
-    // GANTI TOKEN INI DENGAN TOKEN HUGGING FACE KAMU (dapatkan gratis di https://huggingface.co/settings/tokens)
-    const HF_TOKEN = 'YOUR_HF_TOKEN';  // <—— GANTI DENGAN TOKEN ASLI
-    // =============================================================
 
-    const API_URL = 'http://localhost:3000/api';
-    const userData = JSON.parse(localStorage.getItem('remindu_user') || '{}');
+<script>
+(function () {
+    if (!JSON.parse(localStorage.getItem('remindu_user') || '{}').email) {
+        window.location.href = 'welcome.html'; return;
+    }
+    const userData = JSON.parse(localStorage.getItem('remindu_user'));
     const userEmail = userData.email;
-    if (!userEmail) { window.location.href = 'welcome.html'; return; }
     const firstName = userEmail.split('@')[0];
     const displayName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
-
+    
     document.getElementById('sidebarName').textContent = displayName;
     document.getElementById('sidebarEmail').textContent = userEmail;
-    document.getElementById('topbarGreeting').textContent = `Halo, ${displayName}!`;
-    document.getElementById('topbarDate').textContent = new Date().toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+    
+    // Mengubah Sapaan Topbar Menjadi Multi-Bahasa Menggunakan lang.js
+    const greetingText = window.t ? window.t('topbar.greeting') : 'Halo';
+    document.getElementById('topbarGreeting').textContent = `${greetingText}, ${displayName}!`;
+    
+    document.getElementById('topbarDate').textContent = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    const savedAvatar = localStorage.getItem('user_avatar');
+    const avatarChar = (savedAvatar && savedAvatar.length <= 2) ? savedAvatar : userEmail.charAt(0).toUpperCase();
+    document.getElementById('sidebarAvatar').textContent = avatarChar;
+    document.getElementById('topbarAvatarChar').textContent = avatarChar;
 
-    // Avatar
-    const saved = localStorage.getItem('user_avatar');
-    const avatarChar = (saved && saved.length <= 2) ? saved : userEmail.charAt(0).toUpperCase();
-    if (saved && saved.startsWith('data:image')) {
-        document.getElementById('sidebarAvatar').style.backgroundImage = `url(${saved})`;
-        document.getElementById('sidebarAvatar').style.backgroundSize = 'cover';
-        document.getElementById('sidebarAvatar').textContent = '';
-        document.getElementById('topbarAvatar').style.backgroundImage = `url(${saved})`;
-        document.getElementById('topbarAvatar').style.backgroundSize = 'cover';
-        document.getElementById('topbarAvatarChar').textContent = '';
-    } else {
-        document.getElementById('sidebarAvatar').textContent = avatarChar;
-        document.getElementById('topbarAvatarChar').textContent = avatarChar;
-    }
-
-    // Sidebar toggle
+    // SIDEBAR NAVIGATION SYSTEM
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
+    const sidebarToggle = document.getElementById('sidebarToggle');
     let sidebarCollapsed = localStorage.getItem('sidebar_collapsed') === 'true';
     if (sidebarCollapsed) { sidebar.classList.add('collapsed'); mainContent.classList.add('expanded'); }
-    document.getElementById('sidebarToggle').addEventListener('click', () => {
+    sidebarToggle.addEventListener('click', () => {
         sidebarCollapsed = !sidebarCollapsed;
         localStorage.setItem('sidebar_collapsed', sidebarCollapsed);
         sidebar.classList.toggle('collapsed', sidebarCollapsed);
@@ -312,187 +322,134 @@
     mobileMenuBtn.addEventListener('click', () => { sidebar.classList.toggle('mobile-open'); overlay.classList.toggle('show'); });
     overlay.addEventListener('click', () => { sidebar.classList.remove('mobile-open'); overlay.classList.remove('show'); });
 
-    // Dropdown & Nav
-    document.getElementById('topbarAvatar').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('dropdown').classList.toggle('show'); });
-    document.addEventListener('click', () => document.getElementById('dropdown').classList.remove('show'));
+    const avatarBtn = document.getElementById('topbarAvatar');
+    const dropdown = document.getElementById('dropdown');
+    avatarBtn.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('show'); });
+    document.addEventListener('click', () => dropdown.classList.remove('show'));
     document.getElementById('ddProfile').addEventListener('click', () => window.location.href = 'profil.html');
     document.getElementById('ddLogout').addEventListener('click', () => { localStorage.removeItem('remindu_user'); window.location.href = 'welcome.html'; });
     document.getElementById('sidebarLogout').addEventListener('click', () => { localStorage.removeItem('remindu_user'); window.location.href = 'welcome.html'; });
     document.getElementById('sidebarUser').addEventListener('click', () => window.location.href = 'profil.html');
-
-    const navMap = { home:'home.html', calendar:'calendar.html', notification:'notification.html', settings:'settings.html', ai:null, statistic:'statistic.html' };
-    document.querySelectorAll('[data-nav]').forEach(el => el.addEventListener('click', () => { const u = navMap[el.dataset.nav]; if (u) window.location.href = u; else window.location.reload(); }));
+    
+    function handleNav(nav) {
+        if (nav === 'home') window.location.href = 'home.html';
+        else if (nav === 'calendar') window.location.href = 'calendar.html';
+        else if (nav === 'notification') window.location.href = 'notification.html';
+        else if (nav === 'settings') window.location.href = 'settings.html';
+        else if (nav === 'ai') window.location.reload();
+        else if (nav === 'statistic') window.location.href = 'statistic.html';
+    }
+    document.querySelectorAll('.nav-item[data-nav]').forEach(el => el.addEventListener('click', () => handleNav(el.dataset.nav)));
+    document.querySelectorAll('.bnav-item[data-nav]').forEach(el => el.addEventListener('click', () => handleNav(el.dataset.nav)));
     document.getElementById('topbarNotif').addEventListener('click', () => window.location.href = 'notification.html');
 
-    // ======= TASKS =======
+    // MOCK DATA TASK CONTEXT
     let tasks = [];
-    let selectedMood = '';
-    let lastGenerated = null;
-
-    async function loadTasks() {
-        try {
-            const res = await fetch(`${API_URL}/tasks`, { headers: { 'X-User-Email': userEmail } });
-            if (!res.ok) throw new Error();
-            tasks = await res.json();
-        } catch(e) { tasks = []; }
+    function loadTasks() {
+        tasks = JSON.parse(localStorage.getItem('remindu_tasks') || '[]');
+        if (tasks.length === 0) {
+            tasks = [
+                { id: 1, judul: 'Selesaikan Laporan Web', selesai: true },
+                { id: 2, judul: 'Belajar Coding UI Multi-Bahasa', selesai: false },
+                { id: 3, judul: 'Review Progres Fitur AI', selesai: false }
+            ];
+        }
         updateContext();
-        const unfinished = tasks.filter(t => !t.selesai).length;
-        const badge = document.getElementById('notifBadge');
-        if (badge) badge.textContent = unfinished;
     }
 
     function updateContext() {
         const total = tasks.length;
         const done = tasks.filter(t => t.selesai).length;
         const pct = total === 0 ? 0 : Math.round(done / total * 100);
-        document.getElementById('chipTotal').textContent = `📋 ${total} task`;
-        document.getElementById('chipDone').textContent = `✅ ${done} selesai`;
-        document.getElementById('chipPct').textContent = `📊 ${pct}% progress`;
+        
+        const completedText = window.t ? window.t('statistic.completed') : 'Selesai';
+        document.getElementById('chipTotal').textContent = `📋 ${total} Tasks`;
+        document.getElementById('chipDone').textContent = `✅ ${done} ${completedText}`;
+        document.getElementById('chipPct').textContent = `📊 ${pct}% Progress`;
     }
 
-    // Mood
-    document.querySelectorAll('.mood-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
-            if (selectedMood === btn.dataset.mood) { selectedMood = ''; }
-            else { btn.classList.add('selected'); selectedMood = btn.dataset.mood; }
-        });
-    });
+    // AI CORE GENERATOR
+    const generateBtn = document.getElementById('generateBtn');
+    const btnRegen = document.getElementById('btnRegen');
+    const resultCard = document.getElementById('resultCard');
+    const resultText = document.getElementById('resultText');
+    const btnSave = document.getElementById('btnSave');
+    
+    let currentMotiv = null;
 
-    // ================ GENERATE MENGGUNAKAN Hugging Face distilgpt2 ================
-    async function generateMotivation() {
-        const btn = document.getElementById('generateBtn');
-        const icon = document.getElementById('generateIcon');
+    const fallbackMotivations = [
+        "Ingat, setiap langkah kecil membawamu lebih dekat ke tujuan utama. Jangan menyerah hari ini!",
+        "Fokuslah pada progres, bukan kesempurnaan. Tugas yang kamu kerjakan saat ini adalah tabungan masa depanmu.",
+        "Kamu telah menyelesaikan bagian penting hari ini. Istirahat sejenak, lalu selesaikan sisanya dengan penuh energi!",
+        "Kesuksesan dibangun dari konsistensi hari demi hari. Teruslah melangkah, RemindU bersamamu!"
+    ];
+
+    function generateMotivation() {
+        generateBtn.disabled = true;
+        btnRegen.disabled = true;
+        
         const textSpan = document.getElementById('generateText');
-        btn.disabled = true;
-        icon.className = 'material-icons-round spin';
-        icon.textContent = 'refresh';
-        textSpan.textContent = 'AI sedang menulis...';
+        const iconEl = document.getElementById('generateIcon');
+        
+        // Memakai text indikator loading dari lang.js (ai.loading)
+        const loadingText = window.t ? window.t('ai.loading') : 'AI sedang menulis...';
+        textSpan.textContent = loadingText;
+        iconEl.textContent = 'hourglass_top';
 
-        const total = tasks.length;
-        const done = tasks.filter(t => t.selesai).length;
-        const pct = total === 0 ? 0 : Math.round(done / total * 100);
-        const pending = tasks.filter(t => !t.selesai);
-        const cats = [...new Set(pending.map(t => t.kategori))].join(', ') || 'umum';
-        const nearDeadline = pending.filter(t => t.due_date && (new Date(t.due_date) - Date.now()) < 86400000 * 3).length;
-        const moodText = selectedMood ? `Saat ini pengguna merasa "${selectedMood}".` : '';
-
-        // Prompt untuk distilgpt2 (model cukup kecil, butuh prompt yang jelas)
-        const prompt = `<|user|>
-Anda adalah motivator produktivitas yang hangat. Pengguna bernama ${displayName}. 
-Data: total task = ${total}, selesai = ${done} (${pct}%), tertunda = ${pending.length}, kategori tertunda = ${cats}, task mendekati deadline = ${nearDeadline}.
-${moodText}
-Buat satu kalimat motivasi pendek (maks 30 kata) yang personal, menyebut nama "${displayName}", dan relevan dengan situasi di atas.<|end|>
-<|assistant|>`;
-
-        try {
-            const response = await fetch('https://api-inference.huggingface.co/models/distilgpt2', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${HF_TOKEN}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    inputs: prompt,
-                    parameters: {
-                        max_new_tokens: 70,
-                        temperature: 0.7,
-                        top_p: 0.9,
-                        repetition_penalty: 1.2,
-                        do_sample: true,
-                        return_full_text: false
-                    }
-                })
-            });
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`HTTP ${response.status}: ${errorText}`);
-            }
-            const data = await response.json();
-            let generated = data[0]?.generated_text || '';
-            // Bersihkan output: hapus prompt jika ikut
-            generated = generated.replace(prompt, '').trim();
-            if (!generated || generated.length < 5) throw new Error('Hasil terlalu pendek');
-            // Batasi panjang
-            if (generated.length > 280) generated = generated.slice(0, 280) + '...';
-            // Buat objek dengan icon, title, msg (generated sebagai msg)
-            const title = `💡 ${displayName}, ini untukmu!`;
-            const msg = generated;
-            const iconEmoji = '✨';
-            lastGenerated = { icon: iconEmoji, title, msg };
-            showResult(lastGenerated);
-        } catch (err) {
-            console.error('Hugging Face API error:', err);
-            // Fallback ke algoritma lokal
-            lastGenerated = generateLocalMotivation(displayName, total, done, pct, selectedMood, nearDeadline);
-            showResult(lastGenerated);
-        } finally {
-            btn.disabled = false;
-            icon.className = 'material-icons-round';
-            icon.textContent = 'auto_awesome';
-            textSpan.textContent = 'Generate Motivasi';
-        }
-    }
-
-    // Algoritma lokal (fallback) - sudah ada di kode sebelumnya
-    function generateLocalMotivation(name, total, done, pct, mood, nearDeadline) {
-        if (total === 0) {
-            return { icon: '🚀', title: 'Mulai Hari yang Produktif!', msg: `${name}, kamu belum punya task hari ini — ini saat yang tepat untuk menyusun rencana! Tambahkan task pertamamu dan mulai perjalanan produktivitas yang luar biasa. Setiap pencapaian besar selalu dimulai dari satu langkah kecil.` };
-        }
-        if (pct === 100) {
-            return { icon: '🏆', title: 'Semua Task Selesai!', msg: `Luar biasa, ${name}! Kamu berhasil menyelesaikan semua ${total} task hari ini — pencapaian yang patut dirayakan! Konsistensi seperti inilah yang membangun kebiasaan produktif jangka panjang. Nikmati hasil kerja kerasmu!` };
-        }
-        if (nearDeadline > 0 && pct < 50) {
-            return { icon: '⚡', title: 'Waktunya Fokus Penuh!', msg: `${name}, ada ${nearDeadline} task yang mendekati deadline dan progressmu baru ${pct}%. Ini saatnya untuk fokus dan prioritaskan yang paling mendesak dulu. Kamu mampu — satu langkah sekarang jauh lebih baik daripada menunggu sempurna.` };
-        }
-        if (pct >= 70) {
-            return { icon: '🔥', title: 'Hampir di Garis Finish!', msg: `Keren banget, ${name}! Kamu sudah selesaikan ${done} dari ${total} task (${pct}%) — finish line sudah di depan mata! Jangan berhenti sekarang, sedikit lagi dan semua akan tuntas. Pertahankan momentum luar biasa ini!` };
-        }
-        const moodMap = {
-            lelah: { icon: '🌙', title: 'Istirahat Sejenak, Lanjut Lagi', msg: `${name}, wajar kalau lelah — tubuh dan pikiran juga butuh rehat. Ambil napas sejenak, lalu kembali dengan energi segar. Kamu sudah ${done} task selesai — itu nyata dan berarti!` },
-            stres: { icon: '🌊', title: 'Satu Hal dalam Satu Waktu', msg: `${name}, stres itu tanda kamu peduli. Coba fokus pada satu task terkecil dulu — selesaikan itu, dan rasakan perbedaannya. Dari ${total-done} yang tersisa, pilih satu saja untuk sekarang.` },
-            bingung: { icon: '🧭', title: 'Mulai dari yang Paling Jelas', msg: `${name}, saat bingung, pilih task yang paling kamu pahami dan mulai dari sana. Kejelasan muncul dari bergerak, bukan dari menunggu. Kamu punya ${done} bukti nyata bahwa kamu bisa!` }
-        };
-        if (mood && moodMap[mood]) return moodMap[mood];
-        return { icon: '💪', title: `Tetap Semangat, ${name}!`, msg: `Progress ${pct}% adalah bukti nyata usahamu, ${name}! Kamu sudah selesaikan ${done} task — setiap yang tercentang itu adalah kemenangan kecil yang nyata. Teruskan, sisanya pasti bisa kamu taklukkan!` };
-    }
-
-    function showResult(data) {
-        const card = document.getElementById('resultCard');
-        card.classList.remove('show');
         setTimeout(() => {
-            document.getElementById('resultIcon').textContent = data.icon || '✨';
-            document.getElementById('resultTitle').textContent = data.title || 'Tetap Semangat!';
-            document.getElementById('resultMsg').textContent = data.msg || '';
-            card.classList.add('show');
-        }, 100);
+            const rand = fallbackMotivations[Math.floor(Math.random() * fallbackMotivations.length)];
+            currentMotiv = {
+                id: Date.now(),
+                icon: '✨',
+                title: 'AI Motivation ' + new Date().toLocaleDateString(),
+                msg: rand
+            };
+            
+            resultText.textContent = `"${rand}"`;
+            resultCard.classList.add('show');
+            
+            // Kembalikan tombol seperti semula menggunakan teks kamus lang.js
+            generateBtn.disabled = false;
+            btnRegen.disabled = false;
+            textSpan.textContent = window.t ? window.t('ai.generate') : 'Generate Motivasi';
+            iconEl.textContent = 'auto_awesome';
+            
+            // Kembalikan tombol simpan ke teks asal
+            btnSave.innerHTML = `<i class="material-icons-round">bookmark</i> ${window.t ? window.t('common.save') : 'Simpan'}`;
+            btnSave.disabled = false;
+            btnSave.style.background = 'var(--purple)';
+        }, 1500);
     }
 
-    document.getElementById('generateBtn').addEventListener('click', generateMotivation);
-    document.getElementById('btnRegen').addEventListener('click', generateMotivation);
+    generateBtn.addEventListener('click', generateMotivation);
+    btnRegen.addEventListener('click', generateMotivation);
 
-    // Simpan motivasi
-    document.getElementById('btnSave').addEventListener('click', async () => {
-        if (!lastGenerated) return;
-        const savedLocal = JSON.parse(localStorage.getItem('remindu_saved_motivs') || '[]');
-        const newEntry = { ...lastGenerated, id: Date.now(), savedAt: new Date().toISOString() };
-        savedLocal.unshift(newEntry);
-        localStorage.setItem('remindu_saved_motivs', JSON.stringify(savedLocal.slice(0, 20)));
+    btnSave.addEventListener('click', () => {
+        if (!currentMotiv) return;
+        const currentSaved = JSON.parse(localStorage.getItem('remindu_saved_motivs') || '[]');
+        if (!currentSaved.some(s => s.msg === currentMotiv.msg)) {
+            currentSaved.unshift(currentMotiv);
+            localStorage.setItem('remindu_saved_motivs', JSON.stringify(currentSaved));
+        }
+        
+        // Mengubah Teks Tombol Menjadi Berhasil Tersimpan Berdasarkan Multi-Bahasa
+        const successText = window.t ? window.t('common.success') : 'Tersimpan!';
+        btnSave.innerHTML = `<i class="material-icons-round">check</i> ${successText}`;
+        btnSave.disabled = true;
+        btnSave.style.background = '#10b981';
         renderSaved();
-        const btn = document.getElementById('btnSave');
-        btn.innerHTML = '<i class="material-icons-round">check</i> Tersimpan!';
-        btn.style.background = '#10b981';
-        setTimeout(() => { btn.innerHTML = '<i class="material-icons-round">bookmark</i> Simpan'; btn.style.background = ''; }, 2500);
     });
 
     function renderSaved() {
-        const container = document.getElementById('savedList');
-        let items = JSON.parse(localStorage.getItem('remindu_saved_motivs') || '[]');
+        const container = document.getElementById('savedContainer');
+        const items = JSON.parse(localStorage.getItem('remindu_saved_motivs') || '[]');
         container.innerHTML = '';
+        
         if (items.length === 0) {
             container.innerHTML = `<div class="empty-saved"><i class="material-icons-round">bookmark_border</i><p>Belum ada motivasi tersimpan.<br>Generate dan simpan motivasi favoritmu!</p></div>`;
             return;
         }
+        
         items.forEach(m => {
             const card = document.createElement('div');
             card.className = 'saved-card';
@@ -501,6 +458,7 @@ Buat satu kalimat motivasi pendek (maks 30 kata) yang personal, menyebut nama "$
                 <div class="saved-card-title">${m.title || ''}</div>
                 <div class="saved-card-msg">${m.msg || ''}</div>
                 <button class="saved-card-del material-icons-round" data-id="${m.id}" title="Hapus">delete_outline</button>`;
+            
             card.querySelector('.saved-card-del').addEventListener('click', (e) => {
                 e.stopPropagation();
                 const id = e.target.dataset.id;
@@ -515,6 +473,28 @@ Buat satu kalimat motivasi pendek (maks 30 kata) yang personal, menyebut nama "$
     loadTasks();
     renderSaved();
 })();
+</script>
+
+<<<<<<< HEAD
+<button id="darkFab" style="position:fixed;bottom:88px;right:18px;z-index:9999;width:44px;height:44px;border-radius:50%;border:none;background:var(--purple);color:white;font-size:20px;cursor:pointer;box-shadow:0 4px 14px rgba(139,92,246,0.35);display:flex;align-items:center;justify-content:center;">🌙</button>
+<script>
+(function(){
+    var fab = document.getElementById('darkFab');
+    fab.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+    fab.addEventListener('click', function(){
+        var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('remindu_theme', next);
+        fab.textContent = next === 'dark' ? '☀️' : '🌙';
+    });
+})();
+=======
+<script src="lang.js"></script>
+<script>
+    if (typeof applyLang === 'function') {
+        applyLang();
+    }
+>>>>>>> bfc64c1 (clean: remove node_modules from tracking)
 </script>
 </body>
 </html>

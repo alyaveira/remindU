@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RemindU - Edit Profil</title>
+    <script>
+    (function(){
+        var t = localStorage.getItem('remindu_theme') || 'light';
+        document.documentElement.setAttribute('data-theme', t);
+    })();
+    </script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
@@ -11,20 +17,23 @@
         .container { max-width: 700px; margin: 0 auto; background: white; border-radius: 36px; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1); overflow: hidden; }
         .page-content { padding: 28px 24px 36px; }
         .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
-        .btn-back { background: none; border: none; font-size: 16px; font-weight: 500; color: #8b5cf6; cursor: pointer; padding: 8px 12px; border-radius: 30px; }
-        .btn-back:hover { background: #f1f5f9; }
-        h2 { font-size: 24px; font-weight: 600; background: linear-gradient(135deg, #8b5cf6, #6d28d9); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .btn-save { background: #8b5cf6; color: white; border: none; padding: 8px 20px; border-radius: 30px; font-weight: 600; font-size: 14px; cursor: pointer; }
-        .btn-save:hover { background: #7c3aed; transform: translateY(-1px); }
-        .avatar-section { display: flex; align-items: center; gap: 20px; margin-bottom: 28px; flex-wrap: wrap; }
-        .avatar-preview { width: 80px; height: 80px; background: linear-gradient(145deg, #8b5cf6, #6d28d9); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 36px; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); background-size: cover; background-position: center; }
-        .avatar-buttons { flex: 1; display: flex; gap: 12px; flex-wrap: wrap; }
-        .avatar-buttons button { background: #f1f5f9; border: none; padding: 8px 16px; border-radius: 30px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 6px; }
-        .avatar-buttons button:hover { background: #e2e8f0; }
-        .avatar-choices { margin: 20px 0; display: flex; gap: 12px; flex-wrap: wrap; border-top: 1px solid #edf2f7; padding-top: 20px; }
-        .avatar-option { width: 60px; height: 60px; background: #f8fafc; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; cursor: pointer; border: 2px solid transparent; }
-        .avatar-option:hover { transform: scale(1.05); background: #ede9fe; }
+        .btn-back { background: none; border: none; font-size: 16px; font-weight: 500; color: #8b5cf6; cursor: pointer; padding: 8px 12px; border-radius: 14px; transition: all 0.2s; display: flex; align-items: center; gap: 4px; }
+        .btn-back:hover { background: #ede9fe; }
+        .btn-save { background: linear-gradient(135deg, #7c3aed, #8b5cf6); border: none; color: white; padding: 10px 24px; border-radius: 16px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(139,92,246,0.25); }
+        .btn-save:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(139,92,246,0.35); }
+        .page-title { font-size: 20px; font-weight: 800; color: #0f172a; text-align: center; }
+        
+        .avatar-section { display: flex; flex-direction: column; align-items: center; gap: 14px; margin-bottom: 36px; position: relative; }
+        .avatar-wrapper { position: relative; width: 110px; height: 110px; border-radius: 36px; background: linear-gradient(135deg, #8b5cf6, #ec4899); display: flex; align-items: center; justify-content: center; font-size: 42px; font-weight: 700; color: white; box-shadow: 0 10px 25px -5px rgba(139,92,246,0.3); cursor: pointer; transition: transform 0.2s; background-size: cover; background-position: center; }
+        .avatar-wrapper:hover { transform: scale(1.03); }
+        .edit-overlay { position: absolute; bottom: -4px; right: -4px; width: 34px; height: 34px; border-radius: 12px; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; color: #64748b; font-size: 18px; pointer-events: none; border: 2px solid #f5f7fe; }
+        
+        /* Grid Pilihan Ikon Avatar */
+        .avatar-grid { display: none; grid-template-columns: repeat(4, 1fr); gap: 12px; background: #f8fafc; padding: 16px; border-radius: 24px; border: 1px dashed #e2e8f0; margin-bottom: 24px; max-width: 320px; margin-left: auto; margin-right: auto; }
+        .avatar-option { font-size: 28px; display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 16px; background: white; border: 2px solid transparent; cursor: pointer; transition: all 0.15s; box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
+        .avatar-option:hover { transform: scale(1.1); border-color: #cbd5e1; }
         .avatar-option.selected { border-color: #8b5cf6; background: #ede9fe; }
+<<<<<<< HEAD
         .form-group { margin-bottom: 20px; position: relative; }
         .form-group label { display: block; font-size: 13px; font-weight: 500; color: #64748b; margin-bottom: 8px; }
         .input-wrapper { position: relative; }
@@ -34,200 +43,175 @@
         hr { margin: 20px 0; border: none; border-top: 1px solid #edf2f7; }
         .password-note { font-size: 12px; color: #94a3b8; margin-top: 6px; }
         @media (min-width: 768px) { .page-content { padding: 40px 48px; } }
+
+        /* ========== DARK MODE CSS ========== */
+        [data-theme="dark"] body { background: linear-gradient(145deg, #0a0a0f 0%, #0f0f15 100%); }
+        [data-theme="dark"] .container { background: #1a1a24; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.4); }
+        [data-theme="dark"] .btn-back { color: #a78bfa; }
+        [data-theme="dark"] .btn-back:hover { background: #2d2d3a; }
+        [data-theme="dark"] .avatar-buttons button { background: #13131e; color: #94a3b8; }
+        [data-theme="dark"] .avatar-buttons button:hover { background: #2d1f5e; color: #a78bfa; }
+        [data-theme="dark"] .avatar-choices { border-top-color: #2a2a3a; }
+        [data-theme="dark"] .avatar-option { background: #13131e; }
+        [data-theme="dark"] .avatar-option:hover { background: #2d1f5e; }
+        [data-theme="dark"] .avatar-option.selected { border-color: #a78bfa; background: #2d1f5e; }
+        [data-theme="dark"] .form-group label { color: #94a3b8; }
+        [data-theme="dark"] .input-wrapper input { background: #13131e; border-color: #2a2a3a; color: #f1f5f9; }
+        [data-theme="dark"] .input-wrapper input:focus { border-color: #a78bfa; background: #1a1a2a; }
+        [data-theme="dark"] hr { border-top-color: #2a2a3a; }
+        [data-theme="dark"] .password-note { color: #64748b; }
+=======
+        .btn-change-photo { background: #f1f5f9; border: none; color: #475569; font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 10px; cursor: pointer; transition: background 0.15s; }
+        .btn-change-photo:hover { background: #e2e8f0; }
+
+        .form-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 13px; font-weight: 600; color: #475569; padding-left: 2px; }
+        .input-wrapper { position: relative; display: flex; align-items: center; }
+        .input-wrapper i { position: absolute; left: 16px; color: #94a3b8; font-size: 20px; }
+        .input-wrapper input { width: 100%; padding: 14px 16px 14px 48px; border-radius: 16px; border: 1px solid #e2e8f0; font-size: 14px; color: #0f172a; outline: none; background: #f8fafc; transition: all 0.2s; }
+        .input-wrapper input:focus { border-color: #8b5cf6; background: white; box-shadow: 0 0 0 4px rgba(139,92,246,0.1); }
+        .input-wrapper input:disabled { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; }
+        
+        #photoInput { display: none; }
+>>>>>>> bfc64c1 (clean: remove node_modules from tracking)
     </style>
 </head>
 <body>
+
 <div class="container">
     <div class="page-content">
         <div class="header">
-            <button class="btn-back" id="backBtn">← Back</button>
-            <h2>Edit Profil</h2>
-            <button class="btn-save" id="saveBtn">Save</button>
+            <button class="btn-back" id="backBtn">
+                <i class="material-icons-round">arrow_back</i>
+                <span data-i18n="editprofile.btn_back">Kembali</span>
+            </button>
+            <h1 class="page-title" data-i18n="editprofile.title">Ubah Profil</h1>
+            <button class="btn-save" id="saveBtn" data-i18n="editprofile.btn_save">Simpan</button>
         </div>
 
         <div class="avatar-section">
-            <div class="avatar-preview" id="avatarPreview">👤</div>
-            <div class="avatar-buttons">
-                <button id="changeAvatarBtn"><i class="material-icons-round">style</i> Change Avatar</button>
-                <button id="changePhotoBtn"><i class="material-icons-round">photo_camera</i> Change Photo</button>
+            <div class="avatar-wrapper" id="avatarTrigger">
+                <span id="avatarChar">A</span>
+                <div class="edit-overlay"><i class="material-icons-round">edit</i></div>
             </div>
+            <button class="btn-change-photo" id="changePhotoBtn" data-i18n="editprofile.upload_photo">Pilih Foto Galeri</button>
+            <input type="file" id="photoInput" accept="image/png, image/jpeg, image/jpg">
         </div>
 
-        <!-- Input file tersembunyi untuk akses galeri/penyimpanan -->
-        <input type="file" id="photoInput" accept="image/png, image/jpeg, image/jpg" style="display: none;">
-
-        <div id="avatarGrid" style="display: none;" class="avatar-choices">
-            <div class="avatar-option" data-avatar="😀">😀</div>
-            <div class="avatar-option" data-avatar="😎">😎</div>
+        <div class="avatar-grid" id="avatarGrid">
+            <div class="avatar-option" data-avatar="👨‍💻">👨‍💻</div>
+            <div class="avatar-option" data-avatar="👩‍💻">👩‍💻</div>
+            <div class="avatar-option" data-avatar="✨">✨</div>
+            <div class="avatar-option" data-avatar="🎯">🎯</div>
+            <div class="avatar-option" data-avatar="🦊">🦊</div>
             <div class="avatar-option" data-avatar="🐱">🐱</div>
-            <div class="avatar-option" data-avatar="🌟">🌟</div>
-            <div class="avatar-option" data-avatar="🎓">🎓</div>
-            <div class="avatar-option" data-avatar="💪">💪</div>
+            <div class="avatar-option" data-avatar="🪐">🪐</div>
+            <div class="avatar-option" data-avatar="🎨">🎨</div>
         </div>
 
-        <div class="form-group">
-            <label>First Name</label>
-            <div class="input-wrapper">
-                <input type="text" id="firstName" placeholder="Nama depan">
-                <i class="material-icons-round">edit</i>
+        <div class="form-grid">
+            <div class="form-group">
+                <label data-i18n="editprofile.label_email">Alamat Email (Tetap)</label>
+                <div class="input-wrapper">
+                    <i class="material-icons-round">mail_outline</i>
+                    <input type="email" id="emailInput" disabled>
+                </div>
+            </div>
+            <div class="form-group">
+                <label data-i18n="editprofile.label_name">Nama Pengguna Baru</label>
+                <div class="input-wrapper">
+                    <i class="material-icons-round">person_outline</i>
+                    <input type="text" id="nameInput" data-i18n-placeholder="editprofile.placeholder_name" placeholder="Masukkan nama baru">
+                </div>
             </div>
         </div>
-        <div class="form-group">
-            <label>Last Name</label>
-            <div class="input-wrapper">
-                <input type="text" id="lastName" placeholder="Nama belakang">
-                <i class="material-icons-round">edit</i>
-            </div>
-        </div>
-
-        <hr>
-
-        <div class="form-group">
-            <label>New Password (opsional)</label>
-            <div class="input-wrapper">
-                <input type="password" id="newPassword" placeholder="Kosongkan jika tidak ingin ganti password">
-                <i class="material-icons-round">lock</i>
-            </div>
-        </div>
-        <div class="form-group">
-            <label>Confirm New Password</label>
-            <div class="input-wrapper">
-                <input type="password" id="confirmPassword" placeholder="">
-                <i class="material-icons-round">lock</i>
-            </div>
-        </div>
-        <div class="password-note">Password minimal 8 karakter, huruf kecil & angka.</div>
     </div>
 </div>
 
 <script>
-    const API_URL = 'http://localhost:3000/api';
+(function() {
     const userData = JSON.parse(localStorage.getItem('remindu_user') || '{}');
     const userEmail = userData.email;
-    if (!userEmail) {
-        alert('Sesi login tidak ditemukan.');
-        window.location.href = 'welcome.html';
-    }
+    if (!userEmail) { window.location.href = 'welcome.html'; return; }
 
-    const firstNameInput = document.getElementById('firstName');
-    const lastNameInput = document.getElementById('lastName');
-    const newPasswordInput = document.getElementById('newPassword');
-    const confirmPasswordInput = document.getElementById('confirmPassword');
-    const avatarPreview = document.getElementById('avatarPreview');
-    const changeAvatarBtn = document.getElementById('changeAvatarBtn');
-    const changePhotoBtn = document.getElementById('changePhotoBtn');
+    const emailInput = document.getElementById('emailInput');
+    const nameInput = document.getElementById('nameInput');
+    const avatarTrigger = document.getElementById('avatarTrigger');
+    const avatarChar = document.getElementById('avatarChar');
     const avatarGrid = document.getElementById('avatarGrid');
+    const changePhotoBtn = document.getElementById('changePhotoBtn');
     const photoInput = document.getElementById('photoInput');
 
-    let currentAvatar = localStorage.getItem('user_avatar') || userEmail.charAt(0).toUpperCase();
+    // Mengambil inisial default huruf depan email
+    const defaultChar = userEmail.charAt(0).toUpperCase();
+    let currentAvatar = localStorage.getItem('user_avatar') || '';
 
-    // Fungsi untuk menampilkan avatar (baik teks maupun gambar base64)
-    function displayAvatar(avatar) {
-        if (avatar && avatar.startsWith('data:image')) {
-            avatarPreview.textContent = '';
-            avatarPreview.style.backgroundImage = `url(${avatar})`;
-            avatarPreview.style.backgroundSize = 'cover';
-            avatarPreview.style.backgroundPosition = 'center';
-        } else {
-            avatarPreview.textContent = avatar;
-            avatarPreview.style.backgroundImage = '';
-        }
+    emailInput.value = userEmail;
+    
+    // Mengambil tampilan nama custom opsional dari localStorage jika pernah disimpan
+    const savedName = localStorage.getItem('user_display_name');
+    if (savedName) {
+        nameInput.value = savedName;
+    } else {
+        const firstName = userEmail.split('@')[0];
+        nameInput.value = firstName.charAt(0).toUpperCase() + firstName.slice(1);
     }
 
+    function displayAvatar(val) {
+        if (!val) {
+            avatarChar.textContent = defaultChar;
+            avatarTrigger.style.backgroundImage = '';
+        } else if (val.startsWith('data:image')) {
+            avatarChar.textContent = '';
+            avatarTrigger.style.backgroundImage = `url(${val})`;
+        } else {
+            avatarChar.textContent = val;
+            avatarTrigger.style.backgroundImage = '';
+        }
+    }
     displayAvatar(currentAvatar);
 
-    // Load profil dari backend
-    async function loadProfile() {
-        try {
-            const response = await fetch(`${API_URL}/profile`, {
-                headers: { 'X-User-Email': userEmail }
-            });
-            if (!response.ok) throw new Error('Gagal mengambil profil');
-            const data = await response.json();
-            firstNameInput.value = data.nama_depan || '';
-            lastNameInput.value = data.nama_belakang || '';
-        } catch (err) {
-            alert('Gagal memuat profil: ' + err.message);
-        }
+    // Tandai emoji yang sedang terpilih saat ini pada grid internal jika ada
+    if (currentAvatar && !currentAvatar.startsWith('data:image')) {
+        document.querySelectorAll('.avatar-option').forEach(opt => {
+            if (opt.dataset.avatar === currentAvatar) opt.classList.add('selected');
+        });
     }
 
-    // Simpan perubahan
-    async function saveProfile() {
-        const firstName = firstNameInput.value.trim();
-        const lastName = lastNameInput.value.trim();
-        const newPassword = newPasswordInput.value;
-        const confirmPassword = confirmPasswordInput.value;
-
-        if (!firstName || !lastName) {
-            alert('Nama depan dan belakang wajib diisi');
-            return;
-        }
-
-        const payload = { firstName, lastName };
-        if (newPassword || confirmPassword) {
-            if (newPassword !== confirmPassword) {
-                alert('Konfirmasi password tidak cocok');
-                return;
-            }
-            payload.newPassword = newPassword;
-            payload.confirmPassword = confirmPassword;
-        }
-
-        try {
-            const response = await fetch(`${API_URL}/profile`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-User-Email': userEmail
-                },
-                body: JSON.stringify(payload)
-            });
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.error);
-            
-            // Simpan avatar ke localStorage
-            localStorage.setItem('user_avatar', currentAvatar);
-            
-            // Update nama di localStorage untuk greeting
-            const updatedUser = JSON.parse(localStorage.getItem('remindu_user') || '{}');
-            updatedUser.firstName = firstName;
-            localStorage.setItem('remindu_user', JSON.stringify(updatedUser));
-            
-            alert('Profil berhasil diperbarui!');
-            window.location.href = 'profil.html';
-        } catch (err) {
-            alert('Error: ' + err.message);
-        }
-    }
-
-    // Avatar grid (pilihan ikon)
-    changeAvatarBtn.addEventListener('click', () => {
-        avatarGrid.style.display = avatarGrid.style.display === 'none' ? 'flex' : 'none';
+    // Toggle grid avatar emoji internal
+    avatarTrigger.addEventListener('click', () => {
+        avatarGrid.style.display = avatarGrid.style.display === 'grid' ? 'none' : 'grid';
     });
-    document.querySelectorAll('.avatar-option').forEach(opt => {
-        opt.addEventListener('click', () => {
+
+    // Event click untuk setiap pilihan di grid emoji
+    document.querySelectorAll('.avatar-option').forEach(option => {
+        option.addEventListener('click', () => {
             document.querySelectorAll('.avatar-option').forEach(o => o.classList.remove('selected'));
-            opt.classList.add('selected');
-            currentAvatar = opt.dataset.avatar;
+            option.classList.add('selected');
+            currentAvatar = option.dataset.avatar;
             displayAvatar(currentAvatar);
             avatarGrid.style.display = 'none';
         });
     });
 
-    // Change Photo: akses galeri/penyimpanan user
+    // Tombol pemicu pencarian berkas galeri lokal
     changePhotoBtn.addEventListener('click', () => {
-        photoInput.click(); // membuka dialog pilih file
+        photoInput.click();
     });
 
+    // Memproses data gambar dari media lokal penyimpanan user
     photoInput.addEventListener('change', (event) => {
         const file = event.target.files[0];
         if (!file) return;
         if (!file.type.startsWith('image/')) {
-            alert('Harap pilih file gambar (PNG, JPG, JPEG)');
+            const errType = window.t ? window.t('editprofile.err_type') : 'Harap pilih file gambar (PNG, JPG, JPEG)';
+            alert(errType);
             return;
         }
         if (file.size > 2 * 1024 * 1024) {
-            alert('Ukuran maksimal 2MB');
+            const errSize = window.t ? window.t('editprofile.err_size') : 'Ukuran maksimal 2MB';
+            alert(errSize);
             return;
         }
         const reader = new FileReader();
@@ -235,19 +219,59 @@
             const base64 = e.target.result;
             currentAvatar = base64;
             displayAvatar(currentAvatar);
-            // Hapus highlight pilihan ikon
             document.querySelectorAll('.avatar-option').forEach(o => o.classList.remove('selected'));
             avatarGrid.style.display = 'none';
         };
         reader.readAsDataURL(file);
     });
 
+    // Fungsi menyimpan perubahan data profil
+    function saveProfile() {
+        const newName = nameInput.value.trim();
+        if (!newName) {
+            const errEmpty = window.t ? window.t('editprofile.err_empty_name') : 'Nama tidak boleh kosong!';
+            alert(errEmpty);
+            return;
+        }
+        localStorage.setItem('user_display_name', newName);
+        if (currentAvatar) {
+            localStorage.setItem('user_avatar', currentAvatar);
+        } else {
+            localStorage.removeItem('user_avatar');
+        }
+        
+        const successMsg = window.t ? window.t('editprofile.success_save') : 'Profil Anda berhasil diperbarui!';
+        alert(successMsg);
+        window.location.href = 'profil.html';
+    }
+
     document.getElementById('backBtn').addEventListener('click', () => {
         window.location.href = 'profil.html';
     });
+    
     document.getElementById('saveBtn').addEventListener('click', saveProfile);
+})();
+</script>
 
-    loadProfile();
+<script src="lang.js"></script>
+<script>
+    if (typeof applyLang === 'function') {
+        applyLang();
+    }
+</script>
+
+<button id="darkFab" style="position:fixed;bottom:88px;right:18px;z-index:9999;width:44px;height:44px;border-radius:50%;border:none;background:var(--purple);color:white;font-size:20px;cursor:pointer;box-shadow:0 4px 14px rgba(139,92,246,0.35);display:flex;align-items:center;justify-content:center;">🌙</button>
+<script>
+(function(){
+    var fab = document.getElementById('darkFab');
+    fab.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+    fab.addEventListener('click', function(){
+        var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('remindu_theme', next);
+        fab.textContent = next === 'dark' ? '☀️' : '🌙';
+    });
+})();
 </script>
 </body>
 </html>

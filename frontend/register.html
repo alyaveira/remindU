@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RemindU - Daftar</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         :root { --purple:#8b5cf6; --purple-dark:#7c3aed; --purple-light:#ede9fe; --bg:#f5f7fe; --white:#fff; --text:#0f172a; --text-muted:#64748b; --border:#edf2f7; }
         * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',system-ui,-apple-system,'Inter',sans-serif; }
@@ -11,237 +12,340 @@
         .bg-blob { position:fixed; border-radius:50%; filter:blur(60px); opacity:0.38; pointer-events:none; z-index:0; }
         .bg-blob-1 { width:400px; height:400px; background:var(--purple); top:-100px; right:-100px; }
         .bg-blob-2 { width:300px; height:300px; background:#ec4899; bottom:-80px; left:-80px; }
-        .card { max-width:550px; width:100%; background:var(--white); border-radius:36px; box-shadow:0 20px 35px -12px rgba(0,0,0,0.1); padding:40px 28px; position:relative; z-index:10; animation:fadeSlide 0.4s ease both; }
-        @keyframes fadeSlide { from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);} }
-        h2 { font-size:28px; margin-bottom:6px; color:var(--text); font-weight:700; }
-        .subtitle { color:var(--text-muted); margin-bottom:24px; font-size:15px; }
-        .form-row { display:flex; gap:12px; }
-        .form-group { position:relative; margin-bottom:14px; flex:1; }
-        .form-group input, .form-group select {
-            width:100%; padding:13px 48px 13px 48px; background:#f3f4f9;
-            border:1.5px solid transparent; border-radius:60px; font-size:14px; outline:none; transition:all 0.2s;
-        }
-        .form-group input:focus { border-color:var(--purple); background:var(--white); box-shadow:0 0 0 4px rgba(139,92,246,0.1); }
-        .form-group .fi { position:absolute; left:16px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:18px; pointer-events:none; font-family:'Material Icons Round'; }
-        .form-group .eye { position:absolute; right:14px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:var(--text-muted); font-size:18px; font-family:'Material Icons Round'; }
-        .form-group .eye:hover { color:var(--purple); }
-        .err { color:#e53e3e; font-size:11px; padding:0 8px; margin-top:3px; display:none; }
-        .err.show { display:block; }
-        .password-hint { font-size:11px; color:#94a3b8; padding:2px 8px; }
-        .password-strength { height:4px; background:#f1f5f9; border-radius:4px; margin:6px 8px; overflow:hidden; }
-        .strength-fill { height:100%; border-radius:4px; width:0; transition:width 0.3s, background 0.3s; }
-        .terms { display:flex; align-items:center; gap:10px; margin:14px 0 18px; font-size:13px; color:var(--text-muted); }
-        .terms input { width:18px; height:18px; accent-color:var(--purple); cursor:pointer; flex-shrink:0; }
-        .terms label { cursor:pointer; line-height:1.4; }
-        .terms a { color:var(--purple); text-decoration:none; }
-        .btn-primary { background:var(--purple); color:white; border:none; border-radius:60px; padding:14px; width:100%; font-weight:700; font-size:15px; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:8px; }
-        .btn-primary:hover { background:var(--purple-dark); transform:translateY(-2px); box-shadow:0 8px 20px rgba(139,92,246,0.3); }
-        .btn-primary:disabled { opacity:0.6; transform:none; cursor:not-allowed; }
-        .divider { display:flex; align-items:center; gap:12px; margin:18px 0; color:var(--text-muted); font-size:13px; }
-        .divider::before,.divider::after { content:''; flex:1; height:1px; background:var(--border); }
-        .btn-google { width:100%; padding:12px 20px; border:1.5px solid var(--border); border-radius:60px; background:white; color:#1a1a1a; font-size:14px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:12px; transition:all 0.2s; }
-        .btn-google:hover { background:#f8f9fa; border-color:#dadce0; box-shadow:0 2px 8px rgba(0,0,0,0.08); transform:translateY(-1px); }
-        .link { text-align:center; margin-top:18px; font-size:14px; color:var(--text-muted); }
-        a { color:var(--purple); text-decoration:none; }
-        a:hover { text-decoration:underline; }
-        .back-link { display:inline-block; margin-bottom:18px; font-weight:500; font-size:14px; }
-        .spinner { width:18px; height:18px; border:2.5px solid rgba(255,255,255,0.4); border-top-color:white; border-radius:50%; animation:spin 0.7s linear infinite; }
-        @keyframes spin { to { transform:rotate(360deg); } }
-        .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(80px); background:#1e293b; color:white; padding:12px 24px; border-radius:40px; font-size:14px; font-weight:500; z-index:9999; transition:transform 0.3s; white-space:nowrap; }
-        .toast.show { transform:translateX(-50%) translateY(0); }
-        .toast.success { background:#10b981; }
-        .toast.error { background:#e53e3e; }
-        @media (min-width:768px) { .card { padding:48px 40px; } }
+        
+        .container { width:100%; max-width:440px; background:var(--white); padding:36px; border-radius:32px; box-shadow:0 20px 40px rgba(0,0,0,0.03); border:1px solid var(--border); position:relative; z-index:10; }
+        .logo-area { display:flex; flex-direction:column; align-items:center; margin-bottom:28px; }
+        .logo-icon { width:48px; height:48px; border-radius:14px; background:linear-gradient(135deg, #1e3a8a, #8b5cf6); color:white; display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:900; margin-bottom:12px; box-shadow:0 8px 16px rgba(139,92,246,0.25); }
+        .logo-area h2 { font-size:24px; font-weight:800; background:linear-gradient(135deg, #1e3a8a, #3b82f6, #8b5cf6, #ec4899); -webkit-background-clip:text; background-clip:text; color:transparent; }
+        .logo-area p { font-size:14px; color:var(--text-muted); margin-top:4px; font-weight:500; }
+        
+        .form-group { margin-bottom:18px; }
+        .form-group label { display:block; font-size:13px; font-weight:600; color:#475569; margin-bottom:6px; padding-left:2px; }
+        .input-wrapper { position:relative; display:flex; align-items:center; }
+        .input-wrapper svg { position:absolute; left:14px; width:20px; height:20px; color:#94a3b8; fill:none; stroke:currentColor; stroke-width:2; }
+        .input-wrapper input { width:100%; padding:13px 14px 13px 44px; border-radius:14px; border:1px solid #e2e8f0; font-size:14px; color:var(--text); outline:none; background:#f8fafc; transition:all 0.2s; }
+        .input-wrapper input:focus { border-color:var(--purple); background:white; box-shadow:0 0 0 4px rgba(139,92,246,0.1); }
+        
+        .btn-submit { width:100%; background:linear-gradient(135deg, var(--purple-dark), var(--purple)); color:white; border:none; padding:14px; border-radius:14px; font-size:14px; font-weight:700; cursor:pointer; box-shadow:0 6px 20px rgba(139,92,246,0.25); transition:all 0.2s; display:flex; align-items:center; justify-content:center; margin-top:10px; }
+        .btn-submit:hover { transform:translateY(-1px); box-shadow:0 8px 24px rgba(139,92,246,0.35); }
+        .btn-submit:disabled { background:#cbd5e1; box-shadow:none; cursor:not-allowed; }
+        
+        .divider { display:flex; align-items:center; text-align:center; margin:24px 0; color:var(--text-muted); font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; }
+        .divider::before, .divider::after { content:''; flex:1; border-bottom:1px solid var(--border); }
+        .divider:not(:empty)::before { margin-right:12px; }
+        .divider:not(:empty)::after { margin-left:12px; }
+        
+        .btn-google { width:100%; background:white; border:1px solid #e2e8f0; color:#334155; padding:12px; border-radius:14px; font-size:14px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; transition:all 0.2s; }
+        .btn-google:hover { background:#f8fafc; border-color:#cbd5e1; }
+        .btn-google svg { width:18px; height:18px; }
+        
+        .footer-text { text-align:center; font-size:13px; color:var(--text-muted); margin-top:24px; font-weight:500; }
+        .footer-text a { color:var(--purple); text-decoration:none; font-weight:700; }
+        .footer-text a:hover { text-decoration:underline; }
+        
+        /* Toast Notification */
+        .toast { position:fixed; bottom:-60px; left:50%; transform:translateX(-50%); background:#0f172a; color:white; padding:12px 24px; border-radius:30px; font-size:13px; font-weight:600; box-shadow:0 4px 12px rgba(0,0,0,0.15); transition:bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index:1000; display:flex; align-items:center; gap:8px; }
+        .toast.show { bottom:30px; }
+        .toast.error { background:#ef4444; }
     </style>
+<<<<<<< HEAD
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+=======
+>>>>>>> bfc64c1 (clean: remove node_modules from tracking)
 </head>
 <body>
+
 <div class="bg-blob bg-blob-1"></div>
 <div class="bg-blob bg-blob-2"></div>
 
-<div class="card">
-    <a href="login.html" class="back-link">← Kembali ke Login</a>
-    <h2>Buat Akun</h2>
-    <p class="subtitle">Daftar gratis dan mulai kelola task kamu!</p>
+<div id="g_id_onload"
+     data-client_id="YOUR_GOOGLE_CLIENT_ID"
+     data-callback="handleGoogleOneTap"
+     data-auto_select="false"
+     data-cancel_on_tap_outside="false">
+</div>
 
-    <form id="signupForm" novalidate>
-        <div class="form-row">
-            <div class="form-group">
-                <span class="fi">person</span>
-                <input type="text" id="firstName" placeholder="Nama Depan*" autocomplete="given-name">
-                <div class="err" id="firstNameErr"></div>
+<div class="container">
+    <div class="logo-area">
+        <div class="logo-icon">R</div>
+        <h2>RemindU</h2>
+        <p data-i18n="register.subtitle">Buat akun barumu sekarang</p>
+    </div>
+
+    <form id="signupForm">
+        <div class="form-group">
+            <label data-i18n="register.label_name">Nama Lengkap</label>
+            <div class="input-wrapper">
+                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                <input type="text" id="fullnameInput" data-i18n-placeholder="register.placeholder_name" placeholder="Contoh: Ariel IT" required>
             </div>
-            <div class="form-group">
-                <span class="fi">person</span>
-                <input type="text" id="lastName" placeholder="Nama Belakang*" autocomplete="family-name">
+        </div>
+
+        <div class="form-group">
+            <label data-i18n="register.label_email">Alamat Email</label>
+            <div class="input-wrapper">
+                <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                <input type="email" id="emailInput" data-i18n-placeholder="register.placeholder_email" placeholder="name@example.com" required>
             </div>
         </div>
 
         <div class="form-group">
-            <span class="fi">email</span>
-            <input type="email" id="signupEmail" placeholder="Alamat Email*" autocomplete="email">
-            <div class="err" id="emailErr"></div>
+            <label data-i18n="register.label_password">Kata Sandi</label>
+            <div class="input-wrapper">
+                <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                <input type="password" id="passwordInput" data-i18n-placeholder="register.placeholder_password" placeholder="Minimal 6 karakter" required>
+            </div>
         </div>
 
-        <div class="form-group">
-            <span class="fi">lock</span>
-            <input type="password" id="signupPassword" placeholder="Buat Password*" autocomplete="new-password">
-            <button type="button" class="eye" onclick="togglePwd('signupPassword', this)">visibility_off</button>
-        </div>
-        <div class="password-strength"><div class="strength-fill" id="strengthFill"></div></div>
-        <div class="password-hint" id="strengthLabel">Password minimal 8 karakter, huruf kecil &amp; angka</div>
-        <div class="err" id="passwordErr"></div>
-
-        <div class="form-group">
-            <span class="fi">lock</span>
-            <input type="password" id="confirmPassword" placeholder="Konfirmasi Password*" autocomplete="new-password">
-            <button type="button" class="eye" onclick="togglePwd('confirmPassword', this)">visibility_off</button>
-            <div class="err" id="confirmErr"></div>
-        </div>
-
-        <div class="terms">
-            <input type="checkbox" id="acceptTerms">
-            <label for="acceptTerms">Saya menyetujui <a href="#">Syarat & Ketentuan</a> dan <a href="#">Kebijakan Privasi</a> RemindU</label>
-        </div>
-
-        <button type="submit" class="btn-primary" id="signupBtn">
-            <span id="signupBtnText">Buat Akun</span>
+        <button type="submit" class="btn-submit" id="signupBtn">
+            <span id="signupBtnText" data-i18n="register.btn_submit">Buat Akun</span>
         </button>
     </form>
 
-    <div class="divider">atau daftar dengan</div>
+    <div class="divider" data-i18n="register.divider">atau daftar dengan</div>
 
-    <button class="btn-google" onclick="registerWithGoogle()">
+<<<<<<< HEAD
+    <button class="btn-google" id="googleRegisterBtn">
         <svg width="20" height="20" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
         Lanjutkan dengan Google
+=======
+    <button class="btn-google" onclick="registerWithGoogle()">
+        <svg viewBox="0 0 24 24">
+            <path fill="#EA4335" d="M12.24 10.285V14.4h6.887c-.275 1.565-1.88 4.604-6.887 4.604-4.33 0-7.866-3.577-7.866-8s3.536-8 7.866-8c2.46 0 4.105 1.025 5.047 1.926l3.227-3.103C18.225 1.833 15.459 1 12.24 1 6.033 1 1 6.033 1 12.24s5.033 11.24 11.24 11.24c6.478 0 10.793-4.537 10.793-11 0-.746-.08-1.32-.176-1.765H12.24z"/>
+        </svg>
+        <span data-i18n="register.btn_google">Daftar dengan Google</span>
+>>>>>>> bfc64c1 (clean: remove node_modules from tracking)
     </button>
 
-    <div class="link">Sudah punya akun? <a href="login.html">Masuk di sini</a></div>
+    <div class="footer-text">
+        <span data-i18n="register.footer_text">Sudah punya akun?</span> 
+        <a href="login.html" data-i18n="register.footer_link">Masuk di sini</a>
+    </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
+<<<<<<< HEAD
+<script type="module">
+    import { supabase } from './supabase-config.js';
+
+    function showToast(msg, type = '') {
+        const t = document.getElementById('toast');
+        t.textContent = msg; 
+        t.className = 'toast show ' + type;
+        setTimeout(() => t.classList.remove('show'), 4000);
+    }
+
+    window.togglePwd = function(id, btn) {
+        const inp = document.getElementById(id);
+        inp.type = inp.type === 'password' ? 'text' : 'password';
+        btn.textContent = inp.type === 'password' ? 'visibility_off' : 'visibility';
+    }
+
+    // Password strength indicator
+    document.getElementById('signupPassword').addEventListener('input', function () {
+        const val = this.value;
+        const fill = document.getElementById('strengthFill');
+        const label = document.getElementById('strengthLabel');
+        let score = 0;
+        if (val.length >= 6) score++;
+        if (/[a-z]/.test(val)) score++;
+        if (/[0-9]/.test(val)) score++;
+        if (/[A-Z]/.test(val)) score++;
+        if (/[^a-zA-Z0-9]/.test(val)) score++;
+        const pct = score * 20;
+        const colors = ['', '#e53e3e', '#f97316', '#f59e0b', '#10b981', '#8b5cf6'];
+        const labels = ['', 'Sangat Lemah', 'Lemah', 'Cukup', 'Kuat', 'Sangat Kuat'];
+        fill.style.width = pct + '%';
+        fill.style.background = colors[score] || '';
+        label.textContent = score > 0 ? `Kekuatan: ${labels[score]}` : 'Password minimal 6 karakter, huruf kecil & angka';
+        label.style.color = colors[score] || '#94a3b8';
+    });
+
+    function validateForm() {
+        let valid = true;
+        const clearErr = id => { const el = document.getElementById(id); if (el) { el.textContent = ''; el.className = 'err'; } };
+        const showErr  = (id, msg) => { const el = document.getElementById(id); if (el) { el.textContent = msg; el.className = 'err show'; } valid = false; };
+
+        clearErr('firstNameErr'); clearErr('emailErr'); clearErr('passwordErr'); clearErr('confirmErr');
+
+        const first    = document.getElementById('firstName').value.trim();
+        const email    = document.getElementById('signupEmail').value.trim();
+        const password = document.getElementById('signupPassword').value;
+        const confirm  = document.getElementById('confirmPassword').value;
+        const terms    = document.getElementById('acceptTerms').checked;
+
+        if (!first) showErr('firstNameErr', 'Nama depan wajib diisi');
+        if (!email || !email.includes('@')) showErr('emailErr', 'Email tidak valid');
+        if (!password || password.length < 6 || !/[a-z]/.test(password) || !/[0-9]/.test(password))
+            showErr('passwordErr', 'Password minimal 6 karakter, huruf kecil & angka');
+        if (password !== confirm) showErr('confirmErr', 'Konfirmasi password tidak cocok');
+        if (!terms) { showToast('⚠️ Harap menyetujui Syarat & Ketentuan', 'error'); valid = false; }
+        return valid;
+    }
+
+    document.getElementById('signupForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!validateForm()) return;
+
+        const btn = document.getElementById('signupBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<div class="spinner"></div>';
+
+        const firstName = document.getElementById('firstName').value.trim();
+        const lastName  = document.getElementById('lastName').value.trim();
+        const email     = document.getElementById('signupEmail').value.trim();
+        const password  = document.getElementById('signupPassword').value;
+
+        const { data, error } = await supabase.auth.signUp({
+            email: email,
+            password: password,
+            options: {
+                data: {
+                    nama_depan: firstName,
+                    nama_belakang: lastName
+                }
+            }
+        });
+        
+        if (error) {
+            let message = 'Registrasi gagal';
+            if (error.message === 'User already registered') message = 'Email sudah terdaftar';
+            if (error.message === 'Password should be at least 6 characters') message = 'Password minimal 6 karakter';
+            showToast(message, 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<span id="signupBtnText">Buat Akun</span>';
+        } else {
+            showToast('✅ Akun berhasil dibuat! Cek email untuk verifikasi.', 'success');
+            setTimeout(() => window.location.href = 'login.html', 2000);
+        }
+    });
+
+    // Google Register
+    document.getElementById('googleRegisterBtn').addEventListener('click', async () => {
+        const btn = document.getElementById('googleRegisterBtn');
+        btn.disabled = true;
+        const { data, error } = await supabase.auth.signInWithOAuth({
+            provider: 'google'
+        });
+        if (error) {
+            showToast('Google register gagal: ' + error.message, 'error');
+        }
+        btn.disabled = false;
+    });
+=======
 <script>
+const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID'; // Ganti dengan Client ID Anda jika menggunakan Google Sign-In
 const API_URL = 'http://localhost:3000/api';
-const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID'; // Ganti dengan Client ID kamu
 
-function showToast(msg, type = '') {
-    const t = document.getElementById('toast');
-    t.textContent = msg; t.className = 'toast show ' + type;
-    setTimeout(() => t.classList.remove('show'), 4000);
+function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = 'toast show' + (type === 'error' ? ' error' : '');
+    setTimeout(() => toast.classList.remove('show'), 3000);
 }
 
-function togglePwd(id, btn) {
-    const inp = document.getElementById(id);
-    inp.type = inp.type === 'password' ? 'text' : 'password';
-    btn.textContent = inp.type === 'password' ? 'visibility_off' : 'visibility';
-}
+// Konfigurasi Google One Tap awal otomatis saat halaman web dimuat
+window.onload = function () {
+    if (typeof google !== 'undefined' && GOOGLE_CLIENT_ID !== 'YOUR_GOOGLE_CLIENT_ID') {
+        google.accounts.id.initialize({
+            client_id: GOOGLE_CLIENT_ID,
+            callback: handleGoogleOneTap
+        });
+        google.accounts.id.prompt(); // Tampilkan popup Google One Tap
+    }
+};
 
-// Password strength indicator
-document.getElementById('signupPassword').addEventListener('input', function () {
-    const val = this.value;
-    const fill = document.getElementById('strengthFill');
-    const label = document.getElementById('strengthLabel');
-    let score = 0;
-    if (val.length >= 8) score++;
-    if (/[a-z]/.test(val)) score++;
-    if (/[0-9]/.test(val)) score++;
-    if (/[A-Z]/.test(val)) score++;
-    if (/[^a-zA-Z0-9]/.test(val)) score++;
-    const pct = score * 20;
-    const colors = ['', '#e53e3e', '#f97316', '#f59e0b', '#10b981', '#8b5cf6'];
-    const labels = ['', 'Sangat Lemah', 'Lemah', 'Cukup', 'Kuat', 'Sangat Kuat'];
-    fill.style.width = pct + '%';
-    fill.style.background = colors[score] || '';
-    label.textContent = score > 0 ? `Kekuatan: ${labels[score]}` : 'Password minimal 8 karakter, huruf kecil & angka';
-    label.style.color = colors[score] || '#94a3b8';
-});
-
-// Form validation
-function validateForm() {
-    let valid = true;
-    const clearErr = id => { const el = document.getElementById(id); if (el) { el.textContent = ''; el.className = 'err'; } };
-    const showErr  = (id, msg) => { const el = document.getElementById(id); if (el) { el.textContent = msg; el.className = 'err show'; } valid = false; };
-
-    clearErr('firstNameErr'); clearErr('emailErr'); clearErr('passwordErr'); clearErr('confirmErr');
-
-    const first    = document.getElementById('firstName').value.trim();
-    const email    = document.getElementById('signupEmail').value.trim();
-    const password = document.getElementById('signupPassword').value;
-    const confirm  = document.getElementById('confirmPassword').value;
-    const terms    = document.getElementById('acceptTerms').checked;
-
-    if (!first) showErr('firstNameErr', 'Nama depan wajib diisi');
-    if (!email || !email.includes('@')) showErr('emailErr', 'Email tidak valid');
-    if (!password || password.length < 8 || !/[a-z]/.test(password) || !/[0-9]/.test(password))
-        showErr('passwordErr', 'Password minimal 8 karakter, huruf kecil & angka');
-    if (password !== confirm) showErr('confirmErr', 'Konfirmasi password tidak cocok');
-    if (!terms) { showToast('⚠️ Harap menyetujui Syarat & Ketentuan', 'error'); valid = false; }
-    return valid;
-}
-
+// Form Register Manual
 document.getElementById('signupForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    if (!validateForm()) return;
-
+    
+    const fullname = document.getElementById('fullnameInput').value.trim();
+    const email = document.getElementById('emailInput').value.trim();
+    const password = document.getElementById('passwordInput').value.trim();
     const btn = document.getElementById('signupBtn');
-    btn.disabled = true;
-    btn.innerHTML = '<div class="spinner"></div>';
 
-    const firstName = document.getElementById('firstName').value.trim();
-    const lastName  = document.getElementById('lastName').value.trim();
-    const email     = document.getElementById('signupEmail').value.trim();
-    const password  = document.getElementById('signupPassword').value;
+    if (password.length < 6) {
+        const errMinLen = window.t ? window.t('register.err_password_min_length') : 'Kata sandi minimal harus 6 karakter!';
+        showToast(errMinLen, 'error');
+        return;
+    }
+
+    btn.disabled = true;
+    const loadingText = window.t ? window.t('register.btn_loading') : 'Mendaftarkan...';
+    document.getElementById('signupBtnText').textContent = loadingText;
+
+    const splitName = fullname.split(' ');
+    const nama_depan = splitName[0];
+    const nama_belakang = splitName.slice(1).join(' ') || '';
 
     try {
-        const res  = await fetch(`${API_URL}/register`, {
+        const res = await fetch(`${API_URL}/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ firstName, lastName, email, password, terms: true })
+            body: JSON.stringify({ nama_depan, nama_belakang, email, password })
         });
+        
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Registrasi gagal');
+        if (!res.ok) throw new Error(data.error || 'Pendaftaran gagal');
 
-        localStorage.setItem('pendingVerifyEmail', email);
-        showToast('✅ Akun dibuat! Cek email untuk kode OTP.', 'success');
-        // Tampilkan OTP di alert jika SMTP belum aktif
-        if (data.otp) alert(`Kode OTP kamu: ${data.otp}\n(Catatan: Di produksi, OTP dikirim via email otomatis)`);
-        setTimeout(() => window.location.href = 'verify.html', 1000);
+        const successMsg = window.t ? window.t('register.success_register') : '✅ Akun berhasil dibuat! Silakan cek email verifikasi.';
+        showToast(successMsg, 'success');
+        
+        // Simpan email sementara di LocalStorage untuk mempermudah proses verify.html jika dibutuhkan
+        localStorage.setItem('remindu_verify_email', email);
+        setTimeout(() => window.location.href = 'verify.html', 1200);
     } catch (err) {
         showToast(err.message, 'error');
         btn.disabled = false;
-        btn.innerHTML = '<span id="signupBtnText">Buat Akun</span>';
+        document.getElementById('signupBtnText').setAttribute('data-i18n', 'register.btn_submit');
+        if (window.applyLang) window.applyLang(); // Kembalikan teks tombol sesuai bahasa aktif
     }
 });
 
-// Google Register (sama flow dengan login)
+// Google Register (sama flow dengan login redireksi)
 function registerWithGoogle() {
     if (GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID') {
-        showToast('⚠️ Google Login belum dikonfigurasi. Hubungi admin.', 'error');
+        const errConfig = window.t ? window.t('register.err_google_not_configured') : '⚠️ Google Sign-In belum dikonfigurasi. Hubungi admin.';
+        showToast(errConfig, 'error');
         return;
     }
     window.location.href = 'http://localhost:3000/auth/google';
 }
 
-// Google One Tap callback (sama dengan login)
-window.handleGoogleOneTap = async function (response) {
+// Google One Tap Callback Token Handler
+async function handleGoogleOneTap(response) {
     if (!response?.credential) return;
     try {
-        const res  = await fetch(`${API_URL}/auth/google-token`, {
+        const res = await fetch(`${API_URL}/auth/google-token`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ credential: response.credential })
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error);
-        localStorage.setItem('remindu_user', JSON.stringify({ email: data.email, firstName: data.nama_depan, provider: 'google' }));
-        showToast('✅ Daftar via Google berhasil!', 'success');
+        
+        localStorage.setItem('remindu_user', JSON.stringify({ 
+            email: data.email, 
+            firstName: data.nama_depan, 
+            provider: 'google' 
+        }));
+        
+        const successGoogle = window.t ? window.t('register.success_google') : '✅ Daftar via Google berhasil!';
+        showToast(successGoogle, 'success');
         setTimeout(() => window.location.href = 'home.html', 800);
     } catch (err) {
-        showToast(err.message || 'Google login gagal', 'error');
+        showToast(err.message || 'Google Register Gagal', 'error');
     }
-};
+}
+</script>
+
+<script src="lang.js"></script>
+<script>
+    if (typeof applyLang === 'function') {
+        applyLang();
+    }
+>>>>>>> bfc64c1 (clean: remove node_modules from tracking)
 </script>
 </body>
 </html>
