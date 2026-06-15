@@ -20,6 +20,10 @@ const app = express();
 const path = require('path');
 app.use(express.static(path.join(__dirname, 'public')));
 //const PORT = process.env.PORT || 3000;
+// Route untuk root (/) agar menampilkan welcome.html
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'welcome.html'));
+});
 
 // ============================================================
 // MIDDLEWARE
