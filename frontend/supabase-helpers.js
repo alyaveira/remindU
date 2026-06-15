@@ -63,14 +63,11 @@ export async function createTask(payload) {
         .from('tasks')
         .insert([{
             user_id: user.id,
-            title: payload.judul,
             judul: payload.judul,
-            category: payload.kategori || 'personal',
             kategori: payload.kategori || 'personal',
             notes: payload.notes || null,
             due_date: payload.due_date || null,
             remind_at: payload.remind_at || null,
-            completed: false,
             selesai: false
         }])
         .select()
@@ -83,9 +80,9 @@ export async function updateTask(id, payload) {
     const user = await getCurrentUser();
     if (!user) throw new Error('Tidak terautentikasi');
     const updateData = {};
-    if ('selesai' in payload) { updateData.selesai = payload.selesai; updateData.completed = payload.selesai; }
-    if ('judul' in payload) { updateData.judul = payload.judul; updateData.title = payload.judul; }
-    if ('kategori' in payload) { updateData.kategori = payload.kategori; updateData.category = payload.kategori; }
+    if ('selesai' in payload) { updateData.selesai = payload.selesai; }
+    if ('judul' in payload) { updateData.judul = payload.judul; }
+    if ('kategori' in payload) { updateData.kategori = payload.kategori; }
     if ('notes' in payload) updateData.notes = payload.notes;
     if ('due_date' in payload) updateData.due_date = payload.due_date;
     if ('remind_at' in payload) updateData.remind_at = payload.remind_at;
