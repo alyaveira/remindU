@@ -1,5 +1,7 @@
 // server.js — RemindU Backend v2.0 (PostgreSQL / Supabase) — CLEAN VERSION
-require('dotenv').config({ path: './api.env' });
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config({ path: './api.env' });
+}
 
 const express = require('express');
 const bcrypt = require('bcryptjs');
