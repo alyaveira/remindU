@@ -36,14 +36,10 @@
     <div class="progress-bar" id="progressBar"><div class="progress-fill"></div></div>
 </div>
 
-<script>
-(function () {
-    const params  = new URLSearchParams(window.location.search);
-    const email   = params.get('email');
-    const name    = params.get('name');
-    const provider = params.get('provider');
-    const error   = params.get('error');
+<script type="module">
+import { supabase } from './supabase-config.js';
 
+(async function () {
     function setStatus(type, titleText, subText) {
         document.getElementById('mainIcon').style.display = 'none';
         document.getElementById('progressBar').style.display = 'none';
@@ -53,24 +49,39 @@
         document.getElementById('subtitle').textContent = subText;
     }
 
-    if (error || !email) {
-        setStatus('error', 'Login Gagal', 'Terjadi kesalahan saat login dengan Google. Kamu akan diarahkan ke halaman login...');
-        setTimeout(() => window.location.href = 'login.html?error=google_failed', 2500);
-        return;
+    try {
+        // Mendapatkan sesi yang di-parse otomatis oleh Supabase dari hash URL
+        const { data, error } = await supabase.auth.getSession();
+        
+        if (error || !data.session) {
+            setStatus('error', 'Login Gagal', 'Sesi tidak ditemukan atau kedaluwarsa. Kamu akan diarahkan kembali...');
+            setTimeout(() => window.location.href = 'login.html', 2500);
+            return;
+        }
+
+        const user = data.session.user;
+        const email = user.email;
+        // Ambil nama dari metadata Google
+        const name = user.user_metadata?.nama_depan || user.user_metadata?.full_name || user.user_metadata?.name || email.split('@')[0];
+
+        // Simpan data user ke localStorage sesuai format aplikasi
+        localStorage.setItem('remindu_user', JSON.stringify({
+            email: email,
+            uid: user.id,
+            firstName: name,
+            provider: 'google'
+        }));
+
+        setStatus('success',
+            `Selamat Datang, ${name}! 👋`,
+            'Login Google berhasil. Mengalihkan ke beranda...'
+        );
+        setTimeout(() => window.location.href = 'home.html', 1500);
+
+    } catch (err) {
+        setStatus('error', 'Terjadi Kesalahan', 'Gagal memproses login Google.');
+        setTimeout(() => window.location.href = 'login.html', 2500);
     }
-
-    // Simpan data user ke localStorage
-    localStorage.setItem('remindu_user', JSON.stringify({
-        email:     decodeURIComponent(email),
-        firstName: decodeURIComponent(name || email.split('@')[0]),
-        provider:  provider || 'google'
-    }));
-
-    setStatus('success',
-        `Selamat Datang, ${decodeURIComponent(name || 'User')}! 👋`,
-        'Login Google berhasil. Mengalihkan ke dashboard...'
-    );
-    setTimeout(() => window.location.href = 'home.html', 1800);
 })();
 </script>
 </body>
