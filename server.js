@@ -16,6 +16,9 @@ const { OAuth2Client } = require('google-auth-library');
 const db = require('./db');
 
 const app = express();
+// Serve static files from 'public' folder
+const path = require('path');
+app.use(express.static(path.join(__dirname, 'public')));
 //const PORT = process.env.PORT || 3000;
 
 // ============================================================
