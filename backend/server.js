@@ -13,7 +13,7 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const nodemailer = require('nodemailer');
 const cron = require('node-cron');
 const { OAuth2Client } = require('google-auth-library');
-const db = require('./db');
+const db = require('../db');
 
 const app = express();
 //const PORT = process.env.PORT || 3000;
