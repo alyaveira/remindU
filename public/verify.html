@@ -2,209 +2,82 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>RemindU - Selamat Datang</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifikasi OTP - RemindU</title>
     <style>
-        /* --- ROOT VARIABLES (dari welcomebaru) --- */
-        :root {
-            --purple: #8b5cf6;
-            --purple-dark: #7c3aed;
-            --purple-light: #ede9fe;
-            --bg: #f5f7fe;
-            --white: #ffffff;
-            --text: #0f172a;
-            --text-muted: #64748b;
-            --border: #edf2f7;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, -apple-system, 'Inter', sans-serif;
-        }
-
-        /* --- BG DECORATION (blob + warna latar dari welcomebaru) --- */
-        body {
-            background: var(--bg);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            position: relative;
-            overflow-x: hidden;
-            overflow-y: auto;
-        }
-
-        /* Elemen blur / blobs - persis dari welcomebaru */
-        .bg-blob {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(60px);
-            opacity: 0.38;
-            pointer-events: none;
-            z-index: 0;
-        }
-        .bg-blob-1 {
-            width: 400px;
-            height: 400px;
-            background: var(--purple);
-            top: -100px;
-            right: -100px;
-        }
-        .bg-blob-2 {
-            width: 300px;
-            height: 300px;
-            background: #ec4899;
-            bottom: -80px;
-            left: -80px;
-        }
-
-        /* --- CARD STYLE (konten asli dari welcome.html) --- */
-        .card {
-            max-width: 580px;
-            width: 100%;
-            background: var(--white);
-            border-radius: 36px;
-            box-shadow: 0 28px 48px -16px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(139, 92, 246, 0.05);
-            padding: 48px 32px;
-            text-align: center;
-            position: relative;
-            z-index: 10;
-            backdrop-filter: blur(0px);
-            transition: transform 0.2s ease, box-shadow 0.2s;
-        }
-
-        .card:hover {
-            box-shadow: 0 32px 56px -20px rgba(139, 92, 246, 0.2);
-        }
-
-        /* Heading & teks original welcome.html */
-        h1 {
-            font-size: 52px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #1e3a8a, #3b82f6, #8b5cf6, #ec4899);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            letter-spacing: -1px;
-            margin-bottom: 20px;
-        }
-
-        .desc-text {
-            font-size: 1.1rem;
-            line-height: 1.5;
-            color: var(--text-muted);
-            margin-bottom: 36px;
-            font-weight: 500;
-            max-width: 90%;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* Tombol utama (Get Started) */
-        .btn-get-started {
-            background: var(--purple);
-            color: white;
-            border: none;
-            border-radius: 60px;
-            padding: 15px 24px;
-            font-size: 1rem;
-            font-weight: 700;
-            width: 100%;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            box-shadow: 0 8px 20px -8px rgba(139, 92, 246, 0.45);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            letter-spacing: 0.3px;
-        }
-
-        .btn-get-started:hover {
-            background: var(--purple-dark);
-            transform: translateY(-3px);
-            box-shadow: 0 16px 28px -12px rgba(139, 92, 246, 0.55);
-        }
-
-        .btn-get-started:active {
-            transform: translateY(1px);
-        }
-
-        /* Link Sign Up */
-        .link {
-            margin-top: 24px;
-            font-size: 0.95rem;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        .link a {
-            color: var(--purple);
-            text-decoration: none;
-            font-weight: 700;
-            transition: all 0.2s;
-            border-bottom: 1px solid transparent;
-        }
-
-        .link a:hover {
-            color: var(--purple-dark);
-            border-bottom-color: var(--purple-light);
-            text-decoration: none;
-        }
-
-        /* Opsi tambahan: sedikit sentuhan modern tanpa mengubah makna asli */
-        @media (max-width: 550px) {
-            .card {
-                padding: 36px 24px;
-            }
-            h1 {
-                font-size: 42px;
-            }
-            .desc-text {
-                font-size: 1rem;
-                max-width: 100%;
-            }
-        }
-
-        /* Tambahan animasi subtle untuk halaman */
-        @keyframes fadeSlide {
-            0% {
-                opacity: 0;
-                transform: translateY(14px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .card {
-            animation: fadeSlide 0.55s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
-        }
+        :root { --purple:#8b5cf6; --purple-dark:#7c3aed; --bg:#f5f7fe; --white:#ffffff; --text:#0f172a; --border:#edf2f7; }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; }
+        body { background:var(--bg); min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
+        .card { max-width:450px; width:100%; background:var(--white); border-radius:32px; padding:40px 28px; box-shadow:0 20px 35px -12px rgba(0,0,0,0.1); text-align:center; }
+        h2 { font-size:26px; color:var(--text); margin-bottom:12px; }
+        .subtitle { color:#64748b; margin-bottom:28px; }
+        .otp-input { width:100%; padding:14px 20px; font-size:18px; text-align:center; letter-spacing:4px; border:1.5px solid var(--border); border-radius:60px; outline:none; transition:0.2s; }
+        .otp-input:focus { border-color:var(--purple); box-shadow:0 0 0 4px rgba(139,92,246,0.1); }
+        .btn { background:var(--purple); color:white; border:none; border-radius:60px; padding:14px; width:100%; font-weight:700; margin-top:20px; cursor:pointer; transition:0.2s; }
+        .btn:hover { background:var(--purple-dark); transform:translateY(-2px); }
+        .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(80px); background:#1e293b; color:white; padding:12px 24px; border-radius:40px; font-size:14px; transition:transform 0.3s; white-space:nowrap; z-index:1000; }
+        .toast.show { transform:translateX(-50%) translateY(0); }
+        .toast.success { background:#10b981; }
+        .toast.error { background:#e53e3e; }
+        .back-link { display:inline-block; margin-bottom:20px; color:var(--purple); text-decoration:none; font-weight:500; }
+        .spinner { width:18px; height:18px; border:2.5px solid rgba(255,255,255,0.4); border-top-color:white; border-radius:50%; animation:spin 0.7s linear infinite; margin:0 auto; }
+        @keyframes spin { to { transform:rotate(360deg); } }
     </style>
 </head>
 <body>
+<div class="card">
+    <a href="register.html" class="back-link">← Kembali</a>
+    <h2>Verifikasi OTP</h2>
+    <p class="subtitle">Kode verifikasi telah dikirim ke email Anda.</p>
+    <input type="text" class="otp-input" id="otp" placeholder="Kode 6 digit" maxlength="6" inputmode="numeric">
+    <button class="btn" id="verifyBtn">Verifikasi</button>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+    function showToast(msg, type = '') {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = 'toast show ' + type;
+        setTimeout(() => t.classList.remove('show'), 4000);
+    }
 
-    <!-- Background Blobs persis dari welcomebaru (diganti ke welcome.html) -->
-    <div class="bg-blob bg-blob-1"></div>
-    <div class="bg-blob bg-blob-2"></div>
+    const email = localStorage.getItem('pending_verification_email');
+    if (!email) {
+        showToast('Email tidak ditemukan. Silakan registrasi ulang.', 'error');
+        setTimeout(() => window.location.href = 'register.html', 2000);
+    }
 
-    <!-- Card dengan KONTEN ASLI WELCOME.HTML (teks, tombol, tautan) -->
-    <div class="card">
-        <h1>RemindU</h1>
-        <p class="desc-text">Start minimizing missed deadlines and foster a more balanced workflow today.</p>
-        
-        <button class="btn-get-started" onclick="window.location.href='login.html'">
-             Get Started
-        </button>
-        
-        <div class="link">
-            Don't have an account? <a href="register.html">Sign Up</a>
-        </div>
-    </div>
-
+    document.getElementById('verifyBtn').addEventListener('click', async () => {
+        const otp = document.getElementById('otp').value.trim();
+        if (!otp || otp.length !== 6) {
+            showToast('Masukkan kode OTP 6 digit', 'error');
+            return;
+        }
+        const btn = document.getElementById('verifyBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<div class="spinner"></div>';
+        try {
+            const response = await fetch('/api/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, otp })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                showToast('✅ Verifikasi berhasil! Silakan login.', 'success');
+                localStorage.removeItem('pending_verification_email');
+                setTimeout(() => window.location.href = 'login.html', 2000);
+            } else {
+                showToast(data.error || 'Kode OTP salah', 'error');
+                btn.disabled = false;
+                btn.innerHTML = 'Verifikasi';
+            }
+        } catch (err) {
+            showToast('Gagal verifikasi. Coba lagi.', 'error');
+            btn.disabled = false;
+            btn.innerHTML = 'Verifikasi';
+        }
+    });
+</script>
 </body>
 </html>

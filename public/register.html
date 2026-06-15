@@ -121,12 +121,10 @@
 
 <div class="toast" id="toast"></div>
 
-<script type="module">
-    import { supabase } from './supabase-config.js';
-
+<script>
     function showToast(msg, type = '') {
         const t = document.getElementById('toast');
-        t.textContent = msg; 
+        t.textContent = msg;
         t.className = 'toast show ' + type;
         setTimeout(() => t.classList.remove('show'), 4000);
     }
@@ -137,13 +135,13 @@
         btn.textContent = inp.type === 'password' ? 'visibility_off' : 'visibility';
     }
 
-    // Password strength indicator
+    // Password strength
     document.getElementById('signupPassword').addEventListener('input', function () {
         const val = this.value;
         const fill = document.getElementById('strengthFill');
         const label = document.getElementById('strengthLabel');
         let score = 0;
-        if (val.length >= 6) score++;
+        if (val.length >= 8) score++;
         if (/[a-z]/.test(val)) score++;
         if (/[0-9]/.test(val)) score++;
         if (/[A-Z]/.test(val)) score++;
@@ -153,7 +151,7 @@
         const labels = ['', 'Sangat Lemah', 'Lemah', 'Cukup', 'Kuat', 'Sangat Kuat'];
         fill.style.width = pct + '%';
         fill.style.background = colors[score] || '';
-        label.textContent = score > 0 ? `Kekuatan: ${labels[score]}` : 'Password minimal 6 karakter, huruf kecil & angka';
+        label.textContent = score > 0 ? `Kekuatan: ${labels[score]}` : 'Password minimal 8 karakter, huruf kecil & angka';
         label.style.color = colors[score] || '#94a3b8';
     });
 
@@ -161,19 +159,19 @@
         let valid = true;
         const clearErr = id => { const el = document.getElementById(id); if (el) { el.textContent = ''; el.className = 'err'; } };
         const showErr  = (id, msg) => { const el = document.getElementById(id); if (el) { el.textContent = msg; el.className = 'err show'; } valid = false; };
-
         clearErr('firstNameErr'); clearErr('emailErr'); clearErr('passwordErr'); clearErr('confirmErr');
 
-        const first    = document.getElementById('firstName').value.trim();
-        const email    = document.getElementById('signupEmail').value.trim();
+        const first = document.getElementById('firstName').value.trim();
+        const last = document.getElementById('lastName').value.trim();
+        const email = document.getElementById('signupEmail').value.trim();
         const password = document.getElementById('signupPassword').value;
-        const confirm  = document.getElementById('confirmPassword').value;
-        const terms    = document.getElementById('acceptTerms').checked;
+        const confirm = document.getElementById('confirmPassword').value;
+        const terms = document.getElementById('acceptTerms').checked;
 
         if (!first) showErr('firstNameErr', 'Nama depan wajib diisi');
         if (!email || !email.includes('@')) showErr('emailErr', 'Email tidak valid');
-        if (!password || password.length < 6 || !/[a-z]/.test(password) || !/[0-9]/.test(password))
-            showErr('passwordErr', 'Password minimal 6 karakter, huruf kecil & angka');
+        if (!password || password.length < 8 || !/[a-z]/.test(password) || !/[0-9]/.test(password))
+            showErr('passwordErr', 'Password minimal 8 karakter, huruf kecil & angka');
         if (password !== confirm) showErr('confirmErr', 'Konfirmasi password tidak cocok');
         if (!terms) { showToast('⚠️ Harap menyetujui Syarat & Ketentuan', 'error'); valid = false; }
         return valid;
@@ -184,49 +182,43 @@
         if (!validateForm()) return;
 
         const btn = document.getElementById('signupBtn');
+        const originalText = btn.innerHTML;
         btn.disabled = true;
         btn.innerHTML = '<div class="spinner"></div>';
 
         const firstName = document.getElementById('firstName').value.trim();
-        const lastName  = document.getElementById('lastName').value.trim();
-        const email     = document.getElementById('signupEmail').value.trim();
-        const password  = document.getElementById('signupPassword').value;
+        const lastName = document.getElementById('lastName').value.trim();
+        const email = document.getElementById('signupEmail').value.trim();
+        const password = document.getElementById('signupPassword').value;
 
-        const { data, error } = await supabase.auth.signUp({
-            email: email,
-            password: password,
-            options: {
-                data: {
-                    nama_depan: firstName,
-                    nama_belakang: lastName
-                }
+        try {
+            const response = await fetch('/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ firstName, lastName, email, password, terms: true })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                // Simpan email untuk verifikasi OTP
+                localStorage.setItem('pending_verification_email', email);
+                showToast('✅ Registrasi berhasil! Cek email untuk kode OTP.', 'success');
+                // Arahkan ke halaman verifikasi OTP
+                setTimeout(() => window.location.href = 'verify.html', 2000);
+            } else {
+                showToast(data.error || 'Registrasi gagal', 'error');
+                btn.disabled = false;
+                btn.innerHTML = originalText;
             }
-        });
-        
-        if (error) {
-            let message = 'Registrasi gagal';
-            if (error.message === 'User already registered') message = 'Email sudah terdaftar';
-            if (error.message === 'Password should be at least 6 characters') message = 'Password minimal 6 karakter';
-            showToast(message, 'error');
+        } catch (err) {
+            showToast('Terjadi kesalahan jaringan. Coba lagi.', 'error');
             btn.disabled = false;
-            btn.innerHTML = '<span id="signupBtnText">Buat Akun</span>';
-        } else {
-            showToast('✅ Akun berhasil dibuat! Cek email untuk verifikasi.', 'success');
-            setTimeout(() => window.location.href = 'login.html', 2000);
+            btn.innerHTML = originalText;
         }
     });
 
     // Google Register
-    document.getElementById('googleRegisterBtn').addEventListener('click', async () => {
-        const btn = document.getElementById('googleRegisterBtn');
-        btn.disabled = true;
-        const { data, error } = await supabase.auth.signInWithOAuth({
-            provider: 'google'
-        });
-        if (error) {
-            showToast('Google register gagal: ' + error.message, 'error');
-        }
-        btn.disabled = false;
+    document.getElementById('googleRegisterBtn').addEventListener('click', () => {
+        window.location.href = '/auth/google';
     });
 </script>
 </body>

@@ -19,10 +19,7 @@
         h2 { font-size:28px; margin-bottom:6px; color:var(--text); font-weight:700; }
         .subtitle { color:var(--text-muted); margin-bottom:24px; font-size:15px; }
         .form-group { position:relative; margin-bottom:14px; }
-        .form-group input {
-            width:100%; padding:14px 20px 14px 48px; background:#f3f4f9;
-            border:1.5px solid transparent; border-radius:60px; font-size:15px; outline:none; transition:all 0.2s;
-        }
+        .form-group input { width:100%; padding:14px 20px 14px 48px; background:#f3f4f9; border:1.5px solid transparent; border-radius:60px; font-size:15px; outline:none; transition:all 0.2s; }
         .form-group input:focus { border-color:var(--purple); background:var(--white); box-shadow:0 0 0 4px rgba(139,92,246,0.1); }
         .form-group .field-icon { position:absolute; left:16px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:20px; pointer-events:none; }
         .form-group .eye-toggle { position:absolute; right:16px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:var(--text-muted); font-size:20px; padding:4px; }
@@ -53,6 +50,7 @@
         .back-link { display:inline-block; margin-bottom:20px; color:var(--purple); font-weight:500; font-size:14px; }
         @media (min-width:768px) { .card { max-width:550px; padding:48px 40px; } }
     </style>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 </head>
 <body>
 <div class="bg-blob bg-blob-1"></div>
@@ -72,8 +70,8 @@
         <div class="form-group">
             <span class="material-icons-round field-icon">lock</span>
             <input type="password" id="loginPassword" placeholder="Password" autocomplete="current-password">
-            <button type="button" class="eye-toggle" id="eyeToggle" onclick="togglePwd()">
-                <span class="material-icons-round" style="font-size:20px;">visibility_off</span>
+            <button type="button" class="eye-toggle" onclick="togglePwd()">
+                <span class="material-icons-round">visibility_off</span>
             </button>
             <div class="error-msg" id="loginPassError"></div>
         </div>
@@ -104,40 +102,31 @@
 </div>
 
 <div class="toast" id="toast"></div>
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 
-<script type="module">
-    import { supabase } from './supabase-config.js';
-
-    const form = document.getElementById('loginForm');
-    const emailInput = document.getElementById('loginEmail');
-    const passwordInput = document.getElementById('loginPassword');
-    const emailError = document.getElementById('loginEmailError');
-    const passError = document.getElementById('loginPassError');
-    const rememberCheck = document.getElementById('rememberMe');
-    const loginBtn = document.getElementById('loginBtn');
-    const toast = document.getElementById('toast');
-
+<script>
+    // ========== HELPER ==========
     function showToast(msg, type = '') {
-        toast.textContent = msg;
-        toast.className = 'toast show ' + type;
-        setTimeout(() => toast.classList.remove('show'), 4000);
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = 'toast show ' + type;
+        setTimeout(() => t.classList.remove('show'), 4000);
     }
 
     function setLoginLoading(loading) {
-        loginBtn.disabled = loading;
-        loginBtn.innerHTML = loading ? '<div class="spinner"></div>' : '<span id="loginBtnText">Masuk</span>';
+        const btn = document.getElementById('loginBtn');
+        btn.disabled = loading;
+        btn.innerHTML = loading ? '<div class="spinner"></div>' : '<span id="loginBtnText">Masuk</span>';
     }
 
     window.togglePwd = function() {
         const inp = document.getElementById('loginPassword');
-        const btn = document.querySelector('#eyeToggle span');
+        const span = document.querySelector('#loginPassword + .eye-toggle span');
         if (inp.type === 'password') {
             inp.type = 'text';
-            btn.textContent = 'visibility';
+            span.textContent = 'visibility';
         } else {
             inp.type = 'password';
-            btn.textContent = 'visibility_off';
+            span.textContent = 'visibility_off';
         }
     }
 
@@ -145,34 +134,37 @@
     if (localStorage.getItem('remindu_remember') === 'true') {
         const saved = localStorage.getItem('remindu_saved_email');
         if (saved) {
-            emailInput.value = saved;
-            rememberCheck.checked = true;
+            document.getElementById('loginEmail').value = saved;
+            document.getElementById('rememberMe').checked = true;
         }
     }
 
+    // ========== LOGIN ==========
+    const form = document.getElementById('loginForm');
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
-        emailError.classList.remove('show');
-        passError.classList.remove('show');
-        
-        const email = emailInput.value.trim();
-        const password = passwordInput.value;
-        
+
+        // Clear errors
+        document.getElementById('loginEmailError').classList.remove('show');
+        document.getElementById('loginPassError').classList.remove('show');
+
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+
         let valid = true;
         if (!email) {
-            emailError.textContent = 'Email wajib diisi';
-            emailError.classList.add('show');
+            document.getElementById('loginEmailError').textContent = 'Email wajib diisi';
+            document.getElementById('loginEmailError').classList.add('show');
             valid = false;
         }
         if (!password) {
-            passError.textContent = 'Password wajib diisi';
-            passError.classList.add('show');
+            document.getElementById('loginPassError').textContent = 'Password wajib diisi';
+            document.getElementById('loginPassError').classList.add('show');
             valid = false;
         }
         if (!valid) return;
 
-        if (rememberCheck.checked) {
+        if (document.getElementById('rememberMe').checked) {
             localStorage.setItem('remindu_remember', 'true');
             localStorage.setItem('remindu_saved_email', email);
         } else {
@@ -181,53 +173,40 @@
         }
 
         setLoginLoading(true);
-        
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email: email,
-            password: password
-        });
-        
-        if (error) {
-            let message = 'Login gagal';
-            if (error.message === 'Invalid login credentials') message = 'Email atau password salah';
-            
-            // JIKA EMAIL BELUM DIVERIFIKASI (MENGGUNAKAN TOAST SUCCESS SEPERTI PETUNJUKMU AGAR MENCOLOK)
-            if (error.message === 'Email not confirmed') {
-                showToast('✅ Cek emailmu untuk verifikasi akun!', 'success');
-                message = 'Email belum diverifikasi. Cek email kamu!';
+        try {
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                // Simpan data user (tanpa password)
+                localStorage.setItem('remindu_user', JSON.stringify({
+                    email: data.email,
+                    nama_depan: data.nama_depan
+                }));
+                showToast('Login berhasil!', 'success');
+                setTimeout(() => window.location.href = 'home.html', 1500);
             } else {
-                showToast(message, 'error');
+                showToast(data.error || 'Login gagal', 'error');
             }
-        } else {
-            localStorage.setItem('remindu_user', JSON.stringify({
-                email: data.user.email,
-                uid: data.user.id
-            }));
-            showToast('Login berhasil!', 'success');
-            setTimeout(() => window.location.href = 'home.html', 1500);
-        }
-        
-        setLoginLoading(false);
-    });
-
-    // Google Login
-    document.getElementById('googleLoginBtn').addEventListener('click', async () => {
-        setLoginLoading(true);
-        const { data, error } = await supabase.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-                redirectTo: window.location.href.replace('login.html', 'auth-callback.html')
-            }
-        });
-        if (error) {
-            showToast('Login Google gagal: ' + error.message, 'error');
+        } catch (err) {
+            showToast('Terjadi kesalahan jaringan. Coba lagi.', 'error');
+        } finally {
             setLoginLoading(false);
         }
     });
 
+    // ========== GOOGLE LOGIN ==========
+    document.getElementById('googleLoginBtn').addEventListener('click', () => {
+        window.location.href = '/auth/google';
+    });
+
+    // Lupa password (bisa diarahkan ke halaman reset)
     document.getElementById('forgotPwdLink').addEventListener('click', (e) => {
         e.preventDefault();
-        showToast('Hubungi admin untuk reset password.', '');
+        showToast('Fitur reset password segera hadir.', '');
     });
 </script>
 </body>
