@@ -1,6 +1,2 @@
-// api/index.js
-require('dotenv').config();
-const app = require('../backend/server'); // Memanggil logika dari file server.js
-
-// Vercel mengharapkan export default app
+const app = require('../backend/server');
 module.exports = app;
