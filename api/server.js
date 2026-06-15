@@ -758,14 +758,14 @@ app.get('/api/ai/motivasi/history', async (req, res) => {
     }
 });
 
-// ============================================================
-// START SERVER
-// ============================================================
-app.listen(PORT, () => {
-    console.log(`\n✅ RemindU Server v2.0 berjalan di http://localhost:${PORT}`);
-    console.log(`   Google OAuth : ${process.env.GOOGLE_CLIENT_ID ? '✅ Aktif' : '❌ Nonaktif'}`);
-    console.log(`   Email SMTP   : ${process.env.SMTP_USER ? '✅ Aktif' : '❌ Nonaktif'}`);
-    console.log(`   AI Gemini    : ${process.env.GEMINI_API_KEY ? '✅ Aktif' : '❌ Nonaktif'}`);
-    console.log('');
-    startReminderCron();
-});
+// // ============================================================
+// // START SERVER
+// // ============================================================
+// app.listen(PORT, () => {
+//     console.log(`\n✅ RemindU Server v2.0 berjalan di http://localhost:${PORT}`);
+//     console.log(`   Google OAuth : ${process.env.GOOGLE_CLIENT_ID ? '✅ Aktif' : '❌ Nonaktif'}`);
+//     console.log(`   Email SMTP   : ${process.env.SMTP_USER ? '✅ Aktif' : '❌ Nonaktif'}`);
+//     console.log(`   AI Gemini    : ${process.env.GEMINI_API_KEY ? '✅ Aktif' : '❌ Nonaktif'}`);
+//     console.log('');
+//     startReminderCron();
+// });
