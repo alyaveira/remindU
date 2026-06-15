@@ -17,7 +17,7 @@ const db = require('./db');
 
 const app = express();
 //const PORT = process.env.PORT || 3000;
-module.exports = app;
+
 // ============================================================
 // MIDDLEWARE
 // ============================================================
@@ -757,6 +757,7 @@ app.get('/api/ai/motivasi/history', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+module.exports = app;
 
 // // ============================================================
 // // START SERVER
