@@ -30,287 +30,267 @@
         .bg-blob { position: fixed; border-radius: 50%; filter: blur(60px); opacity: 0.38; pointer-events: none; z-index: 0; }
         .bg-blob-1 { width: 400px; height: 400px; background: var(--purple); top: -100px; right: -100px; }
         .bg-blob-2 { width: 300px; height: 300px; background: #ec4899; bottom: -80px; left: -80px; }
-        
-        .backup-container {
-            background: var(--white);
-            border-radius: 24px;
-            padding: 32px;
+
+        .container {
+            max-width: 600px;
             width: 100%;
-            max-width: 500px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.04);
-            border: 1px solid var(--border);
+            background: var(--white);
+            border-radius: 36px;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1);
+            overflow: hidden;
             position: relative;
             z-index: 10;
         }
-        .header {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 28px;
-        }
-        .back-btn {
-            background: var(--bg);
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text);
-            transition: all 0.2s;
-        }
-        .back-btn:hover { background: var(--purple-light); color: var(--purple); }
-        .title h2 { font-size: 20px; font-weight: 800; color: var(--text); }
-        .title p { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+        .page-content { padding: 28px 24px 36px; }
+        .header { display: flex; align-items: center; margin-bottom: 28px; gap: 16px; position: relative; justify-content: center; }
+        .btn-back { position: absolute; left: 0; background: none; border: none; color: var(--purple); cursor: pointer; padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+        .btn-back:hover { background: var(--purple-light); }
+        .btn-back i { font-size: 22px; }
+        h2 { font-size: 22px; font-weight: 600; color: var(--text); }
 
         .info-card {
-            background: var(--bg);
-            border-radius: 16px;
-            padding: 16px;
-            display: flex;
-            align-items: center;
-            gap: 14px;
+            background: linear-gradient(135deg, var(--purple-light), #fce7f3);
+            border-radius: 24px;
+            padding: 20px;
             margin-bottom: 24px;
+            border: 1px solid rgba(139,92,246,0.2);
+        }
+        .info-card p { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+        .info-card strong { color: var(--purple); }
+
+        .backup-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: #f8fafc;
+            border-radius: 20px;
+            margin-bottom: 12px;
             border: 1px solid var(--border);
         }
-        .info-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            background: var(--purple-light);
-            color: var(--purple);
+        .backup-item-left { display: flex; align-items: center; gap: 14px; }
+        .backup-item-left i { font-size: 22px; color: var(--purple); }
+        .backup-item-label { font-size: 14px; font-weight: 600; color: var(--text); }
+        .backup-item-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        .backup-item-value { font-size: 14px; font-weight: 500; color: var(--text-muted); max-width: 180px; text-align: right; word-break: break-all; }
+
+        .btn-action {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 28px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-        .info-text .label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
-        .info-text .count { font-size: 18px; font-weight: 700; color: var(--text); margin-top: 1px; }
-
-        .actions-list { display: flex; flex-direction: column; gap: 12px; }
-        .action-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px;
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            cursor: pointer;
-            transition: all 0.2s;
-            background: var(--white);
-        }
-        .action-item:hover {
-            border-color: var(--purple);
-            background: #fafafa;
-            transform: translateY(-1px);
-        }
-        .action-left { display: flex; align-items: center; gap: 14px; }
-        .action-icon { color: var(--text-muted); }
-        .action-item:hover .action-icon { color: var(--purple); }
-        .action-info h3 { font-size: 14px; font-weight: 700; color: var(--text); }
-        .action-info p { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-        .action-arrow { color: #cbd5e1; font-size: 20px; }
-
-        .action-item.danger { border-color: #fee2e2; }
-        .action-item.danger:hover { background: #fff5f5; border-color: #ef4444; }
-        .action-item.danger .action-icon { color: #f87171; }
-        .action-item.danger:hover .action-icon { color: #ef4444; }
-        .action-item.danger h3 { color: #b91c1c; }
-
-        #fileInput { display: none; }
-
-        /* Toast Notification */
-        .toast {
-            position: fixed;
-            bottom: -60px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #0f172a;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 30px;
-            font-size: 13px;
-            font-weight: 600;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
             gap: 8px;
-            white-space: nowrap;
+            transition: all 0.2s;
+            margin-bottom: 12px;
         }
-        .toast.show { bottom: 30px; }
+        .btn-export {
+            background: var(--purple);
+            color: white;
+            box-shadow: 0 4px 12px rgba(139,92,246,0.3);
+        }
+        .btn-export:hover { background: var(--purple-dark); transform: translateY(-2px); }
+        .btn-danger {
+            background: #fff1f2;
+            color: #e53e3e;
+            border: 1px solid #fecaca;
+        }
+        .btn-danger:hover { background: #fee2e2; }
+
+        .section-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            margin: 24px 0 12px;
+        }
+
+        .toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px);
+            background: #1e293b; color: white; padding: 12px 24px; border-radius: 40px;
+            font-size: 14px; font-weight: 500; z-index: 9999; transition: transform 0.3s ease; white-space: nowrap;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        @media (min-width: 768px) { .page-content { padding: 40px 48px; } }
     </style>
 </head>
 <body>
-
 <div class="bg-blob bg-blob-1"></div>
 <div class="bg-blob bg-blob-2"></div>
 
-<div class="backup-container">
-    <div class="header">
-        <button class="back-btn" id="backBtn"><i class="material-icons-round">arrow_back</i></button>
-        <div class="title">
-            <h2 data-i18n="backup.title">Cadangkan & Impor</h2>
-            <p data-i18n="backup.sub">Amankan data jadwal dan tugas Anda</p>
+<div class="container">
+    <div class="page-content">
+        <div class="header">
+            <button class="btn-back" id="backBtn"><i class="material-icons-round">arrow_back</i></button>
+            <h2>Data Backup</h2>
         </div>
-    </div>
 
-    <div class="info-card">
-        <div class="info-icon"><i class="material-icons-round">assignment_turned_in</i></div>
-        <div class="info-text">
-            <div class="label" data-i18n="backup.total_label">Total Tugas Tersimpan</div>
-            <div class="count" id="taskCount">-</div>
+        <div class="info-card">
+            <p>Data backup memungkinkan kamu <strong>mengekspor semua task</strong> ke file JSON yang bisa disimpan di perangkat kamu. File ini bisa digunakan untuk keperluan arsip atau pemulihan data.</p>
         </div>
-    </div>
 
-    <div class="actions-list">
-        <div class="action-item" id="btnExport">
-            <div class="action-left">
-                <i class="material-icons-round action-icon">download</i>
-                <div class="action-info">
-                    <h3 data-i18n="backup.export_title">Ekspor Data (JSON)</h3>
-                    <p data-i18n="backup.export_sub">Unduh cadangan data untuk disimpan</p>
+        <div class="section-label">Informasi Akun</div>
+
+        <div class="backup-item">
+            <div class="backup-item-left">
+                <i class="material-icons-round">email</i>
+                <div>
+                    <div class="backup-item-label">Email Akun</div>
+                    <div class="backup-item-sub">Terdaftar</div>
                 </div>
             </div>
-            <i class="material-icons-round action-arrow">chevron_right</i>
+            <div class="backup-item-value" id="emailDisplay">—</div>
         </div>
 
-        <div class="action-item" id="btnImportTrigger">
-            <div class="action-left">
-                <i class="material-icons-round action-icon">upload</i>
-                <div class="action-info">
-                    <h3 data-i18n="backup.import_title">Impor Data</h3>
-                    <p data-i18n="backup.import_sub">Pulihkan data dari berkas cadangan JSON</p>
+        <div class="backup-item">
+            <div class="backup-item-left">
+                <i class="material-icons-round">assignment</i>
+                <div>
+                    <div class="backup-item-label">Jumlah Task</div>
+                    <div class="backup-item-sub">Total semua task</div>
                 </div>
             </div>
-            <i class="material-icons-round action-arrow">chevron_right</i>
+            <div class="backup-item-value" id="taskCount">Memuat...</div>
         </div>
-        <input type="file" id="fileInput" accept=".json">
 
-        <div class="action-item danger" id="btnDeleteAll">
-            <div class="action-left">
-                <i class="material-icons-round action-icon">delete_forever</i>
-                <div class="action-info">
-                    <h3 data-i18n="backup.delete_title">Hapus Semua Data</h3>
-                    <p data-i18n="backup.delete_sub">Kosongkan semua daftar tugas permanen</p>
+        <div class="backup-item">
+            <div class="backup-item-left">
+                <i class="material-icons-round">check_circle</i>
+                <div>
+                    <div class="backup-item-label">Task Selesai</div>
+                    <div class="backup-item-sub">Dari total task</div>
                 </div>
             </div>
-            <i class="material-icons-round action-arrow">chevron_right</i>
+            <div class="backup-item-value" id="taskDone">—</div>
         </div>
+
+        <div class="section-label">Backup &amp; Restore</div>
+
+        <button class="btn-action btn-export" id="btnExport">
+            <i class="material-icons-round">download</i> Export Data (JSON)
+        </button>
+
+        <button class="btn-action" style="background:#f1f5f9;color:#334155;border:1px solid var(--border);" id="btnImport">
+            <i class="material-icons-round">upload</i> Import Data (JSON)
+        </button>
+        <input type="file" id="importFile" accept=".json" style="display:none;">
+
+        <div class="section-label">Zona Berbahaya</div>
+
+        <button class="btn-action btn-danger" id="btnDeleteAll">
+            <i class="material-icons-round">delete_forever</i> Hapus Semua Task
+        </button>
     </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-(function() {
+    const API_URL = 'http://localhost:3000/api';
     const userData = JSON.parse(localStorage.getItem('remindu_user') || '{}');
     const userEmail = userData.email;
-    if (!userEmail) { window.location.href = 'welcome.html'; return; }
+    if (!userEmail) { window.location.href = 'welcome.html'; }
 
-    const API_URL = 'http://localhost:3000/api';
-    let allTasks = [];
-
-    function showToast(msg) {
-        const toast = document.getElementById('toast');
-        toast.textContent = msg;
-        toast.classList.add('show');
-        setTimeout(() => { toast.classList.remove('show'); }, 3000);
+    function maskEmail(email) {
+        const [local, domain] = email.split('@');
+        if (local.length <= 2) return email;
+        return local[0] + '*'.repeat(Math.min(local.length - 2, 5)) + local[local.length - 1] + '@' + domain;
     }
+
+    document.getElementById('emailDisplay').textContent = maskEmail(userEmail);
+
+    function showToast(msg, isError = false) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.style.background = isError ? '#e53e3e' : '#1e293b';
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    let allTasks = [];
 
     async function loadTasks() {
         try {
-            const res = await fetch(`${API_URL}/tasks`, {
-                headers: { 'X-User-Email': userEmail }
-            });
+            const res = await fetch(`${API_URL}/tasks`, { headers: { 'X-User-Email': userEmail } });
             if (!res.ok) throw new Error();
             allTasks = await res.json();
-            document.getElementById('taskCount').textContent = `${allTasks.length} Tasks`;
+            document.getElementById('taskCount').textContent = allTasks.length + ' task';
+            document.getElementById('taskDone').textContent = allTasks.filter(t => t.selesai).length + ' task';
         } catch {
-            document.getElementById('taskCount').textContent = '0 Tasks';
+            document.getElementById('taskCount').textContent = 'Gagal memuat';
+            document.getElementById('taskDone').textContent = '—';
         }
     }
+    loadTasks();
 
-    // Export data
+    // Export JSON
     document.getElementById('btnExport').addEventListener('click', () => {
-        if (allTasks.length === 0) {
-            const emptyText = window.t ? window.t('backup.error_empty') : 'Tidak ada data task untuk diekspor!';
-            showToast(emptyText);
-            return;
-        }
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allTasks, null, 2));
-        const downloadAnchor = document.createElement('a');
-        downloadAnchor.setAttribute("href", dataStr);
-        downloadAnchor.setAttribute("download", `remindu_backup_${new Date().toISOString().split('T')[0]}.json`);
-        document.body.appendChild(downloadAnchor);
-        downloadAnchor.click();
-        downloadAnchor.remove();
-        
-        const successExport = window.t ? window.t('backup.success_export') : '✅ Data cadangan berhasil diunduh!';
-        showToast(successExport);
+        if (allTasks.length === 0) { showToast('Tidak ada task untuk diekspor', true); return; }
+        const exportData = {
+            export_date: new Date().toISOString(),
+            user_email: userEmail,
+            total_tasks: allTasks.length,
+            tasks: allTasks
+        };
+        const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `remindu_backup_${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('✅ Data berhasil diekspor!');
     });
 
-    // Import data triggers
-    document.getElementById('btnImportTrigger').addEventListener('click', () => {
-        document.getElementById('fileInput').click();
+    // Import JSON
+    document.getElementById('btnImport').addEventListener('click', () => {
+        document.getElementById('importFile').click();
     });
-
-    document.getElementById('fileInput').addEventListener('change', async (e) => {
+    document.getElementById('importFile').addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (!file) return;
+        try {
+            const text = await file.text();
+            const data = JSON.parse(text);
+            if (!data.tasks || !Array.isArray(data.tasks)) throw new Error('Format file tidak valid');
+            if (!confirm(`Akan mengimpor ${data.tasks.length} task. Lanjutkan?`)) return;
 
-        const reader = new FileReader();
-        reader.onload = async (event) => {
-            try {
-                const importedTasks = JSON.parse(event.target.result);
-                if (!Array.isArray(importedTasks)) throw new Error();
-
-                let imported = 0;
-                for (const task of importedTasks) {
-                    try {
-                        await fetch(`${API_URL}/tasks`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-User-Email': userEmail
-                            },
-                            body: JSON.stringify({
-                                judul: task.judul,
-                                selesai: task.selesai || false,
-                                notes: task.notes || null,
-                                due_date: task.due_date || null,
-                                remind_at: task.remind_at || null
-                            })
-                        });
-                        imported++;
-                    } catch {}
-                }
-                
-                const successImport = window.t ? window.t('backup.success_import') : 'berhasil diimpor!';
-                showToast(`✅ ${imported} ${successImport}`);
-                loadTasks();
-            } catch (err) {
-                const invalidFile = window.t ? window.t('backup.error_invalid') : 'Format file cadangan tidak valid!';
-                showToast(`❌ ${invalidFile}`);
+            let imported = 0;
+            for (const task of data.tasks) {
+                try {
+                    await fetch(`${API_URL}/tasks`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-User-Email': userEmail },
+                        body: JSON.stringify({
+                            judul: task.judul,
+                            kategori: task.kategori || 'personal',
+                            notes: task.notes || null,
+                            due_date: task.due_date || null,
+                            remind_at: task.remind_at || null
+                        })
+                    });
+                    imported++;
+                } catch {}
             }
-        };
-        reader.readAsText(file);
+            showToast(`✅ ${imported} task berhasil diimpor!`);
+            loadTasks();
+        } catch (err) {
+            showToast('Gagal membaca file: ' + err.message, true);
+        }
         e.target.value = '';
     });
 
     // Delete all tasks
     document.getElementById('btnDeleteAll').addEventListener('click', async () => {
-        if (allTasks.length === 0) {
-            const noData = window.t ? window.t('backup.error_no_delete') : 'Tidak ada task untuk dihapus';
-            showToast(noData);
-            return;
-        }
-        
-        const confirmMsg = window.t ? window.t('backup.confirm_delete') : `Yakin ingin menghapus semua ${allTasks.length} task? Tindakan ini tidak bisa dibatalkan!`;
-        if (!confirm(confirmMsg)) return;
-        
+        if (allTasks.length === 0) { showToast('Tidak ada task untuk dihapus'); return; }
+        if (!confirm(`Yakin ingin menghapus semua ${allTasks.length} task? Tindakan ini tidak bisa dibatalkan!`)) return;
         let deleted = 0;
         for (const task of allTasks) {
             try {
@@ -321,25 +301,13 @@
                 deleted++;
             } catch {}
         }
-        
-        const successDelete = window.t ? window.t('backup.success_delete') : 'task berhasil dihapus';
-        showToast(`🗑️ ${deleted} ${successDelete}`);
+        showToast(`🗑️ ${deleted} task berhasil dihapus`);
         loadTasks();
     });
 
     document.getElementById('backBtn').addEventListener('click', () => {
         window.location.href = 'profil.html';
     });
-
-    loadTasks();
-})();
-</script>
-
-<script src="lang.js"></script>
-<script>
-    if (typeof applyLang === 'function') {
-        applyLang();
-    }
 </script>
 </body>
 </html>

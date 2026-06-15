@@ -4,10 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>RemindU - Login</title>
-<<<<<<< HEAD
-=======
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
->>>>>>> bfc64c1 (clean: remove node_modules from tracking)
     <style>
         :root {
             --purple:#8b5cf6; --purple-dark:#7c3aed; --purple-light:#ede9fe;
@@ -18,7 +14,6 @@
         .bg-blob { position:fixed; border-radius:50%; filter:blur(60px); opacity:0.38; pointer-events:none; z-index:0; }
         .bg-blob-1 { width:400px; height:400px; background:var(--purple); top:-100px; right:-100px; }
         .bg-blob-2 { width:300px; height:300px; background:#ec4899; bottom:-80px; left:-80px; }
-<<<<<<< HEAD
         .card { max-width:500px; width:100%; background:var(--white); border-radius:36px; box-shadow:0 20px 35px -12px rgba(0,0,0,0.1); padding:40px 28px; position:relative; z-index:10; animation:fadeSlide 0.4s ease both; }
         @keyframes fadeSlide { from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);} }
         h2 { font-size:28px; margin-bottom:6px; color:var(--text); font-weight:700; }
@@ -57,72 +52,12 @@
         @keyframes spin { to { transform:rotate(360deg); } }
         .back-link { display:inline-block; margin-bottom:20px; color:var(--purple); font-weight:500; font-size:14px; }
         @media (min-width:768px) { .card { max-width:550px; padding:48px 40px; } }
-=======
-        
-        .login-card {
-            background:var(--white); border-radius:32px; padding:40px; width:100%; max-width:440px;
-            box-shadow:0 20px 40px rgba(0,0,0,0.03); border:1px solid var(--border); position:relative; z-index:10;
-        }
-        .brand { display:flex; align-items:center; gap:12px; margin-bottom:28px; justify-content:center; }
-        .brand-logo { width:42px; height:42px; border-radius:14px; background:linear-gradient(135deg, #1e3a8a, var(--purple)); display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:900; color:white; }
-        .brand-name { font-size:24px; font-weight:800; letter-spacing:-0.5px; background:linear-gradient(135deg, #1e3a8a, #3b82f6, var(--purple), #ec4899); -webkit-background-clip:text; background-clip:text; color:transparent; }
-        
-        .intro { text-align:center; margin-bottom:32px; }
-        .intro h2 { font-size:22px; font-weight:800; color:var(--text); }
-        .intro p { font-size:14px; color:var(--text-muted); margin-top:4px; }
-        
-        .form-group { display:flex; flex-direction:column; gap:8px; margin-bottom:20px; }
-        .form-group label { font-size:13px; font-weight:600; color:#475569; padding-left:4px; }
-        .input-wrapper { position:relative; display:flex; align-items:center; }
-        .input-wrapper i { position:absolute; left:16px; color:#94a3b8; font-size:20px; }
-        .input-wrapper input { width:100%; padding:14px 16px 14px 48px; border-radius:16px; border:1px solid #e2e8f0; font-size:14px; color:var(--text); outline:none; background:#f8fafc; transition:all 0.2s; }
-        .input-wrapper input:focus { border-color:var(--purple); background:white; box-shadow:0 0 0 4px rgba(139,92,246,0.1); }
-        
-        .actions { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; font-size:13px; }
-        .remember-me { display:flex; align-items:center; gap:8px; color:#475569; font-weight:500; cursor:pointer; }
-        .remember-me input { width:16px; height:16px; border-radius:4px; border:1px solid #cbd5e1; accent-color:var(--purple); }
-        .forgot-pwd { color:var(--purple); text-decoration:none; font-weight:600; transition:color 0.15s; }
-        .forgot-pwd:hover { color:var(--purple-dark); text-decoration:underline; }
-        
-        .btn-login { width:100%; background:linear-gradient(135deg, var(--purple-dark), var(--purple)); color:white; border:none; padding:14px; border-radius:16px; font-size:14px; font-weight:700; cursor:pointer; box-shadow:0 6px 20px rgba(139,92,246,0.25); transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:8px; }
-        .btn-login:hover { transform:translateY(-1px); box-shadow:0 8px 24px rgba(139,92,246,0.35); }
-        .btn-login:disabled { background:#cbd5e1; color:#94a3b8; box-shadow:none; cursor:not-allowed; }
-        
-        .spinner { width:18px; height:18px; border:2px solid rgba(255,255,255,0.3); border-top-color:white; border-radius:50%; animation:spin 0.6s linear infinite; display:none; }
-        @keyframes spin { to { transform:rotate(360deg); } }
-        
-        .separator { display:flex; align-items:center; gap:16px; margin:24px 0; color:#cbd5e1; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; }
-        .separator::before, .separator::after { content:''; flex:1; height:1px; background:var(--border); }
-        
-        .google-btn-wrap { display:flex; justify-content:center; margin-bottom:24px; min-height:44px; }
-        
-        .footer-text { text-align:center; font-size:13px; color:var(--text-muted); }
-        .footer-text a { color:var(--purple); text-decoration:none; font-weight:600; }
-        .footer-text a:hover { text-decoration:underline; }
-        
-        /* Toast Notification */
-        .toast { position:fixed; bottom:-60px; left:50%; transform:translateX(-50%); background:#0f172a; color:white; padding:12px 24px; border-radius:30px; font-size:13px; font-weight:600; box-shadow:0 4px 12px rgba(0,0,0,0.15); transition:bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index:1000; display:flex; align-items:center; gap:8px; white-space:nowrap; }
-        .toast.show { bottom:30px; }
-        .toast.success { background:#10b981; }
-        .toast.error { background:#ef4444; }
-        
-        /* Material Icon Link CSS manual */
-        @font-face {
-            font-family: 'Material Icons Round';
-            font-style: normal;
-            font-weight: 400;
-            src: url(https://fonts.gstatic.com/s/materialiconsround/v108/L0xYDFM4xlVMF-gWmKvTAXua6CV5xs4.woff2) format('woff2');
-        }
-        .material-icons-round { font-family: 'Material Icons Round'; font-weight: normal; font-style: normal; font-size: 24px; line-height: 1; letter-spacing: normal; text-transform: none; display: inline-block; white-space: nowrap; word-wrap: normal; direction: ltr; -webkit-font-smoothing: antialiased; }
->>>>>>> bfc64c1 (clean: remove node_modules from tracking)
     </style>
 </head>
 <body>
-
 <div class="bg-blob bg-blob-1"></div>
 <div class="bg-blob bg-blob-2"></div>
 
-<<<<<<< HEAD
 <div class="card">
     <a href="welcome.html" class="back-link">← Kembali</a>
     <h2>Masuk</h2>
@@ -147,58 +82,14 @@
             <div class="remember-row">
                 <input type="checkbox" id="rememberMe">
                 <label for="rememberMe">Ingat Saya</label>
-=======
-<div id="g_id_onload"
-     data-client_id="811195325515-gsqvmsghndbe9u6o0v1esd546uipr86n.apps.googleusercontent.com"
-     data-context="signin"
-     data-callback="handleGoogleOneTap"
-     data-auto_select="false"
-     data-close_on_tap_outside="false">
-</div>
+            </div>
+            <a href="#" id="forgotPwdLink">Lupa Password?</a>
+        </div>
 
-<div class="login-card">
-    <div class="brand">
-        <div class="brand-logo">R</div>
-        <div class="brand-name">RemindU</div>
-    </div>
-    
-    <div class="intro">
-        <h2 data-i18n="login.title">Selamat Datang Kembali</h2>
-        <p data-i18n="login.sub">Silakan masuk untuk mengelola tugas Anda</p>
-    </div>
-    
-    <form id="loginForm" novalidate>
-        <div class="form-group">
-            <label data-i18n="login.label_email">Alamat Email</label>
-            <div class="input-wrapper">
-                <i class="material-icons-round">mail_outline</i>
-                <input type="email" id="email" data-i18n-placeholder="login.placeholder_email" placeholder="Nama@email.com" required>
->>>>>>> bfc64c1 (clean: remove node_modules from tracking)
-            </div>
-        </div>
-        
-        <div class="form-group">
-            <label data-i18n="login.label_password">Kata Sandi</label>
-            <div class="input-wrapper">
-                <i class="material-icons-round">lock_open</i>
-                <input type="password" id="password" data-i18n-placeholder="login.placeholder_password" placeholder="Masukkan kata sandi Anda" required>
-            </div>
-        </div>
-        
-        <div class="actions">
-            <label class="remember-me">
-                <input type="checkbox" id="rememberMe">
-                <span data-i18n="login.remember_me">Ingat Saya</span>
-            </label>
-            <a href="#" class="forgot-pwd" id="forgotPwdLink" data-i18n="login.forgot_password">Lupa Sandi?</a>
-        </div>
-        
-        <button type="submit" class="btn-login" id="btnLogin">
-            <span class="spinner" id="btnSpinner"></span>
-            <span id="btnText" data-i18n="login.btn_submit">Masuk Ke Akun</span>
+        <button type="submit" class="btn-primary" id="loginBtn">
+            <span id="loginBtnText">Masuk</span>
         </button>
     </form>
-<<<<<<< HEAD
 
     <div class="divider">atau</div>
 
@@ -209,31 +100,10 @@
 
     <div class="signup-link">
         Belum punya akun? <a href="register.html">Daftar Sekarang</a>
-=======
-    
-    <div class="separator" data-i18n="login.separator">Atau Masuk Lewat</div>
-    
-    <div class="google-btn-wrap">
-        <div class="g_id_signin"
-             data-type="standard"
-             data-shape="rectangular"
-             data-theme="outline"
-             data-text="signin_with"
-             data-size="large"
-             data-logo_alignment="left"
-             data-width="360">
-        </div>
-    </div>
-    
-    <div class="footer-text">
-        <span data-i18n="login.footer_text">Belum punya akun?</span> 
-        <a href="register.html" data-i18n="login.footer_link">Daftar Sekarang</a>
->>>>>>> bfc64c1 (clean: remove node_modules from tracking)
     </div>
 </div>
 
 <div class="toast" id="toast"></div>
-<<<<<<< HEAD
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 
 <script type="module">
@@ -337,74 +207,9 @@
             setTimeout(() => window.location.href = 'home.html', 1500);
         }
         
-=======
-
-<script>
-const API_URL = 'http://localhost:3000/api';
-
-function showToast(message, type = 'success') {
-    const toast = document.getElementById('toast');
-    toast.textContent = message;
-    toast.className = `toast show ${type}`;
-    setTimeout(() => { toast.classList.remove('show'); }, 3000);
-}
-
-function setLoginLoading(isLoading) {
-    const btn = document.getElementById('btnLogin');
-    const spinner = document.getElementById('btnSpinner');
-    const btnText = document.getElementById('btnText');
-    
-    btn.disabled = isLoading;
-    if (isLoading) {
-        spinner.style.display = 'block';
-        btnText.textContent = window.t ? window.t('login.loading_text') : 'Memproses...';
-    } else {
-        spinner.style.display = 'none';
-        btnText.textContent = window.t ? window.t('login.btn_submit') : 'Masuk Ke Akun';
-    }
-}
-
-// ===== LOGIN FORM STANDARD (EMAIL & PASSWORD) =====
-document.getElementById('loginForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value.trim();
-    
-    if (!email || !password) {
-        const fillErr = window.t ? window.t('login.err_fill_fields') : 'Harap isi semua kolom email dan password!';
-        showToast(fillErr, 'error');
-        return;
-    }
-    
-    setLoginLoading(true);
-    try {
-        const res = await fetch(`${API_URL}/auth/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-        });
-        
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Login gagal');
-        
-        // Simpan sesi data user ke local storage browser
-        localStorage.setItem('remindu_user', JSON.stringify({
-            email: data.email,
-            firstName: data.nama_depan || email.split('@')[0],
-            provider: 'local'
-        }));
-        
-        const successMsg = window.t ? window.t('login.success_login') : '✅ Login Berhasil! Selamat datang.';
-        showToast(successMsg, 'success');
-        setTimeout(() => { window.location.href = 'home.html'; }, 800);
-    } catch (err) {
-        showToast(err.message || 'Email atau Password salah!', 'error');
-    } finally {
->>>>>>> bfc64c1 (clean: remove node_modules from tracking)
         setLoginLoading(false);
     });
 
-<<<<<<< HEAD
     // Google Login
     document.getElementById('googleLoginBtn').addEventListener('click', async () => {
         setLoginLoading(true);
@@ -413,33 +218,6 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
             options: {
                 redirectTo: window.location.origin + '/home.html'
             }
-=======
-// ===== GOOGLE OAUTH REDIRECT GENERATOR =====
-async function loginWithGoogle() {
-    try {
-        const res = await fetch(`${API_URL}/auth/google/url`);
-        const data = await res.json();
-        if (data.url) {
-            window.location.href = data.url;
-        } else {
-            throw new Error();
-        }
-    } catch (err) {
-        const serverErr = window.t ? window.t('login.err_server') : 'Gagal terhubung ke server. Hubungi admin.';
-        showToast(serverErr, 'error');
-    }
-}
-
-// ===== GOOGLE ONE TAP CALLBACK =====
-async function handleGoogleOneTap(response) {
-    if (!response?.credential) return;
-    setLoginLoading(true);
-    try {
-        const res = await fetch(`${API_URL}/auth/google-token`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ credential: response.credential })
->>>>>>> bfc64c1 (clean: remove node_modules from tracking)
         });
         if (error) {
             showToast('Login Google gagal: ' + error.message, 'error');
@@ -447,41 +225,10 @@ async function handleGoogleOneTap(response) {
         }
     });
 
-<<<<<<< HEAD
     document.getElementById('forgotPwdLink').addEventListener('click', (e) => {
         e.preventDefault();
         showToast('Hubungi admin untuk reset password.', '');
     });
-=======
-        localStorage.setItem('remindu_user', JSON.stringify({
-            email: data.email,
-            firstName: data.nama_depan,
-            provider: 'google'
-        }));
-        
-        const googleSuccess = window.t ? window.t('login.success_google') : '✅ Login Google berhasil!';
-        showToast(googleSuccess, 'success');
-        setTimeout(() => window.location.href = 'home.html', 800);
-    } catch (err) {
-        showToast(err.message || 'Google login gagal', 'error');
-    } finally {
-        setLoginLoading(false);
-    }
-}
-
-document.getElementById('forgotPwdLink').addEventListener('click', (e) => {
-    e.preventDefault();
-    const featureInfo = window.t ? window.t('login.info_forgot_pwd') : 'Fitur lupa password akan segera hadir!';
-    showToast(featureInfo, 'error');
-});
->>>>>>> bfc64c1 (clean: remove node_modules from tracking)
-</script>
-
-<script src="lang.js"></script>
-<script>
-    if (typeof applyLang === 'function') {
-        applyLang();
-    }
 </script>
 </body>
 </html>

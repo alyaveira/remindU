@@ -2,172 +2,209 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RemindU - Verifikasi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>RemindU - Selamat Datang</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
-        body { background: linear-gradient(145deg, #f5f7fe 0%, #eef2fa 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .card { max-width: 500px; width: 100%; background: white; border-radius: 36px; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1); padding: 40px 28px; text-align: center; }
-        h2 { font-size: 28px; margin-bottom: 8px; color: #0f172a; font-weight: 800; }
-        p { margin-bottom: 24px; color: #64748b; font-size: 15px; line-height: 1.5; }
-        input { width: 100%; padding: 14px 20px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 60px; margin-bottom: 16px; font-size: 15px; font-weight: 600; text-align: center; letter-spacing: 2px; outline: none; transition: all 0.2s; }
-        input:focus { border-color: #8b5cf6; background: white; box-shadow: 0 0 0 4px rgba(139,92,246,0.1); }
-        button { width: 100%; padding: 14px; background: linear-gradient(135deg, #7c3aed, #8b5cf6); color: white; border: none; border-radius: 60px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 20px rgba(139,92,246,0.2); transition: all 0.2s; }
-        button:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(139,92,246,0.3); }
-        button:disabled { background: #cbd5e1; box-shadow: none; cursor: not-allowed; transform: none; }
-        .error { color: #ef4444; font-size: 13px; margin-top: -8px; margin-bottom: 16px; font-weight: 600; min-height: 20px; }
-        .resend { margin-top: 20px; font-size: 14px; color: #64748b; font-weight: 500; }
-        .resend a { color: #8b5cf6; text-decoration: none; font-weight: 700; cursor: pointer; transition: color 0.2s; }
-        .resend a:hover { color: #7c3aed; }
-        .resend span { font-weight: 700; color: #475569; }
+        /* --- ROOT VARIABLES (dari welcomebaru) --- */
+        :root {
+            --purple: #8b5cf6;
+            --purple-dark: #7c3aed;
+            --purple-light: #ede9fe;
+            --bg: #f5f7fe;
+            --white: #ffffff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --border: #edf2f7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, 'Inter', sans-serif;
+        }
+
+        /* --- BG DECORATION (blob + warna latar dari welcomebaru) --- */
+        body {
+            background: var(--bg);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        /* Elemen blur / blobs - persis dari welcomebaru */
+        .bg-blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.38;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .bg-blob-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--purple);
+            top: -100px;
+            right: -100px;
+        }
+        .bg-blob-2 {
+            width: 300px;
+            height: 300px;
+            background: #ec4899;
+            bottom: -80px;
+            left: -80px;
+        }
+
+        /* --- CARD STYLE (konten asli dari welcome.html) --- */
+        .card {
+            max-width: 580px;
+            width: 100%;
+            background: var(--white);
+            border-radius: 36px;
+            box-shadow: 0 28px 48px -16px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(139, 92, 246, 0.05);
+            padding: 48px 32px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            backdrop-filter: blur(0px);
+            transition: transform 0.2s ease, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            box-shadow: 0 32px 56px -20px rgba(139, 92, 246, 0.2);
+        }
+
+        /* Heading & teks original welcome.html */
+        h1 {
+            font-size: 52px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6, #8b5cf6, #ec4899);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -1px;
+            margin-bottom: 20px;
+        }
+
+        .desc-text {
+            font-size: 1.1rem;
+            line-height: 1.5;
+            color: var(--text-muted);
+            margin-bottom: 36px;
+            font-weight: 500;
+            max-width: 90%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Tombol utama (Get Started) */
+        .btn-get-started {
+            background: var(--purple);
+            color: white;
+            border: none;
+            border-radius: 60px;
+            padding: 15px 24px;
+            font-size: 1rem;
+            font-weight: 700;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 8px 20px -8px rgba(139, 92, 246, 0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-get-started:hover {
+            background: var(--purple-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 16px 28px -12px rgba(139, 92, 246, 0.55);
+        }
+
+        .btn-get-started:active {
+            transform: translateY(1px);
+        }
+
+        /* Link Sign Up */
+        .link {
+            margin-top: 24px;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .link a {
+            color: var(--purple);
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.2s;
+            border-bottom: 1px solid transparent;
+        }
+
+        .link a:hover {
+            color: var(--purple-dark);
+            border-bottom-color: var(--purple-light);
+            text-decoration: none;
+        }
+
+        /* Opsi tambahan: sedikit sentuhan modern tanpa mengubah makna asli */
+        @media (max-width: 550px) {
+            .card {
+                padding: 36px 24px;
+            }
+            h1 {
+                font-size: 42px;
+            }
+            .desc-text {
+                font-size: 1rem;
+                max-width: 100%;
+            }
+        }
+
+        /* Tambahan animasi subtle untuk halaman */
+        @keyframes fadeSlide {
+            0% {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            animation: fadeSlide 0.55s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
+        }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2 data-i18n="verify.title">Verifikasi Akun</h2>
-    <p data-i18n="verify.subtitle">Masukkan 6 digit kode OTP yang telah dikirimkan ke alamat email terdaftar Anda untuk mengaktifkan akun.</p>
-    
-    <form id="verifyForm">
-        <input type="text" id="otpInput" maxlength="6" data-i18n-placeholder="verify.placeholder_otp" placeholder="Masukkan kode OTP" autocomplete="one-time-code" required>
-        <div id="otpError" class="error"></div>
-        <button type="submit" id="verifyBtn" data-i18n="verify.btn_submit">Verifikasi Sekarang</button>
-    </form>
+    <!-- Background Blobs persis dari welcomebaru (diganti ke welcome.html) -->
+    <div class="bg-blob bg-blob-1"></div>
+    <div class="bg-blob bg-blob-2"></div>
 
-    <div class="resend">
-        <span data-i18n="verify.txt_no_code">Belum menerima kode?</span> 
-        <a id="resendCodeLink" data-i18n="verify.btn_resend">Kirim Ulang</a>
-        <span id="timerContainer" style="display: none;">(<span id="countdown">60</span>s)</span>
+    <!-- Card dengan KONTEN ASLI WELCOME.HTML (teks, tombol, tautan) -->
+    <div class="card">
+        <h1>RemindU</h1>
+        <p class="desc-text">Start minimizing missed deadlines and foster a more balanced workflow today.</p>
+        
+        <button class="btn-get-started" onclick="window.location.href='login.html'">
+             Get Started
+        </button>
+        
+        <div class="link">
+            Don't have an account? <a href="register.html">Sign Up</a>
+        </div>
     </div>
-</div>
 
-<script>
-(() => {
-    const API_URL = 'http://localhost:3000/api';
-    const pendingEmail = localStorage.getItem('remindu_pending_email');
-
-    if (!pendingEmail) {
-        window.location.href = 'register.html';
-        return;
-    }
-
-    let timerInterval;
-    function startTimer(duration) {
-        clearInterval(timerInterval);
-        const display = document.getElementById('countdown');
-        const container = document.getElementById('timerContainer');
-        const link = document.getElementById('resendCodeLink');
-        
-        let timer = duration;
-        container.style.display = 'inline';
-        link.style.pointerEvents = 'none';
-        link.style.opacity = '0.5';
-
-        timerInterval = setInterval(() => {
-            display.textContent = timer;
-            if (--timer < 0) {
-                clearInterval(timerInterval);
-                container.style.display = 'none';
-                link.style.pointerEvents = 'auto';
-                link.style.opacity = '1';
-            }
-        }, 1000);
-    }
-
-    // Hanya izinkan input berupa angka pada kolom OTP
-    document.getElementById('otpInput').addEventListener('input', (e) => {
-        e.target.value = e.target.value.replace(/[^0-9]/g, '');
-    });
-
-    // --- FORM VERIFIKASI SUBMIT ---
-    document.getElementById('verifyForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const otp = document.getElementById('otpInput').value.trim();
-        const errorEl = document.getElementById('otpError');
-        const btn = document.getElementById('verifyBtn');
-
-        if (otp.length !== 6) {
-            errorEl.innerText = window.t ? window.t('verify.err_invalid_length') : 'Kode OTP harus berjumlah 6 digit lengkap!';
-            return;
-        }
-
-        errorEl.innerText = '';
-        btn.disabled = true;
-
-        try {
-            const res = await fetch(`${API_URL}/verify-otp`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: pendingEmail, otp })
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error);
-
-            // Bersihkan email transit pendaftaran
-            localStorage.removeItem('remindu_pending_email');
-            
-            // Simpan status session login user baru ke lokal aplikasi
-            localStorage.setItem('remindu_user', JSON.stringify({
-                email: data.email,
-                firstName: data.nama_depan || '',
-                provider: 'local'
-            }));
-
-            // Alert / Notifikasi Sukses Terjemahan
-            alert(window.t ? window.t('verify.success_msg') : '🎉 Akun Anda berhasil diverifikasi dan diaktifkan!');
-            window.location.href = 'home.html';
-        } catch (err) {
-            errorEl.innerText = err.message || (window.t ? window.t('verify.err_failed') : 'Verifikasi gagal, periksa kode Anda kembali.');
-            btn.disabled = false;
-        }
-    });
-
-    // --- TIMING RESEND OTP LINK ---
-    let resendCooldown = false;
-    document.getElementById('resendCodeLink').addEventListener('click', async (e) => {
-        e.preventDefault();
-        const errorEl = document.getElementById('otpError');
-        
-        if (resendCooldown) { 
-            errorEl.innerText = window.t ? window.t('verify.err_cooldown') : 'Harap tunggu sebelum meminta kode ulang!'; 
-            return; 
-        }
-        
-        resendCooldown = true;
-        try {
-            const res = await fetch(`${API_URL}/resend-otp`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: pendingEmail })
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error);
-
-            errorEl.innerText = '';
-            
-            // Informasi simulasi box alert pop up
-            const alertPrefix = window.t ? window.t('verify.alert_new_otp') : 'Kode OTP Baru Anda adalah:';
-            const alertSuffix = window.t ? window.t('verify.alert_production_note') : '(Pada mode produksi, kode dikirim via kotak masuk email)';
-            alert(`${alertPrefix} ${data.otp}\n${alertSuffix}`);
-            
-            startTimer(60);
-            document.getElementById('verifyBtn').disabled = false;
-        } catch (err) {
-            errorEl.innerText = err.message;
-        } finally {
-            setTimeout(() => {
-                resendCooldown = false;
-            }, 15000); // Batasi spam klik request API
-        }
-    });
-})();
-</script>
-
-<script src="lang.js"></script>
-<script>
-    if (typeof applyLang === 'function') {
-        applyLang();
-    }
-</script>
 </body>
 </html>
