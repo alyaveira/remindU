@@ -806,7 +806,7 @@
             showToast('✅ Task berhasil ditambahkan!', 'success');
             
             try {
-                await fetch('http://localhost:3000/api/tasks', {
+                await fetch('/api/tasks', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-User-Email': userEmail },
                     body: JSON.stringify({ judul, kategori, notes, due_date, remind_at })
