@@ -34,7 +34,7 @@
         .form-group { margin-bottom: 20px; position: relative; }
         .form-group label { display: block; font-size: 13px; font-weight: 500; color: #64748b; margin-bottom: 8px; }
         .input-wrapper { position: relative; }
-        .input-wrapper input { width: 100%; border: 1px solid #e2e8f0; border-radius: 28px; padding: 12px 45px 12px 18px; font-size: 15px; outline: none; background: #f8fafc; }
+        .input-wrapper input { width: 100%; border: 1px solid #e2e8f0; border-radius: 28px; padding: 12px 45px 12px 18px; font-size: 15px; outline: none; background: #f8fafc; color: var(--text); }
         .input-wrapper input:focus { border-color: #8b5cf6; background: white; }
         .input-wrapper i { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); color: #8b5cf6; font-size: 20px; pointer-events: none; }
         hr { margin: 20px 0; border: none; border-top: 1px solid #edf2f7; }
@@ -125,7 +125,10 @@
 <button id="darkFab" style="position:fixed;bottom:88px;right:18px;z-index:9999;width:44px;height:44px;border-radius:50%;border:none;background:var(--purple);color:white;font-size:20px;cursor:pointer;box-shadow:0 4px 14px rgba(139,92,246,0.35);display:flex;align-items:center;justify-content:center;">🌙</button>
 
 <script>
+    // ===== PERUBAHAN: API URL ke localhost =====
     const API_URL = 'http://localhost:3000/api';
+    // =========================================
+
     const userData = JSON.parse(localStorage.getItem('remindu_user') || '{}');
     const userEmail = userData.email;
     
@@ -179,7 +182,7 @@
             lastNameInput.value = data.nama_belakang || '';
         } catch (err) {
             console.error('Load profile error:', err);
-            alert('Gagal memuat profil: ' + err.message);
+            alert('Gagal memuat profil: ' + err.message + '\n\nPastikan backend berjalan di http://localhost:3000');
         }
     }
 
