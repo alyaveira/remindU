@@ -124,10 +124,9 @@
 
 <button id="darkFab" style="position:fixed;bottom:88px;right:18px;z-index:9999;width:44px;height:44px;border-radius:50%;border:none;background:var(--purple);color:white;font-size:20px;cursor:pointer;box-shadow:0 4px 14px rgba(139,92,246,0.35);display:flex;align-items:center;justify-content:center;">🌙</button>
 
-<script>
-    // ===== PERUBAHAN: API URL ke localhost =====
-    const API_URL = 'http://localhost:3000/api';
-    // =========================================
+<script type="module">
+    import { supabase } from './supabase-config.js';
+    import { getProfile, updateProfile, changePassword } from './supabase-helpers.js';
 
     const userData = JSON.parse(localStorage.getItem('remindu_user') || '{}');
     const userEmail = userData.email;
@@ -165,24 +164,20 @@
 
     async function loadProfile() {
         try {
-            const response = await fetch(`${API_URL}/profile`, {
-                method: 'GET',
-                headers: { 
-                    'X-User-Email': userEmail,
-                    'Content-Type': 'application/json'
+            const data = await getProfile();
+            if (data) {
+                firstNameInput.value = data.nama_depan || '';
+                lastNameInput.value = data.nama_belakang || '';
+            } else {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user && user.user_metadata) {
+                    firstNameInput.value = user.user_metadata.nama_depan || '';
+                    lastNameInput.value = user.user_metadata.nama_belakang || '';
                 }
-            });
-            
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Gagal mengambil profil');
             }
-            const data = await response.json();
-            firstNameInput.value = data.nama_depan || '';
-            lastNameInput.value = data.nama_belakang || '';
         } catch (err) {
             console.error('Load profile error:', err);
-            alert('Gagal memuat profil: ' + err.message + '\n\nPastikan backend berjalan di http://localhost:3000');
+            alert('Gagal memuat profil: ' + err.message);
         }
     }
 
@@ -197,7 +192,6 @@
             return;
         }
 
-        const payload = { firstName, lastName };
         if (newPassword || confirmPassword) {
             if (newPassword !== confirmPassword) {
                 alert('Konfirmasi password tidak cocok');
@@ -207,21 +201,14 @@
                 alert('Password minimal 8 karakter, huruf kecil & angka');
                 return;
             }
-            payload.newPassword = newPassword;
-            payload.confirmPassword = confirmPassword;
         }
 
         try {
-            const response = await fetch(`${API_URL}/profile`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-User-Email': userEmail
-                },
-                body: JSON.stringify(payload)
-            });
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.error || 'Gagal menyimpan');
+            await updateProfile({ firstName, lastName });
+            
+            if (newPassword) {
+                await changePassword(newPassword);
+            }
             
             localStorage.setItem('user_avatar', currentAvatar);
             
