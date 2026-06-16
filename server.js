@@ -39,8 +39,8 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: true,
-        sameSite: 'none',
+        secure: true,         // Wajib untuk koneksi HTTPS
+        sameSite: 'none',     // Wajib untuk navigasi lintas situs (Google -> Vercel)
         maxAge: 7 * 24 * 60 * 60 * 1000
     }
 }));
