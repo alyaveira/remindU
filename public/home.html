@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -435,7 +435,8 @@
         [data-theme="dark"] .modal-option:hover,[data-theme="dark"] .modal-option.selected { background:var(--purple-light) !important; border-color:var(--purple) !important; color:var(--purple) !important; }
         [data-theme="dark"] hr,[data-theme="dark"] .divider { border-color:var(--border) !important; }
         [data-theme="dark"] .sidebar-overlay { background:rgba(0,0,0,0.6) !important; }
-    </style></head>
+    </style>
+</head>
 <body>
 <div class="bg-blob bg-blob-1"></div>
 <div class="bg-blob bg-blob-2"></div>
@@ -689,7 +690,8 @@ async function fetchAiMotivation() {
     try {
         let text = '';
         try {
-            const proxyRes = await fetch('http://localhost:3000/api/ai/motivasi', {
+            // 🔥 PERBAIKAN: pakai path relatif /api, bukan localhost
+            const proxyRes = await fetch('/api/ai/motivasi', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-User-Email': userEmail },
                 body: JSON.stringify({ prompt })
@@ -699,6 +701,7 @@ async function fetchAiMotivation() {
                 text = proxyData.text || '';
             } else throw new Error('proxy unavailable');
         } catch (_) {
+            // fallback ke Anthropic langsung (opsional)
             const res = await fetch('https://api.anthropic.com/v1/messages', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -756,7 +759,8 @@ async function loadTasks() {
     }
     
     try {
-        const res = await fetch('http://localhost:3000/api/tasks', { 
+        // 🔥 PERBAIKAN: pakai /api/tasks
+        const res = await fetch('/api/tasks', { 
             headers: { 'X-User-Email': userEmail } 
         });
         if (res.ok) {
@@ -800,7 +804,8 @@ async function toggleTaskStatus(id, currentStatus) {
         tasks[taskIndex].updated_at = new Date().toISOString();
         saveTasksToLocalStorage();
         renderDashboard();
-        await syncToBackend({ selesai: !currentStatus }, 'PUT', `http://localhost:3000/api/tasks/${id}`);
+        // 🔥 PERBAIKAN: pakai /api/tasks/${id}
+        await syncToBackend({ selesai: !currentStatus }, 'PUT', `/api/tasks/${id}`);
     }
 }
 
@@ -812,7 +817,8 @@ async function deleteTaskById(id) {
         tasks = newTasks;
         saveTasksToLocalStorage();
         renderDashboard();
-        await syncToBackend(null, 'DELETE', `http://localhost:3000/api/tasks/${id}`);
+        // 🔥 PERBAIKAN: pakai /api/tasks/${id}
+        await syncToBackend(null, 'DELETE', `/api/tasks/${id}`);
     }
 }
 
@@ -936,7 +942,8 @@ function showEditModal(task) {
         }
         
         try {
-            await fetch(`http://localhost:3000/api/tasks/${task.id_task}`, {
+            // 🔥 PERBAIKAN: pakai /api/tasks/${task.id_task}
+            await fetch(`/api/tasks/${task.id_task}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'X-User-Email': userEmail },
                 body: JSON.stringify(updatedTask)
