@@ -48,25 +48,35 @@
         document.getElementById('mainIcon').style.display = 'none';
         document.getElementById('progressBar').style.display = 'none';
         const icon = document.getElementById(type + 'Icon');
-        icon.classList.add('show');
+        if (icon) icon.classList.add('show');
         document.getElementById('title').textContent = titleText;
         document.getElementById('subtitle').textContent = subText;
     }
 
+    // Jika ada error dari backend
     if (error) {
-        setStatus('error', 'Login Gagal', error);
-        setTimeout(() => window.location.href = 'login.html', 2500);
-    } else if (email && name) {
-        // Simpan data user ke localStorage
-        localStorage.setItem('remindu_user', JSON.stringify({
-            email: email,
-            nama_depan: name,
-            provider: provider || 'google'
-        }));
-        setStatus('success', `Selamat Datang, ${name}! 👋`, 'Login Google berhasil. Mengalihkan ke beranda...');
-        setTimeout(() => window.location.href = 'home.html', 1500);
-    } else {
-        setStatus('error', 'Terjadi Kesalahan', 'Data tidak lengkap. Coba lagi.');
+        setStatus('error', 'Login Gagal', decodeURIComponent(error) || 'Terjadi kesalahan');
+        setTimeout(() => window.location.href = 'login.html?error=' + encodeURIComponent(decodeURIComponent(error)), 2500);
+    } 
+    // Jika sukses dapat email dan name
+    else if (email && name) {
+        try {
+            // Simpan data user ke localStorage
+            localStorage.setItem('remindu_user', JSON.stringify({
+                email: email,
+                nama_depan: name,
+                provider: provider || 'google'
+            }));
+            setStatus('success', `Selamat Datang, ${name}! 👋`, 'Login Google berhasil. Mengalihkan ke beranda...');
+            setTimeout(() => window.location.href = 'home.html', 1500);
+        } catch (e) {
+            setStatus('error', 'Gagal menyimpan data', 'Coba lagi nanti.');
+            setTimeout(() => window.location.href = 'login.html', 2500);
+        }
+    } 
+    // Jika tidak ada parameter sama sekali (mungkin akses langsung)
+    else {
+        setStatus('error', 'Terjadi Kesalahan', 'Data tidak lengkap. Coba login lagi.');
         setTimeout(() => window.location.href = 'login.html', 2500);
     }
 </script>
