@@ -477,7 +477,11 @@
             const res = await fetch(`${API_URL}/tasks`, { headers: { 'X-User-Email': userEmail } });
             if (!res.ok) throw new Error();
             allTasks = await res.json();
-        } catch { allTasks = []; }
+        } catch (e) { 
+            console.warn('Gagal memuat dari backend, menggunakan localStorage:', e.message);
+            const savedTasks = localStorage.getItem(`remindu_tasks_${userEmail}`);
+            allTasks = savedTasks ? JSON.parse(savedTasks) : [];
+        }
         renderAll();
         loadNotifCount();
     }

@@ -2117,8 +2117,8 @@
                     const body = options.body ? JSON.parse(options.body) : {};
                     if (options.method === 'PUT' && body.selesai !== undefined) {
                         const savedTasks = JSON.parse(localStorage.getItem(`remindu_tasks_${userEmail}`) || '[]');
-                        const taskId = parseInt(url.split('/').pop());
-                        const taskIndex = savedTasks.findIndex(t => t.id_task === taskId);
+                        const taskId = String(url.split('/').pop());
+                        const taskIndex = savedTasks.findIndex(t => String(t.id_task) === taskId);
                         if (taskIndex !== -1) {
                             savedTasks[taskIndex].selesai = body.selesai;
                             localStorage.setItem(`remindu_tasks_${userEmail}`, JSON.stringify(savedTasks));
@@ -2127,9 +2127,9 @@
                         }
                     }
                     if (options.method === 'DELETE') {
-                        const taskId = parseInt(url.split('/').pop());
+                        const taskId = String(url.split('/').pop());
                         const savedTasks = JSON.parse(localStorage.getItem(`remindu_tasks_${userEmail}`) || '[]');
-                        const updatedTasks = savedTasks.filter(t => t.id_task !== taskId);
+                        const updatedTasks = savedTasks.filter(t => String(t.id_task) !== taskId);
                         localStorage.setItem(`remindu_tasks_${userEmail}`, JSON.stringify(updatedTasks));
                         tasks = updatedTasks;
                         renderDashboard();
@@ -2165,7 +2165,7 @@
             try {
                 await apiFetch(`http://localhost:3000/api/tasks/${id}`, { method: 'PUT', body: JSON.stringify({ selesai: !currentStatus }) });
             } catch (e) { }
-            const task = tasks.find(t => t.id_task === id);
+            const task = tasks.find(t => String(t.id_task) === String(id));
             if (task) task.selesai = !currentStatus;
             renderDashboard();
         }
@@ -2175,7 +2175,7 @@
             try {
                 await apiFetch(`http://localhost:3000/api/tasks/${id}`, { method: 'DELETE' });
             } catch (e) { }
-            tasks = tasks.filter(t => t.id_task !== id);
+            tasks = tasks.filter(t => String(t.id_task) !== String(id));
             renderDashboard();
         }
 
@@ -2290,13 +2290,13 @@
                 });
             });
             container.querySelectorAll('.task-cb').forEach(cb => cb.addEventListener('change', (e) => {
-                const id = parseInt(e.target.dataset.id);
-                const found = tasks.find(t => t.id_task === id);
+                const id = String(e.target.dataset.id);
+                const found = tasks.find(t => String(t.id_task) === id);
                 if (found) toggleTaskStatus(id, found.selesai);
             }));
             container.querySelectorAll('.task-del').forEach(btn => btn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const id = parseInt(btn.dataset.id);
+                const id = String(btn.dataset.id);
                 deleteTaskById(id);
             }));
         }
