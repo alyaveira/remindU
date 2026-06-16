@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>RemindU - AI Motivasi</title>
+    <script>
+    (function(){
+        var t = localStorage.getItem('remindu_theme') || 'light';
+        document.documentElement.setAttribute('data-theme', t);
+    })();
+    </script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <style>
         :root {
@@ -41,7 +47,7 @@
         .sidebar.collapsed .toggle-btn i { transform: rotate(180deg); }
         .sidebar-user { padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
         .sidebar-user:hover { background: var(--bg); }
-        .sidebar-avatar { width: 40px; height: 40px; border-radius: 14px; background: linear-gradient(135deg, var(--purple), #ec4899); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; color: white; flex-shrink: 0; }
+        .sidebar-avatar { width: 40px; height: 40px; border-radius: 14px; background: linear-gradient(135deg, var(--purple), #ec4899); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; color: white; flex-shrink: 0; background-size: cover; background-position: center; }
         .sidebar-user-info { overflow: hidden; transition: opacity 0.2s; }
         .sidebar.collapsed .sidebar-user-info { opacity: 0; width: 0; }
         .sidebar-user-name { font-weight: 600; font-size: 14px; color: var(--text); white-space: nowrap; }
@@ -76,9 +82,9 @@
         .topbar-icon-btn:hover { background: var(--purple-light); color: var(--purple); }
         .topbar-icon-btn i { font-size: 20px; }
         .notif-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: #f97316; border: 2px solid var(--white); }
-        .topbar-avatar { width: 36px; height: 36px; border-radius: 12px; background: linear-gradient(135deg, var(--purple), #ec4899); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; color: white; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
+        .topbar-avatar { width: 36px; height: 36px; border-radius: 12px; background: linear-gradient(135deg, var(--purple), #ec4899); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; color: white; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; position: relative; background-size: cover; background-position: center; }
         .topbar-avatar:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(139,92,246,0.3); }
-        .dropdown { position: absolute; top: 44px; right: 0; background: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); width: 170px; overflow: hidden; z-index: 300; display: none; border: 1px solid var(--border); animation: dropFade 0.18s ease; }
+        .dropdown { position: absolute; top: 44px; right: 0; background: var(--white); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); width: 170px; overflow: hidden; z-index: 300; display: none; border: 1px solid var(--border); animation: dropFade 0.18s ease; }
         @keyframes dropFade { from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);} }
         .dropdown.show { display: block; }
         .dd-item { padding: 12px 16px; display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; color: var(--text); transition: background 0.15s; }
@@ -144,6 +150,117 @@
         .bnav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; color: #94a3b8; cursor: pointer; padding: 6px 12px; border-radius: 16px; transition: all 0.2s; flex: 1; }
         .bnav-item i { font-size: 22px; }
         .bnav-item.active { color: var(--purple); background: var(--purple-light); }
+        .mood-indicator {
+            display: inline-block;
+            background: var(--purple-light);
+            color: var(--purple);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 12px;
+            border-radius: 40px;
+            margin-top: 8px;
+        }
+        /* ===== DARK MODE ===== */
+        [data-theme="dark"] {
+            --purple: #a78bfa;
+            --purple-dark: #8b5cf6;
+            --purple-light: #2d1f5e;
+            --bg: #0f0f13;
+            --white: #1a1a24;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #2a2a3a;
+        }
+        [data-theme="dark"] body { background: var(--bg); color: var(--text); }
+        [data-theme="dark"] .sidebar,
+        [data-theme="dark"] .topbar,
+        [data-theme="dark"] .ai-result-card,
+        [data-theme="dark"] .mood-section,
+        [data-theme="dark"] .saved-card,
+        [data-theme="dark"] .empty-saved,
+        [data-theme="dark"] .dropdown,
+        [data-theme="dark"] .bottom-nav {
+            background: var(--white) !important;
+            border-color: var(--border) !important;
+        }
+        [data-theme="dark"] .nav-item { color: var(--text-muted) !important; }
+        [data-theme="dark"] .nav-item:hover { background: rgba(167,139,250,0.08) !important; color: var(--purple) !important; }
+        [data-theme="dark"] .nav-item.active { background: var(--purple-light) !important; color: var(--purple) !important; }
+        [data-theme="dark"] .topbar-greeting,
+        [data-theme="dark"] .sidebar-user-name,
+        [data-theme="dark"] .month-year,
+        [data-theme="dark"] .section-title,
+        [data-theme="dark"] .ai-result-title,
+        [data-theme="dark"] .saved-card-title { color: var(--text) !important; }
+        [data-theme="dark"] .topbar-date,
+        [data-theme="dark"] .sidebar-user-email,
+        [data-theme="dark"] .nav-label,
+        [data-theme="dark"] .text-muted,
+        [data-theme="dark"] .mood-title,
+        [data-theme="dark"] .ai-result-msg { color: var(--text-muted) !important; }
+        [data-theme="dark"] .toggle-btn,
+        [data-theme="dark"] .topbar-icon-btn,
+        [data-theme="dark"] .topbar-mobile-toggle {
+            background: #13131e !important;
+            color: var(--text-muted) !important;
+        }
+        [data-theme="dark"] .mood-btn {
+            background: #13131e !important;
+            border-color: var(--border) !important;
+            color: var(--text-muted) !important;
+        }
+        [data-theme="dark"] .mood-btn.selected {
+            background: var(--purple-light) !important;
+            color: var(--purple) !important;
+            border-color: var(--purple) !important;
+        }
+        [data-theme="dark"] .mood-btn:hover:not(.selected) {
+            background: var(--purple-light) !important;
+            color: var(--purple) !important;
+        }
+        [data-theme="dark"] .btn-regen {
+            background: #13131e !important;
+            border-color: var(--border) !important;
+            color: var(--text) !important;
+        }
+        [data-theme="dark"] .btn-regen:hover {
+            background: var(--purple-light) !important;
+            color: var(--purple) !important;
+            border-color: var(--purple-light) !important;
+        }
+        [data-theme="dark"] .ai-result-divider { border-top-color: var(--border) !important; }
+        [data-theme="dark"] .dd-item { color: var(--text) !important; }
+        [data-theme="dark"] .dd-item:hover { background: #13131e !important; }
+        [data-theme="dark"] .dd-item.danger { color: #f87171 !important; }
+        [data-theme="dark"] .bnav-item { color: var(--text-muted) !important; }
+        [data-theme="dark"] .bnav-item.active { background: var(--purple-light) !important; color: var(--purple) !important; }
+        [data-theme="dark"] .bg-blob-1,
+        [data-theme="dark"] .bg-blob-2 { opacity: 0.07 !important; }
+        [data-theme="dark"] .sidebar-header,
+        [data-theme="dark"] .sidebar-user,
+        [data-theme="dark"] .sidebar-footer { border-color: var(--border) !important; }
+        [data-theme="dark"] .mood-indicator {
+            background: var(--purple-light) !important;
+            color: var(--purple) !important;
+        }
+        [data-theme="dark"] .saved-card-del:hover {
+            background: #3b1f1f !important;
+            color: #f87171 !important;
+        }
+        [data-theme="dark"] .ai-hero {
+            background: linear-gradient(135deg, #a855f7 0%, #7c3aed 60%, #4f46e5 100%) !important;
+        }
+        [data-theme="dark"] .ai-generate-btn {
+            background: var(--white) !important;
+            color: var(--purple-dark) !important;
+        }
+        [data-theme="dark"] .btn-save-motiv {
+            background: var(--purple) !important;
+            color: white !important;
+        }
+        [data-theme="dark"] .btn-save-motiv:hover {
+            background: var(--purple-dark) !important;
+        }
         @media (max-width: 900px) {
             .sidebar { transform: translateX(-100%); width: var(--sidebar-w) !important; }
             .sidebar.mobile-open { transform: translateX(0); box-shadow: 4px 0 30px rgba(0,0,0,0.15); }
@@ -155,17 +272,6 @@
             .saved-list { grid-template-columns: 1fr; }
         }
         .relative { position: relative; }
-        /* mood indicator */
-        .mood-indicator {
-            display: inline-block;
-            background: var(--purple-light);
-            color: var(--purple);
-            font-size: 12px;
-            font-weight: 600;
-            padding: 2px 12px;
-            border-radius: 40px;
-            margin-top: 8px;
-        }
     </style>
 </head>
 <body>
@@ -376,7 +482,6 @@
             }
             btn.classList.add('selected');
             selectedMood = btn.dataset.mood;
-            // tampilkan indikator mood
             const moodLabel = { semangat:'🔥 Semangat', lelah:'😴 Lelah', stres:'😰 Stres', bingung:'😕 Bingung', biasa:'😐 Biasa saja', senang:'😊 Senang' }[selectedMood] || selectedMood;
             const ind = document.getElementById('moodIndicator');
             ind.textContent = '💡 Mood: ' + moodLabel;
@@ -402,7 +507,6 @@
         const cats = [...new Set(pending.map(t => t.kategori))].join(', ') || 'umum';
         const nearDeadline = pending.filter(t => t.due_date && (new Date(t.due_date) - Date.now()) < 86400000 * 3).length;
 
-        // 🔥 INSTRUKSI MOOD YANG SANGAT SPESIFIK
         let moodInstruction = '';
         const moodMap = {
             'semangat': 'Pengguna sedang merasa SEMANGAT. Berikan motivasi yang ENERJIK, PENUH GAI, dan MEMBANGKITKAN. Gunakan kata-kata kuat, optimis, dan ajakan aksi. Contoh: "Ayo!", "Kamu hebat!", "Teruskan!".',
@@ -468,7 +572,6 @@ Balas HANYA dalam format JSON valid tanpa markdown, tanpa penjelasan tambahan:
             showResult(parsed);
 
         } catch(e) {
-            // fallback lokal yang sangat responsif mood
             lastGenerated = generateLocalMotivation(displayName, total, done, pct, selectedMood, nearDeadline);
             showResult(lastGenerated);
         } finally {
@@ -484,7 +587,6 @@ Balas HANYA dalam format JSON valid tanpa markdown, tanpa penjelasan tambahan:
         const pending = total - done;
         const random = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-        // 0. Tidak ada task
         if (total === 0) {
             return random([
                 { icon: '🚀', title: 'Mulai Hari yang Produktif!', msg: `${name}, hari ini masih kosong — ini saat yang sempurna untuk menyusun rencana. Tambahkan satu task kecil dulu, dan rasakan momentumnya. Setiap perjalanan besar dimulai dari satu langkah kecil yang berani.` },
@@ -492,7 +594,6 @@ Balas HANYA dalam format JSON valid tanpa markdown, tanpa penjelasan tambahan:
             ]);
         }
 
-        // 1. Semua selesai
         if (pct === 100) {
             return random([
                 { icon: '🏆', title: 'Sempurna! Semua Beres!', msg: `Luar biasa, ${name}! Kamu berhasil menyelesaikan ${total} task. Ini bukan hanya tentang menyelesaikan, tapi tentang konsistensi. Hari ini kamu membuktikan bahwa kamu bisa! Nikmati hasilnya, besok siapkan diri untuk tantangan berikutnya!` },
@@ -500,7 +601,6 @@ Balas HANYA dalam format JSON valid tanpa markdown, tanpa penjelasan tambahan:
             ]);
         }
 
-        // 2. Progress rendah + deadline dekat
         if (pct < 20 && nearDeadline > 0) {
             return random([
                 { icon: '🔥', title: 'Waktunya Bergerak!', msg: `${name}, kamu punya ${nearDeadline} task mendekati deadline dan progressmu baru ${pct}%. Jangan panik, tapi bergeraklah sekarang. Pilih satu task terkecil yang bisa kamu selesaikan dalam 10 menit — kemenangan kecil akan memicu momentum besar.` },
@@ -508,7 +608,6 @@ Balas HANYA dalam format JSON valid tanpa markdown, tanpa penjelasan tambahan:
             ]);
         }
 
-        // 3. Berdasarkan mood (dengan pesan sangat kontras)
         const moodMessages = {
             semangat: [
                 { icon: '⚡', title: 'Energimu Membara!', msg: `${name}, semangatmu adalah senjata terbaik! Kamu sudah menyelesaikan ${done} task — itu bukti bahwa kamu punya kekuatan. Ambil satu lagi, dan lihat bagaimana hari ini menjadi milikmu sepenuhnya! Ayo, ${name}, kamu pasti bisa lebih dari yang kamu bayangkan!` },
@@ -540,7 +639,6 @@ Balas HANYA dalam format JSON valid tanpa markdown, tanpa penjelasan tambahan:
             return random(moodMessages[mood]);
         }
 
-        // 4. Default
         return { icon: '💪', title: `Tetap Semangat, ${name}!`, msg: `Progress ${pct}% adalah bukti nyata usahamu, ${name}! Kamu sudah selesaikan ${done} task — setiap yang tercentang itu adalah kemenangan kecil yang nyata. Teruskan, sisanya pasti bisa kamu taklukkan!` };
     }
 
@@ -625,6 +723,23 @@ Balas HANYA dalam format JSON valid tanpa markdown, tanpa penjelasan tambahan:
 
     loadTasks();
     renderSaved();
+})();
+</script>
+
+<!-- Dark Mode Toggle Button -->
+<button id="darkFab" style="position:fixed;bottom:88px;right:18px;z-index:9999;width:44px;height:44px;border-radius:50%;border:none;background:var(--purple);color:white;font-size:20px;cursor:pointer;box-shadow:0 4px 14px rgba(139,92,246,0.35);display:flex;align-items:center;justify-content:center;">🌙</button>
+<script>
+(function(){
+    var fab = document.getElementById('darkFab');
+    var currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    fab.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
+    fab.addEventListener('click', function(){
+        var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('remindu_theme', next);
+        fab.textContent = next === 'dark' ? '☀️' : '🌙';
+        // force re-render for dynamic elements (optional)
+    });
 })();
 </script>
 </body>
