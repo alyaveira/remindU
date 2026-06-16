@@ -99,26 +99,36 @@
         .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
         .day { aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; color: var(--text); border-radius: 30px; cursor: pointer; transition: all 0.2s; }
         .day:hover { background: var(--bg); transform: scale(1.05); }
-        /* ===== PERBAIKAN HIGHLIGHT ===== */
+
+        /* ===== PERBEDAAN WARNA: TODAY vs SELECTED ===== */
         .day.has-event { 
-            background: rgba(139, 92, 246, 0.2); 
+            background: rgba(139, 92, 246, 0.18); 
             color: #6d28d9; 
             font-weight: 700; 
         }
+        /* HARI INI - warna ungu solid dengan efek glow */
         .day.today { 
-            background: linear-gradient(135deg, #8b5cf6, #ec4899); 
+            background: linear-gradient(135deg, #7c3aed, #8b5cf6); 
             color: white; 
             font-weight: 700; 
-            box-shadow: 0 4px 16px rgba(139,92,246,0.5);
+            box-shadow: 0 4px 16px rgba(124, 58, 237, 0.5);
             transform: scale(1.05);
         }
-        .day.other-month { color: #cbd5e1; }
+        /* HARI YANG DIKLIK - warna orange/pink berbeda dari today */
         .day.selected-day { 
-            background: linear-gradient(135deg, #8b5cf6, #ec4899); 
+            background: linear-gradient(135deg, #f97316, #ec4899); 
             color: white !important; 
-            box-shadow: 0 4px 16px rgba(139,92,246,0.4);
+            box-shadow: 0 4px 16px rgba(236, 72, 153, 0.5);
             transform: scale(1.05);
         }
+        /* Jika selected-day juga today, prioritaskan selected-day (timpang) */
+        .day.today.selected-day { 
+            background: linear-gradient(135deg, #f97316, #ec4899) !important; 
+            box-shadow: 0 4px 16px rgba(236, 72, 153, 0.6) !important;
+        }
+
+        .day.other-month { color: #cbd5e1; }
+
         .events-section { background: var(--white); border-radius: 28px; padding: 20px; border: 1px solid var(--border); box-shadow: 0 2px 12px rgba(0,0,0,0.02); }
         .events-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
         .events-title i { color: var(--purple); }
@@ -166,20 +176,25 @@
         [data-theme="dark"] .month-nav button:hover { background:var(--purple-light) !important; color:var(--purple) !important; }
         [data-theme="dark"] .day { color:var(--text) !important; }
         [data-theme="dark"] .day.other-month { color:#475569 !important; }
-        /* Dark mode highlight */
         [data-theme="dark"] .day.has-event { 
-            background:rgba(167, 139, 250, 0.25) !important; 
+            background:rgba(167, 139, 250, 0.22) !important; 
             color:#a78bfa !important; 
         }
+        /* Dark mode - TODAY */
         [data-theme="dark"] .day.today { 
-            background:linear-gradient(135deg, #a78bfa, #ec4899) !important; 
+            background:linear-gradient(135deg, #7c3aed, #a78bfa) !important; 
             color:white !important;
-            box-shadow:0 4px 16px rgba(167,139,250,0.5) !important;
+            box-shadow:0 4px 16px rgba(124,58,237,0.5) !important;
         }
+        /* Dark mode - SELECTED */
         [data-theme="dark"] .day.selected-day { 
-            background:linear-gradient(135deg, #a78bfa, #ec4899) !important; 
+            background:linear-gradient(135deg, #f97316, #ec4899) !important; 
             color:white !important;
-            box-shadow:0 4px 16px rgba(167,139,250,0.5) !important;
+            box-shadow:0 4px 16px rgba(236,72,153,0.5) !important;
+        }
+        [data-theme="dark"] .day.today.selected-day { 
+            background:linear-gradient(135deg, #f97316, #ec4899) !important; 
+            box-shadow:0 4px 16px rgba(236,72,153,0.6) !important;
         }
         [data-theme="dark"] .event-card { 
             background:#13131e !important; 
@@ -348,7 +363,6 @@
     let selectedDate = null;
     let selectedDayElem = null;
     
-    // ========== PERBAIKAN: gunakan path relatif, bukan localhost:3000 ==========
     async function fetchTasks() {
         try {
             const res = await fetch('/api/tasks', { 
@@ -356,7 +370,6 @@
             });
             if (!res.ok) throw new Error('Gagal mengambil data dari server');
             tasks = await res.json();
-            console.log('✅ Task berhasil dimuat:', tasks.length, 'task');
             renderCalendar();
             updateBadge();
         } catch(e) {
@@ -423,7 +436,6 @@
         
         document.getElementById('monthYear').textContent = currentDate.toLocaleDateString('id-ID', { month:'long', year:'numeric' });
         
-        // Pilih hari ini jika berada di bulan yang sedang ditampilkan, atau tanggal 1 jika tidak
         if (!selectedDate || selectedDate.getMonth() !== month || selectedDate.getFullYear() !== year) {
             const t = new Date();
             if(t.getMonth() === month && t.getFullYear() === year) {
@@ -440,7 +452,6 @@
         selectedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
         selectedDate.setHours(0, 0, 0, 0);
         
-        // Hapus seleksi sebelumnya
         if(selectedDayElem) {
             selectedDayElem.classList.remove('selected-day');
             selectedDayElem.style.background = '';
@@ -497,7 +508,6 @@
         }
     }
     
-    // Load data
     fetchTasks();
     
 })();
