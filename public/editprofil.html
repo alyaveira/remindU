@@ -76,7 +76,6 @@
             </div>
         </div>
 
-        <!-- Input file tersembunyi untuk akses galeri/penyimpanan -->
         <input type="file" id="photoInput" accept="image/png, image/jpeg, image/jpg" style="display: none;">
 
         <div id="avatarGrid" style="display: none;" class="avatar-choices">
@@ -123,10 +122,13 @@
     </div>
 </div>
 
+<button id="darkFab" style="position:fixed;bottom:88px;right:18px;z-index:9999;width:44px;height:44px;border-radius:50%;border:none;background:var(--purple);color:white;font-size:20px;cursor:pointer;box-shadow:0 4px 14px rgba(139,92,246,0.35);display:flex;align-items:center;justify-content:center;">🌙</button>
+
 <script>
     const API_URL = 'http://localhost:3000/api';
     const userData = JSON.parse(localStorage.getItem('remindu_user') || '{}');
     const userEmail = userData.email;
+    
     if (!userEmail) {
         alert('Sesi login tidak ditemukan.');
         window.location.href = 'welcome.html';
@@ -144,7 +146,6 @@
 
     let currentAvatar = localStorage.getItem('user_avatar') || userEmail.charAt(0).toUpperCase();
 
-    // Fungsi untuk menampilkan avatar (baik teks maupun gambar base64)
     function displayAvatar(avatar) {
         if (avatar && avatar.startsWith('data:image')) {
             avatarPreview.textContent = '';
@@ -159,22 +160,29 @@
 
     displayAvatar(currentAvatar);
 
-    // Load profil dari backend
     async function loadProfile() {
         try {
             const response = await fetch(`${API_URL}/profile`, {
-                headers: { 'X-User-Email': userEmail }
+                method: 'GET',
+                headers: { 
+                    'X-User-Email': userEmail,
+                    'Content-Type': 'application/json'
+                }
             });
-            if (!response.ok) throw new Error('Gagal mengambil profil');
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Gagal mengambil profil');
+            }
             const data = await response.json();
             firstNameInput.value = data.nama_depan || '';
             lastNameInput.value = data.nama_belakang || '';
         } catch (err) {
+            console.error('Load profile error:', err);
             alert('Gagal memuat profil: ' + err.message);
         }
     }
 
-    // Simpan perubahan
     async function saveProfile() {
         const firstName = firstNameInput.value.trim();
         const lastName = lastNameInput.value.trim();
@@ -192,6 +200,10 @@
                 alert('Konfirmasi password tidak cocok');
                 return;
             }
+            if (newPassword.length < 8 || !/[a-z]/.test(newPassword) || !/[0-9]/.test(newPassword)) {
+                alert('Password minimal 8 karakter, huruf kecil & angka');
+                return;
+            }
             payload.newPassword = newPassword;
             payload.confirmPassword = confirmPassword;
         }
@@ -206,12 +218,10 @@
                 body: JSON.stringify(payload)
             });
             const data = await response.json();
-            if (!response.ok) throw new Error(data.error);
+            if (!response.ok) throw new Error(data.error || 'Gagal menyimpan');
             
-            // Simpan avatar ke localStorage
             localStorage.setItem('user_avatar', currentAvatar);
             
-            // Update nama di localStorage untuk greeting
             const updatedUser = JSON.parse(localStorage.getItem('remindu_user') || '{}');
             updatedUser.firstName = firstName;
             localStorage.setItem('remindu_user', JSON.stringify(updatedUser));
@@ -223,10 +233,10 @@
         }
     }
 
-    // Avatar grid (pilihan ikon)
     changeAvatarBtn.addEventListener('click', () => {
         avatarGrid.style.display = avatarGrid.style.display === 'none' ? 'flex' : 'none';
     });
+    
     document.querySelectorAll('.avatar-option').forEach(opt => {
         opt.addEventListener('click', () => {
             document.querySelectorAll('.avatar-option').forEach(o => o.classList.remove('selected'));
@@ -237,9 +247,8 @@
         });
     });
 
-    // Change Photo: akses galeri/penyimpanan user
     changePhotoBtn.addEventListener('click', () => {
-        photoInput.click(); // membuka dialog pilih file
+        photoInput.click();
     });
 
     photoInput.addEventListener('change', (event) => {
@@ -258,7 +267,6 @@
             const base64 = e.target.result;
             currentAvatar = base64;
             displayAvatar(currentAvatar);
-            // Hapus highlight pilihan ikon
             document.querySelectorAll('.avatar-option').forEach(o => o.classList.remove('selected'));
             avatarGrid.style.display = 'none';
         };
@@ -271,20 +279,19 @@
     document.getElementById('saveBtn').addEventListener('click', saveProfile);
 
     loadProfile();
-</script>
 
-<button id="darkFab" style="position:fixed;bottom:88px;right:18px;z-index:9999;width:44px;height:44px;border-radius:50%;border:none;background:var(--purple);color:white;font-size:20px;cursor:pointer;box-shadow:0 4px 14px rgba(139,92,246,0.35);display:flex;align-items:center;justify-content:center;">🌙</button>
-<script>
-(function(){
-    var fab = document.getElementById('darkFab');
-    fab.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
-    fab.addEventListener('click', function(){
-        var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-        document.documentElement.setAttribute('data-theme', next);
-        localStorage.setItem('remindu_theme', next);
-        fab.textContent = next === 'dark' ? '☀️' : '🌙';
-    });
-})();
+    // Dark Mode Toggle
+    (function(){
+        var fab = document.getElementById('darkFab');
+        var currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+        fab.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
+        fab.addEventListener('click', function(){
+            var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('remindu_theme', next);
+            fab.textContent = next === 'dark' ? '☀️' : '🌙';
+        });
+    })();
 </script>
 </body>
 </html>

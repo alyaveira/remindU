@@ -224,11 +224,7 @@
                     <div class="filter-chip" data-filter="achievement">✅ Pencapaian</div>
                 </div>
             </div>
-            <div class="notif-list" id="notifList">
-                <div class="skeleton"></div>
-                <div class="skeleton" style="height:70px;margin-top:4px;opacity:0.6;"></div>
-                <div class="skeleton" style="height:70px;margin-top:4px;opacity:0.4;"></div>
-            </div>
+            <div class="notif-list" id="notifList"></div>
         </div>
     </main>
     <nav class="bottom-nav">
@@ -238,6 +234,7 @@
         <div class="bnav-item" data-nav="settings"><i class="material-icons-round">settings</i><span>Setting</span></div>
     </nav>
 </div>
+
 <script>
 (function() {
     const API_URL = 'http://localhost:3000/api';
@@ -296,9 +293,10 @@
     document.querySelectorAll('[data-nav]').forEach(el => el.addEventListener('click', () => { const u = navMap[el.dataset.nav]; if (u) window.location.href = u; else window.location.reload(); }));
     document.getElementById('topbarNotif').addEventListener('click', () => window.location.reload());
 
-    // ======= NOTIFIKASI DARI BACKEND =======
+    // ======= LOAD NOTIFICATIONS DARI LOCALSTORAGE =======
     let allNotifs = [];
     let currentFilter = 'all';
+    let tasksData = [];
 
     const TIPE_ICON = { deadline:'⏰', motivasi:'💡', system:'📋', achievement:'✅', reminder:'🔔' };
     const TIPE_CLASS = { deadline:'deadline', motivasi:'motivasi', system:'system', achievement:'achievement', reminder:'reminder' };
@@ -311,18 +309,246 @@
         return d.toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' });
     }
 
+    function saveNotifsToLocalStorage() {
+        localStorage.setItem(`remindu_notifications_${userEmail}`, JSON.stringify(allNotifs));
+    }
+
+    // Generate notifikasi dari task yang mendekati deadline
+    function generateTaskDeadlineNotifications(tasks) {
+        const notifications = [];
+        const now = Date.now();
+        const threeDays = 3 * 24 * 60 * 60 * 1000;
+        
+        tasks.forEach(task => {
+            if (!task.selesai && task.due_date) {
+                const dueDate = new Date(task.due_date).getTime();
+                const diff = dueDate - now;
+                
+                if (diff > 0 && diff <= threeDays) {
+                    const notifKey = `deadline_${task.id_task}_${Math.floor(dueDate / (24*60*60*1000))}`;
+                    const alreadyExists = allNotifs.some(n => n.id_notif === notifKey);
+                    
+                    if (!alreadyExists) {
+                        let urgency = '';
+                        let timeText = '';
+                        if (diff <= 86400000) {
+                            urgency = '⚠️ SANGAT MENDESAK! ';
+                            timeText = 'kurang dari 24 jam lagi';
+                        } else if (diff <= 172800000) {
+                            urgency = '⚡ MENDESAK! ';
+                            timeText = 'kurang dari 48 jam lagi';
+                        } else {
+                            urgency = '📢 ';
+                            timeText = `${Math.ceil(diff / 86400000)} hari lagi`;
+                        }
+                        
+                        notifications.push({
+                            id_notif: notifKey,
+                            judul: `${urgency}Deadline Mendekat!`,
+                            pesan: `Task "${task.judul}" akan jatuh tempo ${timeText}. Segera selesaikan!`,
+                            tipe: 'deadline',
+                            waktu_kirim: new Date().toISOString(),
+                            status_baca: 0,
+                            related_task_id: task.id_task
+                        });
+                    }
+                }
+            }
+        });
+        return notifications;
+    }
+
+    // Generate notifikasi sistem (task ditambahkan/diselesaikan) - menggunakan localStorage untuk tracking
+    function generateSystemNotifications(tasks) {
+        const notifications = [];
+        
+        // Ambil daftar ID yang sudah pernah dibuat notifikasi
+        const notifiedAdded = JSON.parse(localStorage.getItem(`system_notified_added_${userEmail}`) || '[]');
+        const notifiedCompleted = JSON.parse(localStorage.getItem(`system_notified_completed_${userEmail}`) || '[]');
+        
+        let addedIds = [...notifiedAdded];
+        let completedIds = [...notifiedCompleted];
+        
+        // Cek semua task
+        tasks.forEach(task => {
+            // Notifikasi untuk task baru (cek dari dibuat_pada)
+            if (!notifiedAdded.includes(task.id_task)) {
+                notifications.push({
+                    id_notif: `system_added_${task.id_task}`,
+                    judul: '📝 Task Baru Ditambahkan',
+                    pesan: `Task "${task.judul}" berhasil ditambahkan ke daftar tugasmu.`,
+                    tipe: 'system',
+                    waktu_kirim: task.dibuat_pada || new Date().toISOString(),
+                    status_baca: 0
+                });
+                addedIds.push(task.id_task);
+            }
+            
+            // Notifikasi untuk task yang selesai
+            if (task.selesai === true && !notifiedCompleted.includes(task.id_task)) {
+                notifications.push({
+                    id_notif: `system_completed_${task.id_task}`,
+                    judul: '✅ Task Selesai!',
+                    pesan: `Selamat! Task "${task.judul}" telah kamu selesaikan. Terus pertahankan produktivitasmu!`,
+                    tipe: 'system',
+                    waktu_kirim: new Date().toISOString(),
+                    status_baca: 0
+                });
+                completedIds.push(task.id_task);
+            }
+        });
+        
+        // Simpan ID yang sudah dibuat notifikasi
+        localStorage.setItem(`system_notified_added_${userEmail}`, JSON.stringify(addedIds));
+        localStorage.setItem(`system_notified_completed_${userEmail}`, JSON.stringify(completedIds));
+        
+        return notifications;
+    }
+
+    // Generate notifikasi pencapaian
+    function generateAchievementNotifications(tasks) {
+        const notifications = [];
+        const totalTasks = tasks.length;
+        const completedTasks = tasks.filter(t => t.selesai === true).length;
+        
+        const taskMilestones = [1, 5, 10, 25, 50];
+        for (const milestone of taskMilestones) {
+            const achievedKey = `achievement_taskcount_${milestone}`;
+            const alreadyExists = allNotifs.some(n => n.id_notif === achievedKey);
+            
+            if (totalTasks >= milestone && !alreadyExists && milestone > 0) {
+                notifications.push({
+                    id_notif: achievedKey,
+                    judul: '🏆 Pencapaian Task!',
+                    pesan: `Kamu telah membuat ${milestone} task! Terus kelola tugasmu dengan baik.`,
+                    tipe: 'achievement',
+                    waktu_kirim: new Date().toISOString(),
+                    status_baca: 0
+                });
+            }
+        }
+        
+        const completedMilestones = [1, 5, 10, 25];
+        for (const milestone of completedMilestones) {
+            const achievedKey = `achievement_completed_${milestone}`;
+            const alreadyExists = allNotifs.some(n => n.id_notif === achievedKey);
+            
+            if (completedTasks >= milestone && !alreadyExists) {
+                let pesan = '';
+                if (milestone === 1) pesan = `🎉 Selamat! Kamu telah menyelesaikan task pertamamu. Langkah kecil yang luar biasa!`;
+                else if (milestone === 5) pesan = `🌟 Hebat! Kamu sudah menyelesaikan ${milestone} task. Produktivitasmu meningkat!`;
+                else pesan = `🔥 Luar biasa! ${milestone} task telah selesai. Kamu luar biasa konsisten!`;
+                
+                notifications.push({
+                    id_notif: achievedKey,
+                    judul: `🎯 ${milestone} Task Selesai!`,
+                    pesan: pesan,
+                    tipe: 'achievement',
+                    waktu_kirim: new Date().toISOString(),
+                    status_baca: 0
+                });
+            }
+        }
+        
+        return notifications;
+    }
+
+    // Generate motivasi harian
+    function generateDailyMotivation() {
+        const today = new Date().toISOString().split('T')[0];
+        const notifKey = `motivation_${today}`;
+        const alreadyExists = allNotifs.some(n => n.id_notif === notifKey);
+        
+        if (!alreadyExists) {
+            const motivasiList = [
+                { judul: '💪 Tetap Semangat!', pesan: 'Setiap langkah kecil membawamu lebih dekat ke tujuan. Teruslah bergerak maju!' },
+                { judul: '🎯 Fokus!', pesan: 'Matikan distraksi dan kerjakan satu task dalam satu waktu. Kualitas lebih penting dari kuantitas.' },
+                { judul: '🌟 Kamu Bisa!', pesan: 'Percaya pada kemampuanmu. Kamu sudah melewati banyak tantangan sebelumnya.' },
+                { judul: '📈 Progress Adalah Kunci', pesan: 'Tidak perlu sempurna, yang penting konsisten. Setiap task yang selesai adalah kemenangan.' }
+            ];
+            const randomMotiv = motivasiList[Math.floor(Math.random() * motivasiList.length)];
+            return {
+                id_notif: notifKey,
+                judul: randomMotiv.judul,
+                pesan: randomMotiv.pesan,
+                tipe: 'motivasi',
+                waktu_kirim: new Date().toISOString(),
+                status_baca: 0
+            };
+        }
+        return null;
+    }
+
+    // Load tasks dan generate notifikasi
+    async function loadTasksAndGenerateNotifs() {
+        try {
+            const res = await fetch(`${API_URL}/tasks`, { headers: { 'X-User-Email': userEmail } });
+            if (res.ok) {
+                const tasks = await res.json();
+                tasksData = tasks;
+                
+                const deadlineNotifs = generateTaskDeadlineNotifications(tasks);
+                const systemNotifs = generateSystemNotifications(tasks);
+                const achievementNotifs = generateAchievementNotifications(tasks);
+                const dailyMotivation = generateDailyMotivation();
+                
+                let newNotifs = [...deadlineNotifs, ...systemNotifs, ...achievementNotifs];
+                if (dailyMotivation) newNotifs.push(dailyMotivation);
+                
+                for (const notif of newNotifs) {
+                    const exists = allNotifs.some(n => n.id_notif === notif.id_notif);
+                    if (!exists) {
+                        allNotifs.unshift(notif);
+                    }
+                }
+                
+                saveNotifsToLocalStorage();
+                renderNotifs();
+                updateBadge();
+            }
+        } catch(e) {
+            console.log('Gagal fetch tasks:', e);
+        }
+    }
+    
+    function updateBadge() {
+        const unreadCount = allNotifs.filter(n => !n.status_baca).length;
+        const badge = document.getElementById('notifBadge');
+        const dot = document.getElementById('notifDot');
+        if (badge) badge.textContent = unreadCount > 0 ? unreadCount : '0';
+        if (dot) dot.style.display = unreadCount > 0 ? 'block' : 'none';
+    }
+    
+    function loadNotifsFromLocalStorage() {
+        const saved = localStorage.getItem(`remindu_notifications_${userEmail}`);
+        if (saved) {
+            allNotifs = JSON.parse(saved);
+        } else {
+            allNotifs = [];
+        }
+        renderNotifs();
+        updateBadge();
+    }
+
     function renderNotifs() {
         const list = document.getElementById('notifList');
         const filtered = currentFilter === 'all' ? allNotifs : allNotifs.filter(n => n.tipe === currentFilter);
-        const unread = allNotifs.filter(n => !n.status_baca).length;
-        const badge = document.getElementById('notifBadge');
-        badge.textContent = unread > 0 ? unread : '0';
-        document.getElementById('notifDot').style.display = unread > 0 ? 'block' : 'none';
+        
         list.innerHTML = '';
         if (filtered.length === 0) {
-            list.innerHTML = `<div class="empty-notif"><i class="material-icons-round">notifications_none</i><p>Tidak ada notifikasi di sini.</p></div>`;
+            let emptyMessage = 'Tidak ada notifikasi di sini.';
+            if (currentFilter === 'deadline') emptyMessage = 'Tidak ada task yang mendekati deadline. Santai dulu!';
+            else if (currentFilter === 'motivasi') emptyMessage = 'Belum ada motivasi hari ini. Cek lagi nanti!';
+            else if (currentFilter === 'system') emptyMessage = 'Belum ada notifikasi sistem. Tambah atau selesaikan task untuk melihat notifikasi.';
+            else if (currentFilter === 'achievement') emptyMessage = 'Belum ada pencapaian. Selesaikan task untuk mendapatkan penghargaan!';
+            else emptyMessage = 'Tidak ada notifikasi di sini.\nTambahkan task dengan deadline untuk melihat notifikasi.';
+            
+            list.innerHTML = `<div class="empty-notif"><i class="material-icons-round">notifications_none</i><p>${emptyMessage}</p></div>`;
             return;
         }
+        
+        filtered.sort((a, b) => new Date(b.waktu_kirim) - new Date(a.waktu_kirim));
+        
         filtered.forEach((n, idx) => {
             const tipe = n.tipe || 'system';
             const icon = TIPE_ICON[tipe] || '📌';
@@ -333,90 +559,57 @@
             card.innerHTML = `
                 <div class="notif-icon-wrap ${cls}">${icon}</div>
                 <div class="notif-body">
-                    <div class="notif-card-title">${n.judul || 'Notifikasi'}</div>
-                    <div class="notif-card-msg">${n.pesan}</div>
+                    <div class="notif-card-title">${escapeHtml(n.judul || 'Notifikasi')}</div>
+                    <div class="notif-card-msg">${escapeHtml(n.pesan)}</div>
                     <div class="notif-card-time">${formatTime(n.waktu_kirim)}</div>
                 </div>
                 ${!n.status_baca ? '<div class="notif-unread-dot"></div>' : ''}
                 <button class="notif-del-btn material-icons-round" data-id="${n.id_notif}" title="Hapus">delete_outline</button>`;
 
-            // Mark as read on click
-            card.addEventListener('click', async (e) => {
+            card.addEventListener('click', (e) => {
                 if (e.target.classList.contains('notif-del-btn')) return;
                 if (!n.status_baca) {
-                    try {
-                        await fetch(`${API_URL}/notifications/${n.id_notif}/read`, { method:'PUT', headers:{'X-User-Email':userEmail} });
-                        n.status_baca = 1;
-                        renderNotifs();
-                    } catch {}
+                    n.status_baca = 1;
+                    saveNotifsToLocalStorage();
+                    renderNotifs();
+                    updateBadge();
                 }
             });
 
-            // Delete
-            card.querySelector('.notif-del-btn').addEventListener('click', async (e) => {
+            card.querySelector('.notif-del-btn').addEventListener('click', (e) => {
                 e.stopPropagation();
-                const id = parseInt(e.target.dataset.id);
-                try {
-                    await fetch(`${API_URL}/notifications/${id}`, { method:'DELETE', headers:{'X-User-Email':userEmail} });
-                    allNotifs = allNotifs.filter(x => x.id_notif !== id);
-                    renderNotifs();
-                } catch {}
+                const id = e.target.dataset.id;
+                allNotifs = allNotifs.filter(x => String(x.id_notif) !== String(id));
+                saveNotifsToLocalStorage();
+                renderNotifs();
+                updateBadge();
             });
 
             list.appendChild(card);
         });
     }
 
-    // Load dari backend; fallback ke localStorage notif lokal (task deadline)
-    async function loadNotifs() {
-        // Load backend notifs
-        let backendNotifs = [];
-        try {
-            const res = await fetch(`${API_URL}/notifications`, { headers:{'X-User-Email':userEmail} });
-            if (res.ok) backendNotifs = await res.json();
-        } catch {}
-
-        // Load task deadline notifs (generate otomatis dari tasks)
-        let taskNotifs = [];
-        try {
-            const res2 = await fetch(`${API_URL}/tasks`, { headers:{'X-User-Email':userEmail} });
-            if (res2.ok) {
-                const tasks = await res2.json();
-                tasks.forEach(task => {
-                    if (!task.selesai && task.due_date) {
-                        const diff = new Date(task.due_date) - Date.now();
-                        if (diff > 0 && diff < 86400000 * 2) {
-                            const already = backendNotifs.some(n => n.tipe === 'deadline' && n.pesan && n.pesan.includes(task.judul));
-                            if (!already) {
-                                taskNotifs.push({
-                                    id_notif: 'local_' + task.id_task,
-                                    judul: '⏰ Deadline Mendekat!',
-                                    pesan: `Task "${task.judul}" akan jatuh tempo ${diff < 86400000 ? 'dalam 24 jam' : 'besok'}. Segera selesaikan!`,
-                                    tipe: 'deadline',
-                                    waktu_kirim: new Date().toISOString(),
-                                    status_baca: 0
-                                });
-                            }
-                        }
-                    }
-                });
-            }
-        } catch {}
-
-        allNotifs = [...taskNotifs, ...backendNotifs];
-        renderNotifs();
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;');
     }
 
-    // Mark all read
-    document.getElementById('btnMarkAll').addEventListener('click', async () => {
-        try {
-            await fetch(`${API_URL}/notifications/read-all`, { method:'PUT', headers:{'X-User-Email':userEmail} });
-        } catch {}
-        allNotifs.forEach(n => n.status_baca = 1);
-        renderNotifs();
+    document.getElementById('btnMarkAll').addEventListener('click', () => {
+        let changed = false;
+        for (const notif of allNotifs) {
+            if (!notif.status_baca) {
+                notif.status_baca = 1;
+                changed = true;
+            }
+        }
+        if (changed) {
+            saveNotifsToLocalStorage();
+            renderNotifs();
+            document.getElementById('notifBadge').textContent = '0';
+            document.getElementById('notifDot').style.display = 'none';
+        }
     });
 
-    // Filter chips
     document.querySelectorAll('.filter-chip').forEach(chip => {
         chip.addEventListener('click', () => {
             document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
@@ -426,7 +619,12 @@
         });
     });
 
-    loadNotifs();
+    loadNotifsFromLocalStorage();
+    loadTasksAndGenerateNotifs();
+    
+    setInterval(() => {
+        loadTasksAndGenerateNotifs();
+    }, 30000);
 })();
 </script>
 

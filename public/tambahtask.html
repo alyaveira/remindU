@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>RemindU - Tambah Reminder</title>
+    <script>
+    (function(){
+        var t = localStorage.getItem('remindu_theme') || 'light';
+        document.documentElement.setAttribute('data-theme', t);
+    })();
+    </script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <style>
         :root {
@@ -34,7 +40,6 @@
 
         .layout { display: flex; min-height: 100vh; position: relative; z-index: 5; }
 
-        /* SIDEBAR (sama persis dengan home) */
         .sidebar {
             width: var(--sidebar-w);
             background: var(--white);
@@ -53,7 +58,6 @@
         .sidebar.collapsed { width: var(--sidebar-collapsed-w); }
         .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 199; backdrop-filter: blur(2px); }
         .sidebar-overlay.show { display: block; }
-
         .sidebar-header {
             display: flex;
             align-items: center;
@@ -71,7 +75,6 @@
         .toggle-btn:hover { background: var(--purple-light); color: var(--purple); }
         .toggle-btn i { font-size: 20px; transition: transform 0.3s; }
         .sidebar.collapsed .toggle-btn i { transform: rotate(180deg); }
-
         .sidebar-user {
             padding: 16px;
             border-bottom: 1px solid var(--border);
@@ -88,7 +91,6 @@
         .sidebar.collapsed .sidebar-user-info { opacity: 0; width: 0; }
         .sidebar-user-name { font-weight: 600; font-size: 14px; color: var(--text); white-space: nowrap; }
         .sidebar-user-email { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
-
         .sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; overflow-x: hidden; }
         .sidebar-nav::-webkit-scrollbar { width: 4px; }
         .sidebar-nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
@@ -102,10 +104,8 @@
         .sidebar.collapsed .nav-item-label { opacity: 0; width: 0; }
         .nav-badge { margin-left: auto; background: var(--purple); color: white; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; flex-shrink: 0; transition: opacity 0.2s; }
         .sidebar.collapsed .nav-badge { opacity: 0; }
-
         .sidebar-footer { padding: 12px 10px 16px; border-top: 1px solid var(--border); flex-shrink: 0; }
 
-        /* MAIN */
         .main {
             flex: 1;
             margin-left: var(--sidebar-w);
@@ -116,7 +116,6 @@
         }
         .main.expanded { margin-left: var(--sidebar-collapsed-w); }
 
-        /* TOPBAR */
         .topbar {
             height: var(--header-h);
             background: var(--white);
@@ -164,7 +163,6 @@
         .dd-item.danger { color: #e53e3e; border-top: 1px solid var(--border); }
         .dd-item i { font-size: 18px; }
 
-        /* PAGE CONTENT (FORM) */
         .page-content {
             flex: 1;
             padding: 28px;
@@ -347,12 +345,14 @@
             width: 100%;
             font-family: inherit;
             font-size: 14px;
+            color: var(--text);
         }
         select {
             appearance: none;
             background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%2364748b" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>') no-repeat right 8px center;
             background-size: 16px;
             cursor: pointer;
+            color: var(--text);
         }
         .clickable {
             cursor: pointer;
@@ -369,7 +369,6 @@
             font-weight: 600;
         }
 
-        /* BOTTOM NAV (mobile) */
         .bottom-nav {
             display: none;
             background: var(--white);
@@ -410,6 +409,93 @@
             .topbar { padding: 0 16px; }
             .form-body { padding: 20px; }
             .form-header { padding: 18px 20px; }
+        }
+
+        /* ========== DARK MODE CSS ========== */
+        [data-theme="dark"] {
+            --purple: #a78bfa;
+            --purple-dark: #8b5cf6;
+            --purple-light: #2d1f5e;
+            --bg: #0f0f13;
+            --white: #1a1a24;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #2a2a3a;
+        }
+        [data-theme="dark"] body { background: var(--bg); color: var(--text); }
+        [data-theme="dark"] .sidebar,
+        [data-theme="dark"] .topbar,
+        [data-theme="dark"] .form-card,
+        [data-theme="dark"] .dropdown,
+        [data-theme="dark"] .bottom-nav,
+        [data-theme="dark"] .task-card,
+        [data-theme="dark"] .notif-card,
+        [data-theme="dark"] .empty-notif {
+            background: var(--white) !important;
+            border-color: var(--border) !important;
+        }
+        [data-theme="dark"] .form-group input,
+        [data-theme="dark"] .form-group textarea,
+        [data-theme="dark"] .form-group select {
+            color: var(--text) !important;
+        }
+        [data-theme="dark"] .form-group input::placeholder,
+        [data-theme="dark"] .form-group textarea::placeholder {
+            color: var(--text-muted) !important;
+        }
+        [data-theme="dark"] input[type="datetime-local"] {
+            background: #13131e !important;
+            border-color: var(--border) !important;
+            color: var(--text) !important;
+        }
+        [data-theme="dark"] .nav-item { color: var(--text-muted) !important; }
+        [data-theme="dark"] .nav-item:hover { background: rgba(167,139,250,0.08) !important; color: var(--purple) !important; }
+        [data-theme="dark"] .nav-item.active { background: var(--purple-light) !important; color: var(--purple) !important; }
+        [data-theme="dark"] .topbar-greeting,
+        [data-theme="dark"] .sidebar-user-name,
+        [data-theme="dark"] .form-header h2,
+        [data-theme="dark"] .form-group label {
+            color: var(--text) !important;
+        }
+        [data-theme="dark"] .topbar-date,
+        [data-theme="dark"] .sidebar-user-email,
+        [data-theme="dark"] .nav-label,
+        [data-theme="dark"] .text-muted {
+            color: var(--text-muted) !important;
+        }
+        [data-theme="dark"] .toggle-btn,
+        [data-theme="dark"] .topbar-icon-btn,
+        [data-theme="dark"] .topbar-mobile-toggle {
+            background: #13131e !important;
+            color: var(--text-muted) !important;
+        }
+        [data-theme="dark"] .dd-item { color: var(--text) !important; }
+        [data-theme="dark"] .dd-item:hover { background: #13131e !important; }
+        [data-theme="dark"] .dd-item.danger { color: #f87171 !important; }
+        [data-theme="dark"] .bnav-item { color: var(--text-muted) !important; }
+        [data-theme="dark"] .bnav-item.active { background: var(--purple-light) !important; color: var(--purple) !important; }
+        [data-theme="dark"] .bg-blob-1,
+        [data-theme="dark"] .bg-blob-2 { opacity: 0.07 !important; }
+        [data-theme="dark"] .sidebar-header,
+        [data-theme="dark"] .sidebar-user,
+        [data-theme="dark"] .sidebar-footer { border-color: var(--border) !important; }
+        [data-theme="dark"] .form-group { border-bottom-color: var(--border) !important; }
+        [data-theme="dark"] .btn-save {
+            background: var(--white) !important;
+            color: var(--purple) !important;
+        }
+        [data-theme="dark"] .btn-save:hover {
+            background: #2d2d3a !important;
+        }
+        [data-theme="dark"] select {
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%2394a3b8" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>') no-repeat right 8px center;
+            background-size: 16px;
+        }
+        [data-theme="dark"] .slider {
+            background-color: #334155;
+        }
+        [data-theme="dark"] .add-due-icon {
+            color: var(--purple);
         }
     </style>
 </head>
@@ -536,11 +622,9 @@
 </div>
 
 <script type="module">
-    import { createTask } from './supabase-helpers.js';
     import { supabase } from './supabase-config.js';
     
     (function() {
-        // ========== AUTH & AVATAR (sama persis dengan home) ==========
         const userData = JSON.parse(localStorage.getItem('remindu_user') || '{}');
         const userEmail = userData.email;
         if (!userEmail) {
@@ -552,7 +636,6 @@
         const firstName = userEmail.split('@')[0];
         const displayName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
         
-        // Fungsi update avatar (membaca dari localStorage)
         function updateAvatar() {
             const savedAvatar = localStorage.getItem('user_avatar');
             const sidebarAvatarDiv = document.getElementById('sidebarAvatar');
@@ -594,7 +677,6 @@
             }
         }
 
-        // Update nama dan email
         document.getElementById('sidebarName').textContent = displayName;
         document.getElementById('sidebarEmail').textContent = userEmail;
         document.getElementById('topbarGreeting').textContent = `Halo, ${displayName}!`;
@@ -602,7 +684,6 @@
         
         updateAvatar();
 
-        // ========== SIDEBAR TOGGLE ==========
         const sidebar = document.getElementById('sidebar');
         const mainContent = document.getElementById('mainContent');
         const sidebarToggle = document.getElementById('sidebarToggle');
@@ -618,7 +699,6 @@
             mainContent.classList.toggle('expanded', sidebarCollapsed);
         });
 
-        // ========== MOBILE SIDEBAR ==========
         const overlay = document.getElementById('sidebarOverlay');
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         function checkMobile() { mobileMenuBtn.style.display = window.innerWidth <= 900 ? 'flex' : 'none'; }
@@ -627,7 +707,6 @@
         mobileMenuBtn.addEventListener('click', () => { sidebar.classList.toggle('mobile-open'); overlay.classList.toggle('show'); });
         overlay.addEventListener('click', () => { sidebar.classList.remove('mobile-open'); overlay.classList.remove('show'); });
 
-        // ========== DROPDOWN & NAVIGASI ==========
         const avatarBtn = document.getElementById('topbarAvatar');
         const dropdown = document.getElementById('dropdown');
         avatarBtn.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('show'); });
@@ -649,7 +728,6 @@
         document.querySelectorAll('.bnav-item[data-nav]').forEach(el => el.addEventListener('click', () => handleNav(el.dataset.nav)));
         document.getElementById('topbarNotif').addEventListener('click', () => handleNav('notification'));
 
-        // ========== FORM HANDLER ==========
         const dueDateTrigger = document.getElementById('dueDateTrigger');
         const dueDateDiv = document.getElementById('dueDateInput');
         dueDateTrigger.addEventListener('click', () => {
@@ -660,9 +738,8 @@
             window.location.href = 'home.html';
         });
 
-        // ---- Deadline preview H-berapa ----
-        const dueDateInput = document.getElementById('taskDueDate');
         let deadlinePreviewEl = null;
+        const dueDateInput = document.getElementById('taskDueDate');
         function updateDeadlinePreview() {
             const val = dueDateInput.value;
             if (!val) { if (deadlinePreviewEl) deadlinePreviewEl.remove(); return; }
@@ -684,7 +761,25 @@
         }
         dueDateInput.addEventListener('change', updateDeadlinePreview);
 
-        // ---- Save task ----
+        function saveTaskToLocalStorage(taskData) {
+            const STORAGE_KEY = `remindu_tasks_${userEmail}`;
+            const savedTasks = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            const newTask = {
+                id_task: Date.now(),
+                judul: taskData.judul,
+                kategori: taskData.kategori,
+                notes: taskData.notes || '',
+                due_date: taskData.due_date,
+                remind_at: taskData.remind_at,
+                selesai: false,
+                dibuat_pada: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+            savedTasks.unshift(newTask);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(savedTasks));
+            return newTask;
+        }
+
         document.getElementById('addBtn').addEventListener('click', async () => {
             const judul    = document.getElementById('taskTitle').value.trim();
             const notes    = document.getElementById('taskNotes').value.trim();
@@ -703,25 +798,28 @@
             addBtn.disabled = true;
             addBtn.textContent = 'Menyimpan...';
 
+            const newTask = saveTaskToLocalStorage({ judul, kategori, notes, due_date, remind_at });
+            
+            const STORAGE_KEY = `remindu_tasks_${userEmail}`;
+            window.dispatchEvent(new StorageEvent('storage', { key: STORAGE_KEY, newValue: localStorage.getItem(STORAGE_KEY) }));
+            
+            showToast('✅ Task berhasil ditambahkan!', 'success');
+            
             try {
-                await createTask({
-                    judul: judul,
-                    kategori: kategori,
-                    notes: notes || '',
-                    due_date: due_date,
-                    remind_at: remind_at
+                await fetch('http://localhost:3000/api/tasks', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-User-Email': userEmail },
+                    body: JSON.stringify({ judul, kategori, notes, due_date, remind_at })
                 });
-                
-                showToast('✅ Task berhasil ditambahkan!', 'success');
-                setTimeout(() => window.location.href = 'home.html', 900);
-            } catch (err) {
-                showToast('Error: ' + err.message, 'error');
-                addBtn.disabled = false;
-                addBtn.textContent = 'Simpan';
+            } catch(e) {
+                console.log('Backend sync gagal, data tetap tersimpan di lokal');
             }
+            
+            setTimeout(() => window.location.href = 'home.html', 900);
+            addBtn.disabled = false;
+            addBtn.textContent = 'Simpan';
         });
 
-        // ========== TOAST ==========
         function showToast(msg, type) {
             let t = document.getElementById('_toast');
             if (!t) {
@@ -736,18 +834,15 @@
             setTimeout(() => t.style.transform = 'translateX(-50%) translateY(80px)', 3500);
         }
 
-        // ========== NOTIF BADGE (real dari backend notifications) ==========
         async function updateNotifBadge() {
             try {
                 const { data: { user } } = await supabase.auth.getUser();
                 if (!user) return;
-                
                 const { data: notifs, error } = await supabase
                     .from('notifications')
                     .select('*')
                     .eq('user_id', user.id)
                     .eq('status_baca', false);
-                    
                 if (!error && notifs) {
                     const unread = notifs.length;
                     const badge = document.getElementById('notifBadge');
@@ -761,6 +856,22 @@
         }
         updateNotifBadge();
     })();
+</script>
+
+<!-- Dark Mode Toggle Button -->
+<button id="darkFab" style="position:fixed;bottom:88px;right:18px;z-index:9999;width:44px;height:44px;border-radius:50%;border:none;background:var(--purple);color:white;font-size:20px;cursor:pointer;box-shadow:0 4px 14px rgba(139,92,246,0.35);display:flex;align-items:center;justify-content:center;">🌙</button>
+<script>
+(function(){
+    var fab = document.getElementById('darkFab');
+    var currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    fab.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
+    fab.addEventListener('click', function(){
+        var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('remindu_theme', next);
+        fab.textContent = next === 'dark' ? '☀️' : '🌙';
+    });
+})();
 </script>
 </body>
 </html>

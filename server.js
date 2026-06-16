@@ -39,8 +39,8 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        secure: true,         // Wajib untuk koneksi HTTPS
-        sameSite: 'none',     // Wajib untuk navigasi lintas situs (Google -> Vercel)
+        secure: process.env.NODE_ENV === 'production', // true di Vercel
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         maxAge: 7 * 24 * 60 * 60 * 1000
     }
 }));

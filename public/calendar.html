@@ -100,7 +100,7 @@
         .day { aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; color: var(--text); border-radius: 30px; cursor: pointer; transition: all 0.2s; }
         .day:hover { background: var(--bg); transform: scale(1.05); }
         .day.has-event { background: var(--purple-light); color: var(--purple); font-weight: 700; }
-        .day.today { background: var(--purple); color: white; box-shadow: 0 4px 12px rgba(139,92,246,0.35); }
+        .day.today { background: var(--purple); color: white; font-weight: 700; box-shadow: 0 4px 12px rgba(139,92,246,0.35); }
         .day.other-month { color: #cbd5e1; }
         .day.selected-day { background: #e0e7ff; outline: 2px solid var(--purple); outline-offset: 1px; }
         .events-section { background: var(--white); border-radius: 28px; padding: 20px; border: 1px solid var(--border); box-shadow: 0 2px 12px rgba(0,0,0,0.02); }
@@ -238,6 +238,7 @@
     if (!userEmail) { alert('Sesi login tidak ditemukan.'); window.location.href = 'welcome.html'; return; }
     const firstName = userEmail.split('@')[0];
     const displayName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
+    
     function updateAvatar() {
         const saved = localStorage.getItem('user_avatar');
         const sidebarAvatar = document.getElementById('sidebarAvatar');
@@ -263,6 +264,7 @@
     document.getElementById('topbarGreeting').textContent = `Halo, ${displayName}!`;
     document.getElementById('topbarDate').textContent = new Date().toLocaleDateString('id-ID', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
     updateAvatar();
+    
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
     const sidebarToggle = document.getElementById('sidebarToggle');
@@ -280,6 +282,7 @@
     checkMobile(); window.addEventListener('resize', checkMobile);
     mobileBtn.addEventListener('click', () => { sidebar.classList.toggle('mobile-open'); overlay.classList.toggle('show'); });
     overlay.addEventListener('click', () => { sidebar.classList.remove('mobile-open'); overlay.classList.remove('show'); });
+    
     const avatarBtn = document.getElementById('topbarAvatar');
     const dropdown = document.getElementById('dropdown');
     avatarBtn.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('show'); });
@@ -288,20 +291,24 @@
     document.getElementById('ddLogout').addEventListener('click', () => { localStorage.removeItem('remindu_user'); window.location.href = 'welcome.html'; });
     document.getElementById('sidebarLogout').addEventListener('click', () => { localStorage.removeItem('remindu_user'); window.location.href = 'welcome.html'; });
     document.getElementById('sidebarUser').addEventListener('click', () => window.location.href = 'profil.html');
+    
     function handleNav(nav) {
         if (nav === 'home') window.location.href = 'home.html';
         else if (nav === 'calendar') window.location.reload();
         else if (nav === 'notification') window.location.href = 'notification.html';
         else if (nav === 'settings') window.location.href = 'settings.html';
         else if (nav === 'ai') window.location.href = 'ai-motivation.html';
+        else if (nav === 'statistic') window.location.href = 'statistic.html';
     }
     document.querySelectorAll('.nav-item[data-nav]').forEach(el => el.addEventListener('click', () => handleNav(el.dataset.nav)));
     document.querySelectorAll('.bnav-item[data-nav]').forEach(el => el.addEventListener('click', () => handleNav(el.dataset.nav)));
     document.getElementById('topbarNotif').addEventListener('click', () => handleNav('notification'));
+    
     let currentDate = new Date();
     let tasks = [];
     let selectedDate = null;
     let selectedDayElem = null;
+    
     async function fetchTasks() {
         try {
             const res = await fetch('http://localhost:3000/api/tasks', { headers: { 'X-User-Email': userEmail } });
@@ -310,10 +317,12 @@
         } catch(e) { tasks = []; }
         renderCalendar();
     }
+    
     function getTasksByDate(date) {
         const dateStr = date.toISOString().split('T')[0];
         return tasks.filter(task => task.due_date && new Date(task.due_date).toISOString().split('T')[0] === dateStr);
     }
+    
     function createDayElement(dayNum, isOtherMonth, dateObj = null, hasEvent = false, isToday = false) {
         const div = document.createElement('div');
         div.className = 'day';
@@ -324,6 +333,7 @@
         if (!isOtherMonth && dateObj) div.addEventListener('click', (e) => { e.stopPropagation(); selectDate(dateObj, div); });
         return div;
     }
+    
     function renderCalendar() {
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
@@ -334,22 +344,34 @@
         const prevMonthDays = new Date(year, month, 0).getDate();
         const container = document.getElementById('calendarDays');
         container.innerHTML = '';
+        
+        // Reset today ke 00:00:00 untuk perbandingan akurat
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const currentYear = today.getFullYear();
+        const currentMonth = today.getMonth();
+        const currentDay = today.getDate();
+        
         for(let i=0; i<offset; i++) {
             const dayNum = prevMonthDays - offset + i + 1;
             container.appendChild(createDayElement(dayNum, true));
         }
-        const today = new Date();
-        const isCurrentMonth = (year === today.getFullYear() && month === today.getMonth());
+        
         for(let d=1; d<=daysInMonth; d++) {
             const dateObj = new Date(year, month, d);
+            dateObj.setHours(0, 0, 0, 0);
             const hasEvent = tasks.some(task => task.due_date && new Date(task.due_date).toISOString().split('T')[0] === dateObj.toISOString().split('T')[0]);
-            const isToday = isCurrentMonth && d === today.getDate();
+            // Perbaikan: bandingkan dengan variabel yang sudah di-reset
+            const isToday = (year === currentYear && month === currentMonth && d === currentDay);
             container.appendChild(createDayElement(d, false, dateObj, hasEvent, isToday));
         }
+        
         const total = offset + daysInMonth;
         const remaining = 42 - total;
         for(let i=1; i<=remaining; i++) container.appendChild(createDayElement(i, true));
+        
         document.getElementById('monthYear').textContent = currentDate.toLocaleDateString('id-ID', { month:'long', year:'numeric' });
+        
         if (!selectedDate) {
             const t = new Date();
             if(t.getMonth()===month && t.getFullYear()===year) selectDate(t);
@@ -357,17 +379,33 @@
         } else if(selectedDate.getMonth()!==month || selectedDate.getFullYear()!==year) selectDate(new Date(year,month,1));
         else selectDate(selectedDate);
     }
+    
     function selectDate(date, targetElem=null) {
         selectedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-        if(selectedDayElem) { selectedDayElem.style.background = ''; selectedDayElem.classList.remove('selected-day'); }
-        if(targetElem) { selectedDayElem = targetElem; targetElem.style.background = '#e0e7ff'; targetElem.classList.add('selected-day'); }
-        else {
+        selectedDate.setHours(0, 0, 0, 0);
+        
+        if(selectedDayElem) {
+            selectedDayElem.classList.remove('selected-day');
+            selectedDayElem.style.background = '';
+        }
+        
+        if(targetElem) {
+            selectedDayElem = targetElem;
+            targetElem.classList.add('selected-day');
+        } else {
             const days = document.querySelectorAll('.days .day:not(.other-month)');
-            for(let d of days) if(parseInt(d.textContent) === selectedDate.getDate()) { d.style.background = '#e0e7ff'; d.classList.add('selected-day'); selectedDayElem = d; break; }
+            for(let d of days) {
+                if(parseInt(d.textContent) === selectedDate.getDate()) {
+                    d.classList.add('selected-day');
+                    selectedDayElem = d;
+                    break;
+                }
+            }
         }
         document.getElementById('selectedDateLabel').innerHTML = `${selectedDate.getDate()} ${selectedDate.toLocaleDateString('id-ID', { month:'long', year:'numeric' })}`;
         renderEventsForDate(selectedDate);
     }
+    
     function renderEventsForDate(date) {
         const events = getTasksByDate(date);
         const container = document.getElementById('eventList');
@@ -381,10 +419,14 @@
             container.appendChild(div);
         });
     }
+    
     function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
+    
     document.getElementById('prevMonth').addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth()-1); renderCalendar(); });
     document.getElementById('nextMonth').addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth()+1); renderCalendar(); });
+    
     fetchTasks();
+    
     function updateBadge() { const badge = document.getElementById('notifBadge'); if(badge) badge.textContent = tasks.filter(t=>!t.selesai).length; }
     setInterval(() => { if(tasks.length) updateBadge(); }, 1000);
 })();
