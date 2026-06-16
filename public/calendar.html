@@ -99,15 +99,38 @@
         .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
         .day { aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; color: var(--text); border-radius: 30px; cursor: pointer; transition: all 0.2s; }
         .day:hover { background: var(--bg); transform: scale(1.05); }
-        .day.has-event { background: var(--purple-light); color: var(--purple); font-weight: 700; }
-        .day.today { background: var(--purple); color: white; font-weight: 700; box-shadow: 0 4px 12px rgba(139,92,246,0.35); }
+        /* ===== PERBAIKAN HIGHLIGHT ===== */
+        .day.has-event { 
+            background: rgba(139, 92, 246, 0.2); 
+            color: #6d28d9; 
+            font-weight: 700; 
+        }
+        .day.today { 
+            background: linear-gradient(135deg, #8b5cf6, #ec4899); 
+            color: white; 
+            font-weight: 700; 
+            box-shadow: 0 4px 16px rgba(139,92,246,0.5);
+            transform: scale(1.05);
+        }
         .day.other-month { color: #cbd5e1; }
-        .day.selected-day { background: #e0e7ff; outline: 2px solid var(--purple); outline-offset: 1px; }
+        .day.selected-day { 
+            background: linear-gradient(135deg, #8b5cf6, #ec4899); 
+            color: white !important; 
+            box-shadow: 0 4px 16px rgba(139,92,246,0.4);
+            transform: scale(1.05);
+        }
         .events-section { background: var(--white); border-radius: 28px; padding: 20px; border: 1px solid var(--border); box-shadow: 0 2px 12px rgba(0,0,0,0.02); }
         .events-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
         .events-title i { color: var(--purple); }
         .event-list { display: flex; flex-direction: column; gap: 12px; }
-        .event-card { background: var(--bg); border-radius: 20px; padding: 14px 18px; border-left: 5px solid var(--purple); transition: all 0.2s; }
+        .event-card { 
+            background: var(--bg); 
+            border-radius: 20px; 
+            padding: 14px 18px; 
+            border-left: 5px solid #8b5cf6; 
+            border-image: linear-gradient(135deg, #8b5cf6, #ec4899) 1;
+            transition: all 0.2s; 
+        }
         .event-card:hover { transform: translateX(6px); background: #f1f5f9; box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
         .event-title { font-weight: 700; font-size: 15px; color: var(--text); }
         .event-time { font-size: 12px; color: var(--text-muted); margin-top: 6px; display: flex; align-items: center; gap: 4px; }
@@ -143,10 +166,26 @@
         [data-theme="dark"] .month-nav button:hover { background:var(--purple-light) !important; color:var(--purple) !important; }
         [data-theme="dark"] .day { color:var(--text) !important; }
         [data-theme="dark"] .day.other-month { color:#475569 !important; }
-        [data-theme="dark"] .day.has-event { background:var(--purple-light) !important; color:var(--purple) !important; }
-        [data-theme="dark"] .day.today { background:var(--purple) !important; color:white !important; }
-        [data-theme="dark"] .day.selected-day { background:#3b2a5e !important; outline-color:var(--purple) !important; }
-        [data-theme="dark"] .event-card { background:#13131e !important; border-left-color:var(--purple) !important; }
+        /* Dark mode highlight */
+        [data-theme="dark"] .day.has-event { 
+            background:rgba(167, 139, 250, 0.25) !important; 
+            color:#a78bfa !important; 
+        }
+        [data-theme="dark"] .day.today { 
+            background:linear-gradient(135deg, #a78bfa, #ec4899) !important; 
+            color:white !important;
+            box-shadow:0 4px 16px rgba(167,139,250,0.5) !important;
+        }
+        [data-theme="dark"] .day.selected-day { 
+            background:linear-gradient(135deg, #a78bfa, #ec4899) !important; 
+            color:white !important;
+            box-shadow:0 4px 16px rgba(167,139,250,0.5) !important;
+        }
+        [data-theme="dark"] .event-card { 
+            background:#13131e !important; 
+            border-left-color:#a78bfa !important;
+            border-image:linear-gradient(135deg, #a78bfa, #ec4899) 1 !important;
+        }
         [data-theme="dark"] .event-card:hover { background:#1a1a2a !important; }
         [data-theme="dark"] .no-event { background:#13131e !important; color:var(--text-muted) !important; }
         [data-theme="dark"] .dd-item { color:var(--text) !important; }
