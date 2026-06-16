@@ -93,7 +93,18 @@
         .ai-hero::before { content:''; position:absolute; top:-60px; right:-40px; width:220px; height:220px; border-radius:50%; background:rgba(255,255,255,0.1); }
         .ai-hero::after { content:''; position:absolute; bottom:-50px; left:20%; width:160px; height:160px; border-radius:50%; background:rgba(255,255,255,0.07); }
         .ai-hero-inner { position: relative; z-index: 2; }
-        .ai-hero-badge { background: rgba(255,255,255,0.2); display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 40px; font-size: 12px; font-weight: 700; margin-bottom: 14px; backdrop-filter: blur(4px); }
+        .ai-hero-badge { 
+            background: rgba(255,255,255,0.2); 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 6px; 
+            padding: 5px 14px; 
+            border-radius: 40px; 
+            font-size: 12px; 
+            font-weight: 700; 
+            margin-bottom: 14px; 
+            backdrop-filter: blur(4px); 
+        }
         .ai-hero-badge i { font-size: 14px; }
         .ai-hero h2 { font-size: 28px; font-weight: 800; margin-bottom: 8px; line-height: 1.2; }
         .ai-hero p { font-size: 14px; opacity: 0.88; margin-bottom: 20px; }
@@ -339,6 +350,7 @@
             tasks = await res.json();
         } catch(e) { tasks = []; }
         updateContext();
+        // Update notif badge
         const unfinished = tasks.filter(t => !t.selesai).length;
         const badge = document.getElementById('notifBadge');
         if (badge) badge.textContent = unfinished;
@@ -353,22 +365,16 @@
         document.getElementById('chipPct').textContent = `📊 ${pct}% progress`;
     }
 
-    // ======= MOOD ======= dengan auto-generate =======
+    // ======= MOOD =======
     document.querySelectorAll('.mood-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
-            if (selectedMood === btn.dataset.mood) { 
-                selectedMood = ''; 
-                return; 
-            }
-            btn.classList.add('selected');
-            selectedMood = btn.dataset.mood;
-            // 🔥 OTOMATIS GENERATE saat mood dipilih
-            generateMotivation();
+            if (selectedMood === btn.dataset.mood) { selectedMood = ''; }
+            else { btn.classList.add('selected'); selectedMood = btn.dataset.mood; }
         });
     });
 
-    // ======= AI GENERATE dengan prompt yang lebih kuat =======
+    // ======= AI GENERATE — via backend proxy + fallback lokal yang lebih kaya =======
     async function generateMotivation() {
         const btn = document.getElementById('generateBtn');
         const icon = document.getElementById('generateIcon');
@@ -384,24 +390,10 @@
         const pending = tasks.filter(t => !t.selesai);
         const cats = [...new Set(pending.map(t => t.kategori))].join(', ') || 'umum';
         const nearDeadline = pending.filter(t => t.due_date && (new Date(t.due_date) - Date.now()) < 86400000 * 3).length;
+        const moodText = selectedMood ? ` Mood pengguna saat ini: "${selectedMood}".` : '';
 
-        // 🔥 INSTRUKSI MOOD YANG LEBIH SPESIFIK
-        let moodInstruction = '';
-        const moodMap = {
-            'semangat': 'Pengguna sedang merasa SEMANGAT. Berikan motivasi yang ENERJIK, PENUH GAI, dan MEMBANGKITKAN. Gunakan kata-kata yang kuat dan optimis. Contoh: "Ayo!", "Kamu hebat!", "Teruskan!".',
-            'lelah': 'Pengguna sedang merasa LELAH. Berikan motivasi yang LEMBUT, MENENANGKAN, dan MEMBERI RUANG ISTIRAHAT. Jangan paksa, tapi ingatkan bahwa istirahat adalah bagian dari produktivitas. Contoh: "Istirahatlah sejenak", "Kamu sudah melakukan banyak hal".',
-            'stres': 'Pengguna sedang merasa STRES. Berikan motivasi yang MENENANGKAN, MEMBUMIKAN, dan TIDAK MENAMBAH TEKANAN. Fokus pada satu langkah kecil dan ketenangan. Contoh: "Tenang", "Satu demi satu", "Kamu bisa melewati ini".',
-            'bingung': 'Pengguna sedang merasa BINGUNG. Berikan motivasi yang MEMBERI ARAH JELAS, SEDERHANA, dan MENENANGKAN. Bantu mereka fokus pada satu hal yang paling jelas. Contoh: "Mulai dari yang paling mudah", "Satu langkah saja".',
-            'biasa': 'Pengguna sedang merasa BIASA SAJA. Berikan motivasi yang MENGGERAKKAN, POSITIF, dan SEGAR. Bantu mereka keluar dari rutinitas dengan semangat baru. Contoh: "Hari ini bisa jadi luar biasa", "Coba satu hal baru".',
-            'senang': 'Pengguna sedang merasa SENANG. Berikan motivasi yang CELEBRATIVE, PENUH SYUKUR, dan MEMPERKUAT kebahagiaan mereka. Contoh: "Rayakan momen ini!", "Kamu luar biasa!".'
-        };
-        if (selectedMood && moodMap[selectedMood]) {
-            moodInstruction = moodMap[selectedMood];
-        } else {
-            moodInstruction = 'Berikan motivasi yang hangat dan sesuai dengan situasi pengguna.';
-        }
-
-        const prompt = `Kamu adalah motivator produktivitas yang sangat empatis untuk aplikasi RemindU. Nama pengguna: ${displayName}.
+        // Prompt yang lebih kaya dan personal
+        const prompt = `Kamu adalah motivator produktivitas empatis untuk aplikasi RemindU. Nama pengguna: ${displayName}.
 
 Konteks task pengguna saat ini:
 - Total task: ${total}
@@ -409,13 +401,12 @@ Konteks task pengguna saat ini:
 - Task tertunda: ${pending.length}
 - Kategori belum selesai: ${cats}
 - Task mendekati deadline (3 hari): ${nearDeadline}
+${moodText}
 
-${moodInstruction}
-
-Berikan motivasi yang SANGAT personal, hangat, dan relevan dengan situasi nyata pengguna ini. Sebutkan nama "${displayName}" di dalam pesannya. Jika ada task mendekati deadline, singgung itu dengan cara yang tidak menekan (kecuali mood semangat). Jika progress tinggi, puji spesifik. Jika progress rendah, berikan semangat lembut tanpa menghakimi.
+Berikan motivasi yang SANGAT personal, hangat, dan relevan dengan situasi nyata pengguna ini. Sebutkan nama "${displayName}" di dalam pesannya. Jika ada task mendekati deadline, singgung itu. Jika progress tinggi, puji spesifik. Jika progress rendah, berikan semangat lembut tanpa menghakimi.
 
 Balas HANYA dalam format JSON valid tanpa markdown, tanpa penjelasan tambahan:
-{"icon":"<1 emoji>","title":"<judul inspiratif max 6 kata>","msg":"<3-4 kalimat motivasi yang sangat personal, hangat, dan spesifik untuk ${displayName} berdasarkan data di atas dan instruksi mood>"}`;
+{"icon":"<1 emoji>","title":"<judul inspiratif max 6 kata>","msg":"<3-4 kalimat motivasi yang sangat personal, hangat, dan spesifik untuk ${displayName} berdasarkan data di atas>"}`;
 
         try {
             let rawText = '';
@@ -432,7 +423,7 @@ Balas HANYA dalam format JSON valid tanpa markdown, tanpa penjelasan tambahan:
                     throw new Error('proxy_failed');
                 }
             } catch (proxyErr) {
-                // Fallback langsung ke Anthropic (jika ada API key di frontend)
+                // Fallback: langsung ke Anthropic (butuh API key di frontend — hanya untuk development)
                 const directRes = await fetch('https://api.anthropic.com/v1/messages', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -452,7 +443,7 @@ Balas HANYA dalam format JSON valid tanpa markdown, tanpa penjelasan tambahan:
             showResult(parsed);
 
         } catch(e) {
-            // Fallback lokal yang lebih kaya
+            // Fallback motivasi lokal dengan lebih banyak variasi
             lastGenerated = generateLocalMotivation(displayName, total, done, pct, selectedMood, nearDeadline);
             showResult(lastGenerated);
         } finally {
@@ -463,7 +454,7 @@ Balas HANYA dalam format JSON valid tanpa markdown, tanpa penjelasan tambahan:
         }
     }
 
-    // ======= FALLBACK LOKAL DENGAN SEMUA MOOD =======
+    // ======= FALLBACK LOKAL DENGAN VARIASI LEBIH BANYAK =======
     function generateLocalMotivation(name, total, done, pct, mood, nearDeadline) {
         const pending = total - done;
         const random = (arr) => arr[Math.floor(Math.random() * arr.length)];
@@ -484,7 +475,7 @@ Balas HANYA dalam format JSON valid tanpa markdown, tanpa penjelasan tambahan:
             ]);
         }
 
-        // 3. PROGRESS RENDAH + DEADLINE DEKAT
+        // 3. PROGRESS SANGAT RENDAH (0-20%) dan ada deadline
         if (pct < 20 && nearDeadline > 0) {
             return random([
                 { icon: '🔥', title: 'Waktunya Bergerak!', msg: `${name}, kamu punya ${nearDeadline} task mendekati deadline dan progressmu baru ${pct}%. Jangan panik, tapi bergeraklah sekarang. Pilih satu task terkecil yang bisa kamu selesaikan dalam 10 menit — kemenangan kecil akan memicu momentum besar.` },
@@ -492,39 +483,41 @@ Balas HANYA dalam format JSON valid tanpa markdown, tanpa penjelasan tambahan:
             ]);
         }
 
-        // 4. BERDASARKAN MOOD (DENGAN VARIASI UNIK)
-        const moodMessages = {
-            semangat: [
-                { icon: '⚡', title: 'Energi Positif!', msg: `${name}, semangatmu adalah aset terbesarmu hari ini! Kamu sudah ${done} task selesai, dan energi ini akan membawamu menyelesaikan sisanya. Teruslah bergerak, ${name}, kamu sedang dalam momentum yang luar biasa!` },
-                { icon: '🔥', title: 'Bakar Semangatmu!', msg: `${name}, hari ini adalah milikmu! Dengan ${done} task sudah selesai, kamu sudah membuktikan bahwa kamu bisa. Ambil satu lagi, dan rasakan kemenangan berikutnya. Kamu hebat, jangan ragu!` }
-            ],
-            lelah: [
-                { icon: '🌙', title: 'Istirahat Sejenak, Lanjut Lagi', msg: `${name}, wajar kalau lelah — tubuh dan pikiran juga butuh rehat. Kamu sudah ${done} task selesai, itu luar biasa. Ambil napas sejenak, minum air, dan kembali dengan energi segar. Kamu pasti bisa melanjutkan!` },
-                { icon: '🛌', title: 'Waktu untuk Mengisi Energi', msg: `${name}, kelelahan adalah tanda bahwa kamu sudah berusaha keras. Istirahatlah sebentar, jangan merasa bersalah. Setelah rehat, kamu akan lebih fokus dan siap menyelesaikan ${pending} task tersisa.` }
-            ],
-            stres: [
-                { icon: '🌊', title: 'Tenang, Satu Langkah Saja', msg: `${name}, stres itu wajar, tapi jangan biarkan itu menghentikanmu. Fokus pada satu task terkecil dulu — selesaikan itu, dan rasakan lega. Dari ${pending} task yang tersisa, cukup pilih satu untuk sekarang. Kamu bisa melewati ini.` },
-                { icon: '🧘', title: 'Bawa Ketenangan dalam Tindakan', msg: `${name}, saat stres, kita cenderung melihat semuanya berat. Tapi ${done} task sudah kamu selesaikan — itu bukti bahwa kamu mampu. Ambil satu langkah kecil sekarang, dan biarkan ketenangan datang bersama gerakan.` }
-            ],
-            bingung: [
-                { icon: '🧭', title: 'Mulai dari yang Paling Jelas', msg: `${name}, kebingungan adalah bagian dari proses. Pilih task yang paling sederhana dan paling kamu pahami — mulai dari sana. Kejelasan datang dari bergerak, bukan dari menunggu. Kamu sudah ${done} bukti bahwa kamu bisa!` },
-                { icon: '🔦', title: 'Fokus pada Satu Titik Terang', msg: `${name}, saat bingung, kita kehilangan arah. Lihat ${pending} task yang tersisa, pilih satu yang paling mudah, dan kerjakan. Arah akan muncul saat kamu mulai bergerak. Kamu kuat, ${name}!` }
-            ],
-            biasa: [
-                { icon: '🌟', title: 'Hari Biasa, Peluang Luar Biasa', msg: `${name}, hari biasa adalah panggung untuk hal-hal luar biasa. Kamu sudah ${done} task selesai, dan ${pending} lagi menunggu. Ambil satu task yang paling membosankan, dan selesaikan dengan semangat baru. Kamu bisa mengubah hari ini menjadi luar biasa!` },
-                { icon: '🌤️', title: 'Mulai dengan Satu Langkah', msg: `${name}, kadang hari biasa terasa berat. Tapi ${done} task yang sudah selesai adalah bukti bahwa kamu bergerak. Selesaikan satu lagi, dan lihat bagaimana hari ini berubah. Kamu lebih kuat dari yang kamu kira.` }
-            ],
-            senang: [
-                { icon: '😊', title: 'Rayakan Kebahagiaanmu!', msg: `${name}, kebahagiaan adalah bahan bakar terbaik. Kamu sudah ${done} task selesai — lanjutkan dengan senyuman. Hari ini adalah hari yang indah, dan kamu adalah bagian dari keindahan itu. Selesaikan sisanya dengan ringan dan penuh sukacita!` },
-                { icon: '🎈', title: 'Energi Gembira Membawa Hasil', msg: `${name}, suasana hatimu yang cerah adalah kekuatan. ${done} task telah selesai, dan ${pending} lagi siap untuk ditaklukkan. Kerjakan dengan penuh semangat, dan nikmati setiap momen. Kamu luar biasa!` }
-            ]
-        };
-
-        if (mood && moodMessages[mood]) {
-            return random(moodMessages[mood]);
+        // 4. PROGRESS RENDAH (0-30%) tanpa deadline
+        if (pct < 30) {
+            return random([
+                { icon: '💪', title: 'Mulai dari Nol Itu Wajar', msg: `${name}, progress ${pct}% adalah awal yang wajar. Kamu baru menyelesaikan ${done} dari ${total} task — itu bukan kegagalan, itu fondasi. Setiap orang besar pernah di posisi ini. Teruslah, percayalah pada prosesnya.` },
+                { icon: '🌅', title: 'Hari Baru, Semangat Baru', msg: `${name}, ${pct}% mungkin terlihat kecil, tapi ini adalah awal dari perubahan besar. Selesaikan satu task sekarang, dan lihat bagaimana ini mengubah seluruh harimu. Kamu pasti bisa!` }
+            ]);
         }
 
-        // 5. DEFAULT (jika tidak ada kondisi di atas)
+        // 5. PROGRESS SEDANG (30-60%)
+        if (pct >= 30 && pct < 60) {
+            return random([
+                { icon: '🚶', title: 'Terus Bergerak, ${name}!', msg: `${name}, kamu sudah menyelesaikan ${done} dari ${total} task (${pct}%). Jangan berhenti di tengah jalan. Ambil satu task lagi, fokus, dan selesaikan. Momentummu sedang terbangun, pertahankan!` },
+                { icon: '🌊', title: 'Arus Positif Mengalir', msg: `${name}, ${pct}% progress adalah bukti bahwa kamu bergerak. ${done} task sudah selesai — itu nyata dan berarti. Banyak orang berhenti di sini, tapi kamu bukan mereka. Lanjutkan, ${name}!` }
+            ]);
+        }
+
+        // 6. PROGRESS TINGGI (60-99%)
+        if (pct >= 60 && pct < 100) {
+            return random([
+                { icon: '🔥', title: 'Hampir di Garis Finish!', msg: `${name}, ${done} dari ${total} task sudah selesai (${pct}%) — finish line sudah di depan mata! Jangan lengah sekarang. Selesaikan ${pending} task terakhir, dan kamu akan merasakan kepuasan yang luar biasa. Kamu luar biasa!` },
+                { icon: '⭐', title: 'Tinggal Sedikit Lagi!', msg: `${name}, ${pct}% progress — ini adalah fase paling krusial. ${done} task telah kamu taklukkan, ${pending} lagi menunggu. Jangan biarkan kelelahan menghentikanmu. Kamu sudah sejauh ini, kamu pasti bisa menyelesaikan sisanya!` }
+            ]);
+        }
+
+        // 7. BERDASARKAN MOOD (jika dipilih)
+        const moodMap = {
+            lelah: { icon: '🌙', title: 'Istirahat Sejenak, Lanjut Lagi', msg: `${name}, wajar kalau lelah — tubuh dan pikiran juga butuh rehat. Ambil napas sejenak, lalu kembali dengan energi segar. Kamu sudah ${done} task selesai — itu nyata dan berarti!` },
+            stres: { icon: '🌊', title: 'Satu Hal dalam Satu Waktu', msg: `${name}, stres itu tanda kamu peduli. Coba fokus pada satu task terkecil dulu — selesaikan itu, dan rasakan perbedaannya. Dari ${pending} yang tersisa, pilih satu saja untuk sekarang.` },
+            bingung: { icon: '🧭', title: 'Mulai dari yang Paling Jelas', msg: `${name}, saat bingung, pilih task yang paling kamu pahami dan mulai dari sana. Kejelasan muncul dari bergerak, bukan dari menunggu. Kamu punya ${done} bukti nyata bahwa kamu bisa!` },
+            semangat: { icon: '⚡', title: 'Energimu Luar Biasa!', msg: `${name}, semangatmu adalah kunci! Kamu sudah ${done} task selesai — pertahankan energi ini, selesaikan sisanya dengan percaya diri. Hari ini adalah hari yang produktif dan kamu adalah pahlawannya!` },
+            senang: { icon: '😊', title: 'Kebahagiaan adalah Motivasi', msg: `${name}, suasana hatimu yang baik adalah modal besar. Kamu sudah ${done} task selesai — nikmati prosesnya, dan selesaikan sisanya dengan senyuman. Hari ini adalah hari yang menyenangkan!` }
+        };
+        if (mood && moodMap[mood]) return moodMap[mood];
+
+        // 8. DEFAULT (jika tidak ada kondisi di atas)
         return { icon: '💪', title: `Tetap Semangat, ${name}!`, msg: `Progress ${pct}% adalah bukti nyata usahamu, ${name}! Kamu sudah selesaikan ${done} task — setiap yang tercentang itu adalah kemenangan kecil yang nyata. Teruskan, sisanya pasti bisa kamu taklukkan!` };
     }
 
