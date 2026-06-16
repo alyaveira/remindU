@@ -93,7 +93,18 @@
         .ai-hero::before { content:''; position:absolute; top:-60px; right:-40px; width:220px; height:220px; border-radius:50%; background:rgba(255,255,255,0.1); }
         .ai-hero::after { content:''; position:absolute; bottom:-50px; left:20%; width:160px; height:160px; border-radius:50%; background:rgba(255,255,255,0.07); }
         .ai-hero-inner { position: relative; z-index: 2; }
-        .ai-hero-badge { background: rgba(255,255,255,0.2); display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 40px; font-size: 12px; font-weight: 700; margin-bottom: 14px; backdrop-filter: blur(4px); }
+        .ai-hero-badge { 
+            background: rgba(255,255,255,0.2); 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 6px; 
+            padding: 5px 14px; 
+            border-radius: 40px; 
+            font-size: 12px; 
+            font-weight: 700; 
+            margin-bottom: 14px; 
+            backdrop-filter: blur(4px); 
+        }
         .ai-hero-badge i { font-size: 14px; }
         .ai-hero h2 { font-size: 28px; font-weight: 800; margin-bottom: 8px; line-height: 1.2; }
         .ai-hero p { font-size: 14px; opacity: 0.88; margin-bottom: 20px; }
@@ -215,7 +226,7 @@
             <!-- HERO -->
             <div class="ai-hero">
                 <div class="ai-hero-inner">
-                    <div class="ai-hero-badge"><i class="material-icons-round">auto_awesome</i> Powered by Claude AI</div>
+                    <div class="ai-hero-badge"><i class="material-icons-round">auto_awesome</i> AI Motivasi</div>
                     <h2>AI Motivasi Personal</h2>
                     <p>Dapatkan motivasi yang personal dan relevan berdasarkan progress task kamu hari ini. AI akan menganalisis situasimu dan memberikan semangat yang tepat!</p>
                     <div class="ai-context-row" id="contextRow">
@@ -363,7 +374,7 @@
         });
     });
 
-    // ======= AI GENERATE — via backend proxy ATAU langsung ke Anthropic =======
+    // ======= AI GENERATE — via backend proxy + fallback lokal yang lebih kaya =======
     async function generateMotivation() {
         const btn = document.getElementById('generateBtn');
         const icon = document.getElementById('generateIcon');
@@ -381,7 +392,7 @@
         const nearDeadline = pending.filter(t => t.due_date && (new Date(t.due_date) - Date.now()) < 86400000 * 3).length;
         const moodText = selectedMood ? ` Mood pengguna saat ini: "${selectedMood}".` : '';
 
-        // Prompt yang kaya konteks untuk AI yang lebih personal dan akurat
+        // Prompt yang lebih kaya dan personal
         const prompt = `Kamu adalah motivator produktivitas empatis untuk aplikasi RemindU. Nama pengguna: ${displayName}.
 
 Konteks task pengguna saat ini:
@@ -398,7 +409,6 @@ Balas HANYA dalam format JSON valid tanpa markdown, tanpa penjelasan tambahan:
 {"icon":"<1 emoji>","title":"<judul inspiratif max 6 kata>","msg":"<3-4 kalimat motivasi yang sangat personal, hangat, dan spesifik untuk ${displayName} berdasarkan data di atas>"}`;
 
         try {
-            // Coba via backend proxy dulu (lebih aman, API key tersimpan di server)
             let rawText = '';
             try {
                 const proxyRes = await fetch(`${API_URL}/ai/motivasi`, {
@@ -433,7 +443,7 @@ Balas HANYA dalam format JSON valid tanpa markdown, tanpa penjelasan tambahan:
             showResult(parsed);
 
         } catch(e) {
-            // Fallback motivasi lokal berbasis algoritma sederhana
+            // Fallback motivasi lokal dengan lebih banyak variasi
             lastGenerated = generateLocalMotivation(displayName, total, done, pct, selectedMood, nearDeadline);
             showResult(lastGenerated);
         } finally {
@@ -444,26 +454,70 @@ Balas HANYA dalam format JSON valid tanpa markdown, tanpa penjelasan tambahan:
         }
     }
 
-    // Algoritma motivasi lokal sebagai fallback — rule-based berdasarkan konteks nyata user
+    // ======= FALLBACK LOKAL DENGAN VARIASI LEBIH BANYAK =======
     function generateLocalMotivation(name, total, done, pct, mood, nearDeadline) {
+        const pending = total - done;
+        const random = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+        // 1. TIDAK ADA TASK
         if (total === 0) {
-            return { icon: '🚀', title: 'Mulai Hari yang Produktif!', msg: `${name}, kamu belum punya task hari ini — ini saat yang tepat untuk menyusun rencana! Tambahkan task pertamamu dan mulai perjalanan produktivitas yang luar biasa. Setiap pencapaian besar selalu dimulai dari satu langkah kecil.` };
+            return random([
+                { icon: '🚀', title: 'Mulai Hari yang Produktif!', msg: `${name}, hari ini masih kosong — ini saat yang sempurna untuk menyusun rencana. Tambahkan satu task kecil dulu, dan rasakan momentumnya. Setiap perjalanan besar dimulai dari satu langkah kecil yang berani.` },
+                { icon: '🌱', title: 'Tanam Kebiasaan Baru', msg: `${name}, tidak ada task hari ini — itu bukan masalah, tapi kesempatan! Mulai dengan satu tugas kecil. Hari ini adalah awal dari kebiasaan produktif yang akan mengubah hidupmu.` }
+            ]);
         }
+
+        // 2. SEMUA TASK SELESAI
         if (pct === 100) {
-            return { icon: '🏆', title: 'Semua Task Selesai!', msg: `Luar biasa, ${name}! Kamu berhasil menyelesaikan semua ${total} task hari ini — pencapaian yang patut dirayakan! Konsistensi seperti inilah yang membangun kebiasaan produktif jangka panjang. Nikmati hasil kerja kerasmu!` };
+            return random([
+                { icon: '🏆', title: 'Sempurna! Semua Beres!', msg: `Luar biasa, ${name}! Kamu berhasil menyelesaikan ${total} task. Ini bukan hanya tentang menyelesaikan, tapi tentang konsistensi. Hari ini kamu membuktikan bahwa kamu bisa! Nikmati hasilnya, besok siapkan diri untuk tantangan berikutnya!` },
+                { icon: '🎉', title: 'Hari yang Luar Biasa!', msg: `${name}, ${total} task selesai dengan sempurna — itu pencapaian yang patut dirayakan! Kamu telah menunjukkan bahwa dengan fokus dan konsistensi, tidak ada yang mustahil.` }
+            ]);
         }
-        if (nearDeadline > 0 && pct < 50) {
-            return { icon: '⚡', title: 'Waktunya Fokus Penuh!', msg: `${name}, ada ${nearDeadline} task yang mendekati deadline dan progressmu baru ${pct}%. Ini saatnya untuk fokus dan prioritaskan yang paling mendesak dulu. Kamu mampu — satu langkah sekarang jauh lebih baik daripada menunggu sempurna.` };
+
+        // 3. PROGRESS SANGAT RENDAH (0-20%) dan ada deadline
+        if (pct < 20 && nearDeadline > 0) {
+            return random([
+                { icon: '🔥', title: 'Waktunya Bergerak!', msg: `${name}, kamu punya ${nearDeadline} task mendekati deadline dan progressmu baru ${pct}%. Jangan panik, tapi bergeraklah sekarang. Pilih satu task terkecil yang bisa kamu selesaikan dalam 10 menit — kemenangan kecil akan memicu momentum besar.` },
+                { icon: '⚡', title: 'Action Starts Now!', msg: `${name}, deadline semakin dekat dan progressmu ${pct}%. Ini saatnya fokus total. Ambil task yang paling mendesak, kerjakan 25 menit tanpa distraksi. Satu langkah sekarang lebih berharga dari seribu rencana nanti.` }
+            ]);
         }
-        if (pct >= 70) {
-            return { icon: '🔥', title: 'Hampir di Garis Finish!', msg: `Keren banget, ${name}! Kamu sudah selesaikan ${done} dari ${total} task (${pct}%) — finish line sudah di depan mata! Jangan berhenti sekarang, sedikit lagi dan semua akan tuntas. Pertahankan momentum luar biasa ini!` };
+
+        // 4. PROGRESS RENDAH (0-30%) tanpa deadline
+        if (pct < 30) {
+            return random([
+                { icon: '💪', title: 'Mulai dari Nol Itu Wajar', msg: `${name}, progress ${pct}% adalah awal yang wajar. Kamu baru menyelesaikan ${done} dari ${total} task — itu bukan kegagalan, itu fondasi. Setiap orang besar pernah di posisi ini. Teruslah, percayalah pada prosesnya.` },
+                { icon: '🌅', title: 'Hari Baru, Semangat Baru', msg: `${name}, ${pct}% mungkin terlihat kecil, tapi ini adalah awal dari perubahan besar. Selesaikan satu task sekarang, dan lihat bagaimana ini mengubah seluruh harimu. Kamu pasti bisa!` }
+            ]);
         }
+
+        // 5. PROGRESS SEDANG (30-60%)
+        if (pct >= 30 && pct < 60) {
+            return random([
+                { icon: '🚶', title: 'Terus Bergerak, ${name}!', msg: `${name}, kamu sudah menyelesaikan ${done} dari ${total} task (${pct}%). Jangan berhenti di tengah jalan. Ambil satu task lagi, fokus, dan selesaikan. Momentummu sedang terbangun, pertahankan!` },
+                { icon: '🌊', title: 'Arus Positif Mengalir', msg: `${name}, ${pct}% progress adalah bukti bahwa kamu bergerak. ${done} task sudah selesai — itu nyata dan berarti. Banyak orang berhenti di sini, tapi kamu bukan mereka. Lanjutkan, ${name}!` }
+            ]);
+        }
+
+        // 6. PROGRESS TINGGI (60-99%)
+        if (pct >= 60 && pct < 100) {
+            return random([
+                { icon: '🔥', title: 'Hampir di Garis Finish!', msg: `${name}, ${done} dari ${total} task sudah selesai (${pct}%) — finish line sudah di depan mata! Jangan lengah sekarang. Selesaikan ${pending} task terakhir, dan kamu akan merasakan kepuasan yang luar biasa. Kamu luar biasa!` },
+                { icon: '⭐', title: 'Tinggal Sedikit Lagi!', msg: `${name}, ${pct}% progress — ini adalah fase paling krusial. ${done} task telah kamu taklukkan, ${pending} lagi menunggu. Jangan biarkan kelelahan menghentikanmu. Kamu sudah sejauh ini, kamu pasti bisa menyelesaikan sisanya!` }
+            ]);
+        }
+
+        // 7. BERDASARKAN MOOD (jika dipilih)
         const moodMap = {
             lelah: { icon: '🌙', title: 'Istirahat Sejenak, Lanjut Lagi', msg: `${name}, wajar kalau lelah — tubuh dan pikiran juga butuh rehat. Ambil napas sejenak, lalu kembali dengan energi segar. Kamu sudah ${done} task selesai — itu nyata dan berarti!` },
             stres: { icon: '🌊', title: 'Satu Hal dalam Satu Waktu', msg: `${name}, stres itu tanda kamu peduli. Coba fokus pada satu task terkecil dulu — selesaikan itu, dan rasakan perbedaannya. Dari ${pending} yang tersisa, pilih satu saja untuk sekarang.` },
-            bingung: { icon: '🧭', title: 'Mulai dari yang Paling Jelas', msg: `${name}, saat bingung, pilih task yang paling kamu pahami dan mulai dari sana. Kejelasan muncul dari bergerak, bukan dari menunggu. Kamu punya ${done} bukti nyata bahwa kamu bisa!` }
+            bingung: { icon: '🧭', title: 'Mulai dari yang Paling Jelas', msg: `${name}, saat bingung, pilih task yang paling kamu pahami dan mulai dari sana. Kejelasan muncul dari bergerak, bukan dari menunggu. Kamu punya ${done} bukti nyata bahwa kamu bisa!` },
+            semangat: { icon: '⚡', title: 'Energimu Luar Biasa!', msg: `${name}, semangatmu adalah kunci! Kamu sudah ${done} task selesai — pertahankan energi ini, selesaikan sisanya dengan percaya diri. Hari ini adalah hari yang produktif dan kamu adalah pahlawannya!` },
+            senang: { icon: '😊', title: 'Kebahagiaan adalah Motivasi', msg: `${name}, suasana hatimu yang baik adalah modal besar. Kamu sudah ${done} task selesai — nikmati prosesnya, dan selesaikan sisanya dengan senyuman. Hari ini adalah hari yang menyenangkan!` }
         };
         if (mood && moodMap[mood]) return moodMap[mood];
+
+        // 8. DEFAULT (jika tidak ada kondisi di atas)
         return { icon: '💪', title: `Tetap Semangat, ${name}!`, msg: `Progress ${pct}% adalah bukti nyata usahamu, ${name}! Kamu sudah selesaikan ${done} task — setiap yang tercentang itu adalah kemenangan kecil yang nyata. Teruskan, sisanya pasti bisa kamu taklukkan!` };
     }
 
@@ -481,10 +535,9 @@ Balas HANYA dalam format JSON valid tanpa markdown, tanpa penjelasan tambahan:
     document.getElementById('generateBtn').addEventListener('click', generateMotivation);
     document.getElementById('btnRegen').addEventListener('click', generateMotivation);
 
-    // ======= SAVE ke localStorage DAN minta backend simpan ke DB =======
+    // ======= SAVE ke localStorage =======
     document.getElementById('btnSave').addEventListener('click', async () => {
         if (!lastGenerated) return;
-        // Simpan di localStorage
         const savedLocal = JSON.parse(localStorage.getItem('remindu_saved_motivs') || '[]');
         const newEntry = { ...lastGenerated, id: Date.now(), savedAt: new Date().toISOString() };
         savedLocal.unshift(newEntry);
@@ -497,17 +550,15 @@ Balas HANYA dalam format JSON valid tanpa markdown, tanpa penjelasan tambahan:
         setTimeout(() => { btn.innerHTML = '<i class="material-icons-round">bookmark</i> Simpan'; btn.style.background = ''; }, 2500);
     });
 
-    // ======= RENDER SAVED — gabung dari localStorage + backend history =======
+    // ======= RENDER SAVED =======
     async function renderSaved() {
         const container = document.getElementById('savedList');
         let items = JSON.parse(localStorage.getItem('remindu_saved_motivs') || '[]');
 
-        // Juga load history dari backend (AI yang pernah di-generate)
         try {
             const res = await fetch(`${API_URL}/ai/motivasi/history`, { headers: { 'X-User-Email': userEmail } });
             if (res.ok) {
                 const history = await res.json();
-                // Merge — hindari duplikat berdasarkan title+msg
                 const localTitles = new Set(items.map(i => i.title));
                 history.forEach(h => {
                     if (h.response_title && !localTitles.has(h.response_title)) {
@@ -552,7 +603,6 @@ Balas HANYA dalam format JSON valid tanpa markdown, tanpa penjelasan tambahan:
     loadTasks();
     renderSaved();
 })();
-
 </script>
 </body>
 </html>
