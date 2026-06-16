@@ -761,6 +761,7 @@
         }
         dueDateInput.addEventListener('change', updateDeadlinePreview);
 
+        // Fungsi fallback untuk menyimpan secara lokal (jika backend gagal)
         function saveTaskToLocalStorage(taskData) {
             const STORAGE_KEY = `remindu_tasks_${userEmail}`;
             const savedTasks = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
@@ -780,6 +781,7 @@
             return newTask;
         }
 
+        // ===== PERBAIKAN UTAMA =====
         document.getElementById('addBtn').addEventListener('click', async () => {
             const judul    = document.getElementById('taskTitle').value.trim();
             const notes    = document.getElementById('taskNotes').value.trim();
@@ -798,26 +800,51 @@
             addBtn.disabled = true;
             addBtn.textContent = 'Menyimpan...';
 
-            const newTask = saveTaskToLocalStorage({ judul, kategori, notes, due_date, remind_at });
-            
-            const STORAGE_KEY = `remindu_tasks_${userEmail}`;
-            window.dispatchEvent(new StorageEvent('storage', { key: STORAGE_KEY, newValue: localStorage.getItem(STORAGE_KEY) }));
-            
-            showToast('✅ Task berhasil ditambahkan!', 'success');
-            
+            // Siapkan data untuk dikirim
+            const taskData = { judul, kategori, notes, due_date, remind_at };
+
             try {
-                await fetch('/api/tasks', {
+                // 1. Kirim ke backend
+                const response = await fetch('/api/tasks', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-User-Email': userEmail },
-                    body: JSON.stringify({ judul, kategori, notes, due_date, remind_at })
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'X-User-Email': userEmail
+                    },
+                    body: JSON.stringify(taskData)
                 });
-            } catch(e) {
+
+                if (response.ok) {
+                    // Backend mengembalikan task yang sudah tersimpan dengan ID-nya
+                    const savedTask = await response.json();
+                    // Simpan ke localStorage dengan ID dari backend
+                    const STORAGE_KEY = `remindu_tasks_${userEmail}`;
+                    const savedTasks = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                    savedTasks.unshift(savedTask);
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(savedTasks));
+                    showToast('✅ Task berhasil ditambahkan!', 'success');
+                } else {
+                    // Jika backend gagal, gunakan fallback lokal
+                    const newTask = saveTaskToLocalStorage(taskData);
+                    showToast('⚠️ Disimpan lokal (backend error)', 'error');
+                }
+            } catch (e) {
+                // Fallback jika network error
+                const newTask = saveTaskToLocalStorage(taskData);
+                showToast('⚠️ Disimpan lokal (koneksi gagal)', 'error');
                 console.log('Backend sync gagal, data tetap tersimpan di lokal');
             }
-            
-            setTimeout(() => window.location.href = 'home.html', 900);
+
+            // Kirim event storage agar halaman lain (home) mendeteksi perubahan
+            const STORAGE_KEY = `remindu_tasks_${userEmail}`;
+            window.dispatchEvent(new StorageEvent('storage', { 
+                key: STORAGE_KEY, 
+                newValue: localStorage.getItem(STORAGE_KEY) 
+            }));
+
             addBtn.disabled = false;
             addBtn.textContent = 'Simpan';
+            setTimeout(() => window.location.href = 'home.html', 900);
         });
 
         function showToast(msg, type) {
