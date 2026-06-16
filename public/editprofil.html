@@ -41,7 +41,7 @@
         .password-note { font-size: 12px; color: #94a3b8; margin-top: 6px; }
         @media (min-width: 768px) { .page-content { padding: 40px 48px; } }
 
-        /* ========== DARK MODE CSS ========== */
+        /* ========== DARK MODE ========== */
         [data-theme="dark"] body { background: linear-gradient(145deg, #0a0a0f 0%, #0f0f15 100%); }
         [data-theme="dark"] .container { background: #1a1a24; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.4); }
         [data-theme="dark"] .btn-back { color: #a78bfa; }
@@ -63,16 +63,16 @@
 <div class="container">
     <div class="page-content">
         <div class="header">
-            <button class="btn-back" id="backBtn">← Back</button>
+            <button class="btn-back" id="backBtn">← Kembali</button>
             <h2>Edit Profil</h2>
-            <button class="btn-save" id="saveBtn">Save</button>
+            <button class="btn-save" id="saveBtn">Simpan</button>
         </div>
 
         <div class="avatar-section">
             <div class="avatar-preview" id="avatarPreview">👤</div>
             <div class="avatar-buttons">
-                <button id="changeAvatarBtn"><i class="material-icons-round">style</i> Change Avatar</button>
-                <button id="changePhotoBtn"><i class="material-icons-round">photo_camera</i> Change Photo</button>
+                <button id="changeAvatarBtn"><i class="material-icons-round">style</i> Ganti Avatar</button>
+                <button id="changePhotoBtn"><i class="material-icons-round">photo_camera</i> Upload Foto</button>
             </div>
         </div>
 
@@ -88,14 +88,14 @@
         </div>
 
         <div class="form-group">
-            <label>First Name</label>
+            <label>Nama Depan</label>
             <div class="input-wrapper">
                 <input type="text" id="firstName" placeholder="Nama depan">
                 <i class="material-icons-round">edit</i>
             </div>
         </div>
         <div class="form-group">
-            <label>Last Name</label>
+            <label>Nama Belakang</label>
             <div class="input-wrapper">
                 <input type="text" id="lastName" placeholder="Nama belakang">
                 <i class="material-icons-round">edit</i>
@@ -105,29 +105,28 @@
         <hr>
 
         <div class="form-group">
-            <label>New Password (opsional)</label>
+            <label>Password Baru (opsional)</label>
             <div class="input-wrapper">
                 <input type="password" id="newPassword" placeholder="Kosongkan jika tidak ingin ganti password">
                 <i class="material-icons-round">lock</i>
             </div>
         </div>
         <div class="form-group">
-            <label>Confirm New Password</label>
+            <label>Konfirmasi Password Baru</label>
             <div class="input-wrapper">
-                <input type="password" id="confirmPassword" placeholder="">
+                <input type="password" id="confirmPassword" placeholder="Ulangi password baru">
                 <i class="material-icons-round">lock</i>
             </div>
         </div>
-        <div class="password-note">Password minimal 8 karakter, huruf kecil & angka.</div>
+        <div class="password-note">Password minimal 8 karakter, huruf kecil &amp; angka.</div>
     </div>
 </div>
 
-<button id="darkFab" style="position:fixed;bottom:88px;right:18px;z-index:9999;width:44px;height:44px;border-radius:50%;border:none;background:var(--purple);color:white;font-size:20px;cursor:pointer;box-shadow:0 4px 14px rgba(139,92,246,0.35);display:flex;align-items:center;justify-content:center;">🌙</button>
+<button id="darkFab" style="position:fixed;bottom:88px;right:18px;z-index:9999;width:44px;height:44px;border-radius:50%;border:none;background:#8b5cf6;color:white;font-size:20px;cursor:pointer;box-shadow:0 4px 14px rgba(139,92,246,0.35);display:flex;align-items:center;justify-content:center;">🌙</button>
 
 <script>
-    // ===== PERUBAHAN: API URL ke localhost =====
-    const API_URL = 'http://localhost:3000/api';
-    // =========================================
+    // ✅ PERBAIKAN: API URL pakai path relatif (bukan localhost)
+    const API_URL = '/api';
 
     const userData = JSON.parse(localStorage.getItem('remindu_user') || '{}');
     const userEmail = userData.email;
@@ -182,7 +181,7 @@
             lastNameInput.value = data.nama_belakang || '';
         } catch (err) {
             console.error('Load profile error:', err);
-            alert('Gagal memuat profil: ' + err.message + '\n\nPastikan backend berjalan di http://localhost:3000');
+            alert('Gagal memuat profil: ' + err.message);
         }
     }
 
@@ -226,10 +225,11 @@
             localStorage.setItem('user_avatar', currentAvatar);
             
             const updatedUser = JSON.parse(localStorage.getItem('remindu_user') || '{}');
-            updatedUser.firstName = firstName;
+            updatedUser.nama_depan = firstName;
+            updatedUser.nama_belakang = lastName;
             localStorage.setItem('remindu_user', JSON.stringify(updatedUser));
             
-            alert('Profil berhasil diperbarui!');
+            alert('✅ Profil berhasil diperbarui!');
             window.location.href = 'profil.html';
         } catch (err) {
             alert('Error: ' + err.message);
