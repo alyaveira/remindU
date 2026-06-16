@@ -121,6 +121,10 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- Import SDK Supabase dan Konfigurasi -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+
 <script>
     function showToast(msg, type = '') {
         const t = document.getElementById('toast');
@@ -177,6 +181,7 @@
         return valid;
     }
 
+    // Proses Submit menggunakan Supabase Auth
     document.getElementById('signupForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         if (!validateForm()) return;
@@ -192,22 +197,38 @@
         const password = document.getElementById('signupPassword').value;
 
         try {
-            const response = await fetch('/api/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ firstName, lastName, email, password, terms: true })
+            // Memanggil API Supabase untuk Registrasi
+            const { data, error } = await supabase.auth.signUp({
+                email: email,
+                password: password,
+                options: {
+                    data: {
+                        first_name: firstName,
+                        last_name: lastName
+                    }
+                }
             });
-            const data = await response.json();
-            if (response.ok) {
-                // Simpan email untuk verifikasi OTP
-                localStorage.setItem('pending_verification_email', email);
-                showToast('✅ Registrasi berhasil! Cek email untuk kode OTP.', 'success');
-                // Arahkan ke halaman verifikasi OTP
-                setTimeout(() => window.location.href = 'verify.html', 2000);
-            } else {
-                showToast(data.error || 'Registrasi gagal', 'error');
+
+            if (error) {
+                showToast(error.message || 'Registrasi gagal', 'error');
                 btn.disabled = false;
                 btn.innerHTML = originalText;
+            } else {
+                // Notifikasi sesuai instruksi "Confirm Email"
+                showToast('✅ Registrasi berhasil! Silakan cek kotak masuk atau folder spam email Anda untuk mengklik link verifikasi sebelum login.', 'success');
+                
+                // Mengosongkan form setelah berhasil
+                document.getElementById('signupForm').reset();
+                document.getElementById('strengthFill').style.width = '0';
+                document.getElementById('strengthLabel').textContent = 'Password minimal 8 karakter, huruf kecil & angka';
+                
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+
+                // Jika kamu memiliki halaman khusus untuk verifikasi kode OTP (bukan magic link),
+                // kamu bisa menghapus tanda // pada dua baris di bawah ini:
+                // localStorage.setItem('pending_verification_email', email);
+                // setTimeout(() => window.location.href = 'verify.html', 3000);
             }
         } catch (err) {
             showToast('Terjadi kesalahan jaringan. Coba lagi.', 'error');
@@ -216,9 +237,18 @@
         }
     });
 
-    // Google Register
-    document.getElementById('googleRegisterBtn').addEventListener('click', () => {
-        window.location.href = '/auth/google';
+    // Proses Google Login menggunakan Supabase Auth
+    document.getElementById('googleRegisterBtn').addEventListener('click', async () => {
+        const { error } = await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: 'https://remindu-2.vercel.app/auth/google/callback'
+            }
+        });
+        
+        if (error) {
+            showToast('Gagal mendaftar dengan Google', 'error');
+        }
     });
 </script>
 </body>
