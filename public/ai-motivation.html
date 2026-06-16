@@ -268,7 +268,9 @@
         <div class="bnav-item" data-nav="settings"><i class="material-icons-round">settings</i><span>Setting</span></div>
     </nav>
 </div>
-<script>
+<script type="module">
+import { supabase } from './supabase-config.js';
+
 (function() {
     const API_URL = 'http://localhost:3000/api';
     const userData = JSON.parse(localStorage.getItem('remindu_user') || '{}');
@@ -334,24 +336,39 @@
 
     async function loadTasks() {
         try {
-            const res = await fetch(`${API_URL}/tasks`, { headers: { 'X-User-Email': userEmail } });
-            if (!res.ok) throw new Error();
-            tasks = await res.json();
-        } catch(e) { tasks = []; }
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) throw new Error('Not logged in via Supabase Auth');
+
+            const { data, error } = await supabase
+                .from('tasks')
+                .select('*')
+                .eq('user_id', user.id);
+            
+            if (error) throw error;
+            tasks = data || [];
+        } catch(e) { 
+            console.error('Error fetching tasks from Supabase:', e);
+            tasks = []; 
+        }
         updateContext();
         // Update notif badge
-        const unfinished = tasks.filter(t => !t.selesai).length;
+        const unfinished = tasks.filter(t => !t.selesai && !t.completed).length;
         const badge = document.getElementById('notifBadge');
         if (badge) badge.textContent = unfinished;
     }
 
     function updateContext() {
         const total = tasks.length;
-        const done = tasks.filter(t => t.selesai).length;
-        const pct = total === 0 ? 0 : Math.round(done / total * 100);
-        document.getElementById('chipTotal').textContent = `📋 ${total} task`;
-        document.getElementById('chipDone').textContent = `✅ ${done} selesai`;
-        document.getElementById('chipPct').textContent = `📊 ${pct}% progress`;
+        const done = tasks.filter(t => t.selesai || t.completed).length;
+        const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+        
+        const chipTotal = document.getElementById('chipTotal');
+        const chipDone = document.getElementById('chipDone');
+        const chipPct = document.getElementById('chipPct');
+        
+        if (chipTotal) chipTotal.textContent = `📋 ${total} task`;
+        if (chipDone) chipDone.textContent = `✅ ${done} selesai`;
+        if (chipPct) chipPct.textContent = `📊 ${pct}% progress`;
     }
 
     // ======= MOOD =======
