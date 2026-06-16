@@ -117,11 +117,10 @@
             color: var(--text);
         }
 
-        /* User card di atas */
         .user-card {
             background: linear-gradient(135deg, var(--purple) 0%, #6d28d9 60%, #4f46e5 100%);
             border-radius: 24px;
-            padding: 20px 20px 20px 20px;
+            padding: 20px;
             display: flex;
             align-items: center;
             gap: 16px;
@@ -294,7 +293,7 @@
             font-size: 20px;
         }
 
-        /* About modal */
+        /* MODAL UMUM */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -314,7 +313,7 @@
             background: var(--white);
             border-radius: 28px;
             padding: 32px 28px;
-            max-width: 340px;
+            max-width: 400px;
             width: 90%;
             text-align: center;
             animation: modalIn 0.25s ease;
@@ -325,7 +324,6 @@
                 opacity: 0;
                 transform: scale(0.9);
             }
-
             to {
                 opacity: 1;
                 transform: scale(1);
@@ -369,53 +367,76 @@
             background: var(--purple-dark);
         }
 
-        /* Language modal */
-        .lang-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin: 12px 0 16px;
-            text-align: left;
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
         }
 
-        .lang-option {
-            padding: 12px 16px;
-            border-radius: 16px;
+        .btn-secondary:hover {
+            background: var(--purple-light);
+            color: var(--purple);
+            border-color: var(--purple-light);
+        }
+
+        .backup-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 16px 0 8px;
+        }
+
+        .backup-btn {
+            padding: 14px;
+            border-radius: 20px;
             border: 2px solid var(--border);
+            background: var(--bg);
             cursor: pointer;
+            font-weight: 600;
             font-size: 14px;
-            font-weight: 500;
             color: var(--text);
             transition: all 0.2s;
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
+            gap: 8px;
         }
 
-        .lang-option:hover {
-            border-color: var(--purple);
-            background: var(--purple-light);
-        }
-
-        .lang-option.active {
+        .backup-btn:hover {
             border-color: var(--purple);
             background: var(--purple-light);
             color: var(--purple);
-            font-weight: 700;
         }
 
-        .lang-option span {
-            margin-left: auto;
-            font-size: 16px;
+        .backup-btn.export {
+            background: var(--purple);
+            color: white;
+            border-color: var(--purple);
         }
 
-        @media (min-width: 768px) {
-            .page-content {
-                padding: 40px 48px;
-            }
+        .backup-btn.export:hover {
+            background: var(--purple-dark);
+            border-color: var(--purple-dark);
         }
 
-        /* ========== DARK MODE CSS ========== */
+        .file-input-wrap {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input-wrap input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        /* Dark mode */
         [data-theme="dark"] {
             --purple: #a78bfa;
             --purple-dark: #8b5cf6;
@@ -436,18 +457,6 @@
             box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.3);
         }
 
-        [data-theme="dark"] .btn-back {
-            color: var(--purple);
-        }
-
-        [data-theme="dark"] .btn-back:hover {
-            background: var(--purple-light);
-        }
-
-        [data-theme="dark"] h2 {
-            color: var(--text);
-        }
-
         [data-theme="dark"] .menu-item {
             background: #13131e;
             border-color: var(--border);
@@ -465,10 +474,6 @@
             color: var(--text-muted);
         }
 
-        [data-theme="dark"] .section-divider {
-            color: var(--text-muted);
-        }
-
         [data-theme="dark"] .modal {
             background: var(--white);
         }
@@ -481,20 +486,26 @@
             color: var(--text-muted);
         }
 
-        [data-theme="dark"] .lang-option {
+        [data-theme="dark"] .backup-btn {
+            background: #13131e;
             border-color: var(--border);
             color: var(--text);
         }
 
-        [data-theme="dark"] .lang-option:hover {
-            border-color: var(--purple);
+        [data-theme="dark"] .backup-btn:hover {
             background: var(--purple-light);
+            border-color: var(--purple);
+            color: var(--purple);
         }
 
-        [data-theme="dark"] .lang-option.active {
+        [data-theme="dark"] .backup-btn.export {
+            background: var(--purple);
+            color: white;
             border-color: var(--purple);
-            background: var(--purple-light);
-            color: var(--purple);
+        }
+
+        [data-theme="dark"] .backup-btn.export:hover {
+            background: var(--purple-dark);
         }
 
         [data-theme="dark"] .bg-blob-1,
@@ -615,20 +626,44 @@
         </div>
     </div>
 
-    <!-- Language Modal - HANYA BAHASA INDONESIA -->
+    <!-- Language Modal -->
     <div class="modal-overlay" id="langModal">
         <div class="modal">
             <div class="modal-icon">🌐</div>
             <h3>Pilih Bahasa</h3>
-            <div class="lang-list">
-                <div class="lang-option active" data-lang="id">🇮🇩 Indonesia <span>✓</span></div>
+            <div class="lang-list" style="display:flex;flex-direction:column;gap:8px;margin:12px 0 16px;text-align:left;">
+                <div class="lang-option active" data-lang="id"
+                    style="padding:12px 16px;border-radius:16px;border:2px solid var(--border);cursor:pointer;font-size:14px;font-weight:500;color:var(--text);transition:all 0.2s;display:flex;align-items:center;gap:10px;">
+                    🇮🇩 Indonesia <span style="margin-left:auto;">✓</span>
+                </div>
             </div>
             <button class="modal-close" id="langClose">Simpan</button>
         </div>
     </div>
 
+    <!-- ===== NEW: DATA BACKUP MODAL ===== -->
+    <div class="modal-overlay" id="backupModal">
+        <div class="modal">
+            <div class="modal-icon">💾</div>
+            <h3>Backup Data</h3>
+            <p>Ekspor atau impor data task kamu dalam format JSON.</p>
+            <div class="backup-actions">
+                <button class="backup-btn export" id="exportBtn">
+                    <i class="material-icons-round">download</i> Export JSON
+                </button>
+                <div class="file-input-wrap">
+                    <button class="backup-btn" id="importBtn">
+                        <i class="material-icons-round">upload</i> Import JSON
+                    </button>
+                    <input type="file" id="fileInput" accept=".json">
+                </div>
+            </div>
+            <button class="modal-close btn-secondary" id="backupClose">Tutup</button>
+        </div>
+    </div>
+
     <script>
-        const API_URL = 'http://localhost:3000/api';
+        const API_URL = '/api';
         const userData = JSON.parse(localStorage.getItem('remindu_user') || '{}');
         if (!userData.email) { alert('Sesi login tidak ditemukan.'); window.location.href = 'welcome.html'; }
         const userEmail = userData.email;
@@ -656,7 +691,8 @@
             try {
                 const res = await fetch(`${API_URL}/profile`, { headers: { 'X-User-Email': userEmail } });
                 const data = await res.json();
-                if (data.nama_depan) document.getElementById('profileName').textContent = data.nama_depan + ' ' + (data.nama_belakang || '');
+                if (data.nama_depan) document.getElementById('profileName').textContent = data.nama_depan + ' ' + (data
+                    .nama_belakang || '');
             } catch { document.getElementById('profileName').textContent = userEmail.split('@')[0]; }
 
             try {
@@ -668,19 +704,15 @@
         }
         loadProfile();
 
-        // Language - HANYA BAHASA INDONESIA (opsi lain dihapus)
+        // Language - HANYA BAHASA INDONESIA
         const langNames = { id: 'Indonesia' };
         let currentLang = localStorage.getItem('remindu_lang') || 'id';
-        // Pastikan selalu bahasa Indonesia
-        if (currentLang !== 'id') {
-            currentLang = 'id';
-            localStorage.setItem('remindu_lang', 'id');
-        }
+        if (currentLang !== 'id') { currentLang = 'id';
+            localStorage.setItem('remindu_lang', 'id'); }
         document.getElementById('langSub').textContent = langNames[currentLang] || 'Indonesia';
         document.querySelectorAll('.lang-option').forEach(opt => {
             if (opt.dataset.lang === currentLang) opt.classList.add('active');
             opt.addEventListener('click', () => {
-                // Hanya izinkan bahasa Indonesia
                 if (opt.dataset.lang !== 'id') return;
                 document.querySelectorAll('.lang-option').forEach(o => {
                     o.classList.remove('active');
@@ -707,25 +739,83 @@
         document.getElementById('userCardBtn').addEventListener('click', () => window.location.href = 'editprofil.html');
         document.getElementById('yourAccount').addEventListener('click', () => window.location.href = 'editprofil.html');
         document.getElementById('privacy').addEventListener('click', () => window.location.href = 'privacy.html');
-        document.getElementById('dataBackup').addEventListener('click', () => window.location.href = 'data_backup.html');
+
+        // ===== FIX: Data backup sekarang buka modal, bukan redirect =====
+        document.getElementById('dataBackup').addEventListener('click', () => {
+            document.getElementById('backupModal').classList.add('show');
+        });
+
         document.getElementById('statistic').addEventListener('click', () => window.location.href = 'statistic.html');
-        document.getElementById('language').addEventListener('click', () => document.getElementById('langModal').classList.add('show'));
-        document.getElementById('about').addEventListener('click', () => document.getElementById('aboutModal').classList.add('show'));
-        document.getElementById('aboutClose').addEventListener('click', () => document.getElementById('aboutModal').classList.remove('show'));
+        document.getElementById('language').addEventListener('click', () => document.getElementById('langModal').classList.add(
+            'show'));
+        document.getElementById('about').addEventListener('click', () => document.getElementById('aboutModal').classList.add(
+            'show'));
+        document.getElementById('aboutClose').addEventListener('click', () => document.getElementById('aboutModal').classList
+            .remove('show'));
+        document.getElementById('backupClose').addEventListener('click', () => document.getElementById('backupModal').classList
+            .remove('show'));
 
         // Close modals on overlay click
         document.querySelectorAll('.modal-overlay').forEach(overlay => {
             overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('show'); });
         });
 
+        // Logout
         document.getElementById('logoutBtn').addEventListener('click', () => {
             if (confirm('Yakin ingin keluar?')) {
                 localStorage.removeItem('remindu_user');
                 window.location.href = 'welcome.html';
             }
         });
+
+        // ===== BACKUP FUNCTIONS =====
+        // Export
+        document.getElementById('exportBtn').addEventListener('click', async () => {
+            try {
+                const res = await fetch(`${API_URL}/tasks`, { headers: { 'X-User-Email': userEmail } });
+                const tasks = await res.json();
+                const blob = new Blob([JSON.stringify(tasks, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `remindu_backup_${new Date().toISOString().slice(0,10)}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+            } catch (e) {
+                alert('Gagal mengekspor data: ' + e.message);
+            }
+        });
+
+        // Import
+        document.getElementById('fileInput').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            try {
+                const text = await file.text();
+                const importedTasks = JSON.parse(text);
+                if (!Array.isArray(importedTasks)) throw new Error('Format tidak valid, harus array task.');
+
+                // Kirim ke backend untuk disimpan
+                const res = await fetch(`${API_URL}/tasks/import`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-User-Email': userEmail },
+                    body: JSON.stringify({ tasks: importedTasks })
+                });
+                if (!res.ok) throw new Error('Gagal impor di server.');
+                alert('✅ Berhasil mengimpor ' + importedTasks.length + ' task!');
+                // Refresh task count
+                loadProfile();
+                document.getElementById('backupModal').classList.remove('show');
+                // Reset input
+                document.getElementById('fileInput').value = '';
+            } catch (err) {
+                alert('❌ Gagal impor: ' + err.message);
+                document.getElementById('fileInput').value = '';
+            }
+        });
     </script>
 
+    <!-- Dark mode toggle -->
     <button id="darkFab"
         style="position:fixed;bottom:88px;right:18px;z-index:9999;width:44px;height:44px;border-radius:50%;border:none;background:var(--purple);color:white;font-size:20px;cursor:pointer;box-shadow:0 4px 14px rgba(139,92,246,0.35);display:flex;align-items:center;justify-content:center;">🌙</button>
     <script>
