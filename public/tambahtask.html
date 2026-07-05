@@ -621,9 +621,11 @@
     </nav>
 </div>
 
-<script type="module">
-    import { supabase } from './supabase-config.js';
-    
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script>
+    var supabase = window.supabaseClient;
+
     (function() {
         const userData = JSON.parse(localStorage.getItem('remindu_user') || '{}');
         const userEmail = userData.email;
