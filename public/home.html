@@ -831,7 +831,12 @@ window.addEventListener('storage', (e) => {
 function formatDueDate(dateStr) {
     if (!dateStr) return '';
     const d = new Date(dateStr);
-    const diff = Math.ceil((d - new Date()) / 86400000);
+    const now = new Date();
+    // Bandingkan tanggal kalendernya saja (abaikan jam/menit), supaya deadline
+    // hari ini jam berapa pun tetap kebaca "Hari ini", bukan "Besok"
+    const dOnly = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    const nowOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const diff = Math.round((dOnly - nowOnly) / 86400000);
     if (diff < 0) return `<span style="color:#e53e3e;">Terlambat</span>`;
     if (diff === 0) return `<span style="color:#f97316;">Hari ini</span>`;
     if (diff === 1) return 'Besok';
