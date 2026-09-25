@@ -4,6 +4,7 @@ backend/node_modules/
 frontend/node_modules/
 
 # environment variables
+api.env
 .env
 .env.local
 .env.development
